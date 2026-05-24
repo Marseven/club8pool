@@ -37,6 +37,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/competitions/nouvelle', [AdminCompetitionController::class, 'create'])->name('competitions.create');
     Route::post('/competitions', [AdminCompetitionController::class, 'store'])->name('competitions.store');
     Route::get('/competitions/{competition}', [AdminCompetitionController::class, 'show'])->name('competitions.show');
+    Route::get('/competitions/{competition}/edit', [AdminCompetitionController::class, 'edit'])->name('competitions.edit');
+    Route::patch('/competitions/{competition}', [AdminCompetitionController::class, 'update'])->name('competitions.update');
 
     Route::get('/tirage', [DrawController::class, 'show'])->name('draw');
     Route::post('/tirage', [DrawController::class, 'commit'])->name('draw.commit');
