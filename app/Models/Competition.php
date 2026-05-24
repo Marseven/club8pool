@@ -22,6 +22,11 @@ class Competition extends Model
         return $this->hasMany(PoolTable::class);
     }
 
+    public function pools()
+    {
+        return $this->hasMany(Pool::class)->orderBy('position');
+    }
+
     public function registrations()
     {
         return $this->hasMany(Registration::class);

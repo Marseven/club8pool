@@ -1,6 +1,8 @@
 # Club 8 Pool
 
-Application de gestion de compétitions de billard pour la Fédération Gabonaise de Billard. Monolithe **Laravel + Inertia + Vue 3** couvrant la plateforme publique, l'espace organisateur et le scoreboard de salle.
+Application de gestion de compétitions de billard. Monolithe **Laravel + Inertia + Vue 3** couvrant la plateforme publique, l'espace organisateur et le scoreboard de salle.
+
+Supporte le format **Poules + phase finale** (round-robin par poule avec V/W/L/Diff/Rang, qualifiés vers bracket d'élimination) et l'**élimination directe** classique.
 
 L'application mobile arbitre (Flutter) est dans un dépôt séparé : [marseven/club8pool-mobile](https://github.com/marseven/club8pool-mobile).
 
@@ -31,10 +33,11 @@ Direction A · ARENA — noir profond, vert craie de billard, typo display conde
 
 | Route | Page |
 | --- | --- |
-| `/admin` | Tableau de bord — tables temps réel + contrôleur match |
+| `/admin` | Tableau de bord — tables temps réel + avancement poules + contrôleur match |
 | `/admin/competitions` | Liste des éditions |
 | `/admin/competitions/nouvelle` | Wizard 5 étapes |
-| `/admin/tirage` | Tirage au sort animé (joueur courant 1.8s) |
+| `/admin/poules` | Gestion par poule — classement live + saisie scores (nul, avertissements) |
+| `/admin/tirage` | Tirage au sort animé (qualifiés vers phase finale) |
 | `/admin/joueurs` | CRUD joueurs |
 | `/admin/arbitres` | CRUD arbitres |
 
@@ -82,10 +85,11 @@ php artisan serve   # http://127.0.0.1:8000
 
 ## Données seed
 
-- 16 joueurs gabonais répartis sur 6 clubs (Libreville, Akanda, Owendo, Port-Gentil, Franceville, Lambaréné)
-- Coupe du Gabon 8-Ball Édition 04 — phase de quarts en cours
-- 5 tables (3 actives, 1 libre, 1 maintenance)
-- Bracket R16 complet, QF en cours
+- **Icone Pool Championship** : 28 joueurs répartis en 4 poules de 7 (A, B, C, D)
+- Format **Poules + phase finale**, race to 3, nul autorisé, avertissements activés
+- Scores réels importés du fichier de gestion Excel : Poule A et C complètes, B et D en cours
+- 2 matchs live, 4 tables (2 actives, 2 libres)
+- Classements (V, W, L, Diff, Rang) calculés en temps réel par `App\Services\PoolStanding`
 
 ## Structure
 

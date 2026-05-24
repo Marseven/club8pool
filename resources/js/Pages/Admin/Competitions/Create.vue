@@ -8,7 +8,7 @@ const step = ref(0);
 const steps = ['Informations', 'Format & règles', 'Joueurs', 'Calendrier & tables', 'Publication'];
 
 const form = useForm({
-  name: 'Coupe du Gabon 8-Ball — Édition 05',
+  name: 'Icone Pool Championship — Édition 2',
   discipline: '8-ball',
   format: 'single_elim',
   player_slots: 16,

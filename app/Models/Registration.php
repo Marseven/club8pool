@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Registration extends Model
 {
-    protected $fillable = ['competition_id', 'player_id', 'seed', 'status', 'registered_at'];
+    protected $fillable = ['competition_id', 'pool_id', 'pool_slot', 'player_id', 'seed', 'status', 'registered_at'];
 
     protected $casts = [
         'registered_at' => 'datetime',
@@ -20,5 +20,10 @@ class Registration extends Model
     public function player()
     {
         return $this->belongsTo(Player::class);
+    }
+
+    public function pool()
+    {
+        return $this->belongsTo(Pool::class);
     }
 }
