@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Registration extends Model
+{
+    protected $fillable = ['competition_id', 'player_id', 'seed', 'status', 'registered_at'];
+
+    protected $casts = [
+        'registered_at' => 'datetime',
+    ];
+
+    public function competition()
+    {
+        return $this->belongsTo(Competition::class);
+    }
+
+    public function player()
+    {
+        return $this->belongsTo(Player::class);
+    }
+}
