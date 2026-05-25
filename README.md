@@ -75,6 +75,43 @@ npm run dev         # hot reload
 php artisan serve   # http://127.0.0.1:8000
 ```
 
+## Déploiement Hostinger (mutualisé)
+
+Hostinger n'exécute pas Node — les assets Vite doivent donc être compilés en local puis poussés sur Git. Le dossier `public/build/` est intentionnellement tracké pour cette raison.
+
+```bash
+# Localement, avant chaque déploiement
+npm run build
+git add public/build && git commit -m "build: assets" && git push
+```
+
+Côté serveur Hostinger :
+
+1. **Racine du site** : pointer le domaine sur `public/` (via le panneau Hostinger ou un `.htaccess` à la racine qui redirige vers `public/`).
+2. **Cloner le dépôt** sur le serveur (`git clone` ou déploiement Git automatique de Hostinger).
+3. **Composer prod** :
+   ```bash
+   composer install --no-dev --optimize-autoloader
+   ```
+4. **Configuration** : copier `.env.example` en `.env`, remplir les variables, puis :
+   ```bash
+   php artisan key:generate
+   php artisan migrate --seed --force
+   php artisan storage:link
+   php artisan config:cache && php artisan route:cache && php artisan view:cache
+   ```
+5. **Permissions** : `chmod -R 775 storage bootstrap/cache`.
+6. **Base de données** : par défaut SQLite (le fichier `database/database.sqlite` est ignoré). Pour MySQL Hostinger, ajuster `DB_*` dans `.env`.
+
+Pour les mises à jour suivantes :
+
+```bash
+git pull
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force
+php artisan config:cache && php artisan route:cache && php artisan view:cache
+```
+
 ## Comptes de démo
 
 | Rôle | Identifiants |

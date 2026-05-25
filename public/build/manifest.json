@@ -1,0 +1,379 @@
+{
+  "_AdminSidebar-C99nhn_m.js": {
+    "file": "assets/AdminSidebar-C99nhn_m.js",
+    "name": "AdminSidebar",
+    "imports": [
+      "resources/js/app.js",
+      "_Logo-BuIDdX2_.js"
+    ]
+  },
+  "_Ball8-Cu1fMEBe.js": {
+    "file": "assets/Ball8-Cu1fMEBe.js",
+    "name": "Ball8",
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "_Chip-BwSKvrHC.js": {
+    "file": "assets/Chip-BwSKvrHC.js",
+    "name": "Chip",
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "_GabonFlag-CoBI8TDF.js": {
+    "file": "assets/GabonFlag-CoBI8TDF.js",
+    "name": "GabonFlag",
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "_Logo-BuIDdX2_.js": {
+    "file": "assets/Logo-BuIDdX2_.js",
+    "name": "Logo",
+    "imports": [
+      "_Ball8-Cu1fMEBe.js",
+      "resources/js/app.js"
+    ]
+  },
+  "_PoolStandings-CI1KA2Wl.js": {
+    "file": "assets/PoolStandings-CI1KA2Wl.js",
+    "name": "PoolStandings",
+    "imports": [
+      "_Chip-BwSKvrHC.js",
+      "resources/js/app.js"
+    ]
+  },
+  "_PublicNav-C-EFLMIm.js": {
+    "file": "assets/PublicNav-C-EFLMIm.js",
+    "name": "PublicNav",
+    "imports": [
+      "resources/js/app.js",
+      "_Logo-BuIDdX2_.js",
+      "_GabonFlag-CoBI8TDF.js"
+    ]
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-CgUS0AuT.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/Pages/Admin/Competitions/Create.vue": {
+    "file": "assets/Create-dNpJabJp.js",
+    "name": "Create",
+    "src": "resources/js/Pages/Admin/Competitions/Create.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminSidebar-C99nhn_m.js",
+      "_Ball8-Cu1fMEBe.js",
+      "_Logo-BuIDdX2_.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Competitions/Edit.vue": {
+    "file": "assets/Edit-DC0oaqfk.js",
+    "name": "Edit",
+    "src": "resources/js/Pages/Admin/Competitions/Edit.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminSidebar-C99nhn_m.js",
+      "_Logo-BuIDdX2_.js",
+      "_Ball8-Cu1fMEBe.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Competitions/Index.vue": {
+    "file": "assets/Index-BONxJC1r.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Competitions/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminSidebar-C99nhn_m.js",
+      "_Chip-BwSKvrHC.js",
+      "_Logo-BuIDdX2_.js",
+      "_Ball8-Cu1fMEBe.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Competitions/Show.vue": {
+    "file": "assets/Show-bCvH29p2.js",
+    "name": "Show",
+    "src": "resources/js/Pages/Admin/Competitions/Show.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminSidebar-C99nhn_m.js",
+      "_Chip-BwSKvrHC.js",
+      "_Logo-BuIDdX2_.js",
+      "_Ball8-Cu1fMEBe.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Dashboard.vue": {
+    "file": "assets/Dashboard-Dujcye7E.js",
+    "name": "Dashboard",
+    "src": "resources/js/Pages/Admin/Dashboard.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminSidebar-C99nhn_m.js",
+      "_Ball8-Cu1fMEBe.js",
+      "_Chip-BwSKvrHC.js",
+      "_Logo-BuIDdX2_.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Draw.vue": {
+    "file": "assets/Draw-CgwxzlDY.js",
+    "name": "Draw",
+    "src": "resources/js/Pages/Admin/Draw.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminSidebar-C99nhn_m.js",
+      "_Ball8-Cu1fMEBe.js",
+      "_Chip-BwSKvrHC.js",
+      "_Logo-BuIDdX2_.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Players/Index.vue": {
+    "file": "assets/Index-B08-unFL.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Players/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminSidebar-C99nhn_m.js",
+      "_Logo-BuIDdX2_.js",
+      "_Ball8-Cu1fMEBe.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Pools/Index.vue": {
+    "file": "assets/Index-C7dNtvZx.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Pools/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminSidebar-C99nhn_m.js",
+      "_PoolStandings-CI1KA2Wl.js",
+      "_Chip-BwSKvrHC.js",
+      "_Logo-BuIDdX2_.js",
+      "_Ball8-Cu1fMEBe.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Referees/Index.vue": {
+    "file": "assets/Index-ErUCLFPb.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Referees/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminSidebar-C99nhn_m.js",
+      "_Logo-BuIDdX2_.js",
+      "_Ball8-Cu1fMEBe.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Auth/Login.vue": {
+    "file": "assets/Login-BxcF1Y74.js",
+    "name": "Login",
+    "src": "resources/js/Pages/Auth/Login.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_Ball8-Cu1fMEBe.js",
+      "_GabonFlag-CoBI8TDF.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Public/Competition.vue": {
+    "file": "assets/Competition-DfiVJjz1.js",
+    "name": "Competition",
+    "src": "resources/js/Pages/Public/Competition.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_PublicNav-C-EFLMIm.js",
+      "_PoolStandings-CI1KA2Wl.js",
+      "_Ball8-Cu1fMEBe.js",
+      "_Chip-BwSKvrHC.js",
+      "_Logo-BuIDdX2_.js",
+      "_GabonFlag-CoBI8TDF.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Public/Landing.vue": {
+    "file": "assets/Landing-BPAqhe62.js",
+    "name": "Landing",
+    "src": "resources/js/Pages/Public/Landing.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_PublicNav-C-EFLMIm.js",
+      "_GabonFlag-CoBI8TDF.js",
+      "_Chip-BwSKvrHC.js",
+      "_Logo-BuIDdX2_.js",
+      "_Ball8-Cu1fMEBe.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Public/Player.vue": {
+    "file": "assets/Player-CWmJ2G0L.js",
+    "name": "Player",
+    "src": "resources/js/Pages/Public/Player.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_PublicNav-C-EFLMIm.js",
+      "_GabonFlag-CoBI8TDF.js",
+      "_Chip-BwSKvrHC.js",
+      "_Logo-BuIDdX2_.js",
+      "_Ball8-Cu1fMEBe.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Public/Register.vue": {
+    "file": "assets/Register-CmWIsoW5.js",
+    "name": "Register",
+    "src": "resources/js/Pages/Public/Register.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_PublicNav-C-EFLMIm.js",
+      "_Chip-BwSKvrHC.js",
+      "_Logo-BuIDdX2_.js",
+      "_Ball8-Cu1fMEBe.js",
+      "_GabonFlag-CoBI8TDF.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Public/Tv.vue": {
+    "file": "assets/Tv-Ddb-Jmo_.js",
+    "name": "Tv",
+    "src": "resources/js/Pages/Public/Tv.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_Ball8-Cu1fMEBe.js",
+      "_GabonFlag-CoBI8TDF.js",
+      "_Chip-BwSKvrHC.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Referee/EndMatch.vue": {
+    "file": "assets/EndMatch-BM7aADRn.js",
+    "name": "EndMatch",
+    "src": "resources/js/Pages/Referee/EndMatch.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Referee/Live.vue": {
+    "file": "assets/Live-COwPfbmj.js",
+    "name": "Live",
+    "src": "resources/js/Pages/Referee/Live.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Referee/PreMatch.vue": {
+    "file": "assets/PreMatch-DH2octqQ.js",
+    "name": "PreMatch",
+    "src": "resources/js/Pages/Referee/PreMatch.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/Pages/Referee/Queue.vue": {
+    "file": "assets/Queue-DVrK7V7d.js",
+    "name": "Queue",
+    "src": "resources/js/Pages/Referee/Queue.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_Ball8-Cu1fMEBe.js"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-t7y6HuxE.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/Pages/Admin/Competitions/Create.vue",
+      "resources/js/Pages/Admin/Competitions/Edit.vue",
+      "resources/js/Pages/Admin/Competitions/Index.vue",
+      "resources/js/Pages/Admin/Competitions/Show.vue",
+      "resources/js/Pages/Admin/Dashboard.vue",
+      "resources/js/Pages/Admin/Draw.vue",
+      "resources/js/Pages/Admin/Players/Index.vue",
+      "resources/js/Pages/Admin/Pools/Index.vue",
+      "resources/js/Pages/Admin/Referees/Index.vue",
+      "resources/js/Pages/Auth/Login.vue",
+      "resources/js/Pages/Public/Competition.vue",
+      "resources/js/Pages/Public/Landing.vue",
+      "resources/js/Pages/Public/Player.vue",
+      "resources/js/Pages/Public/Register.vue",
+      "resources/js/Pages/Public/Tv.vue",
+      "resources/js/Pages/Referee/EndMatch.vue",
+      "resources/js/Pages/Referee/Live.vue",
+      "resources/js/Pages/Referee/PreMatch.vue",
+      "resources/js/Pages/Referee/Queue.vue"
+    ],
+    "css": [
+      "assets/app-CgUS0AuT.css"
+    ]
+  }
+}
