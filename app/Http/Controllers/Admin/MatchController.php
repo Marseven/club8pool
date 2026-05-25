@@ -25,7 +25,7 @@ class MatchController extends Controller
         if (($data['status'] ?? null) === 'done' && ! $match->ended_at) {
             $data['ended_at'] = now();
             if ($match->started_at) {
-                $data['duration_seconds'] = now()->diffInSeconds($match->started_at);
+                $data['duration_seconds'] = (int) $match->started_at->diffInSeconds(now());
             }
         }
 

@@ -109,7 +109,7 @@ class RefereeApiController extends Controller
         $match->update([
             'status' => 'done',
             'ended_at' => now(),
-            'duration_seconds' => $match->started_at ? (int) now()->diffInSeconds($match->started_at) : null,
+            'duration_seconds' => $match->started_at ? (int) $match->started_at->diffInSeconds(now()) : null,
             'referee_note' => $data['referee_note'] ?? null,
         ]);
 
