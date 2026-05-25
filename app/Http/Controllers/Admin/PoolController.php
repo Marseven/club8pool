@@ -88,6 +88,36 @@ class PoolController extends Controller
         return back()->with('success', 'Score enregistré.');
     }
 
+    public function scoreFrame(Request $request, GameMatch $match): RedirectResponse
+    {
+        $data = $request->validate(['player' => ['required', 'in:A,B']]);
+
+        if ($data['player'] === 'A') {
+            $match->increment('score_a');
+        } else {
+            $match->increment('score_b');
+        }
+
+        if ($match->status !== 'live') {
+            $match->update(['status' => 'live', 'started_at' => $match->started_at ?? now()]);
+        }
+
+        return back();
+    }
+
+    public function undoFrame(Request $request, GameMatch $match): RedirectResponse
+    {
+        $data = $request->validate(['player' => ['required', 'in:A,B']]);
+
+        if ($data['player'] === 'A' && $match->score_a > 0) {
+            $match->decrement('score_a');
+        } elseif ($data['player'] === 'B' && $match->score_b > 0) {
+            $match->decrement('score_b');
+        }
+
+        return back();
+    }
+
     public function resetMatch(GameMatch $match): RedirectResponse
     {
         $match->update([

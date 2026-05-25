@@ -4,7 +4,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import PoolStandings from '@/Components/PoolStandings.vue';
 import Chip from '@/Components/Chip.vue';
-import { Play, Square, RotateCcw } from 'lucide-vue-next';
+import { Play, Square, RotateCcw, Plus, Minus, Trophy } from 'lucide-vue-next';
 
 const props = defineProps({
   competition: Object,
@@ -60,6 +60,25 @@ const launch = () => {
 
 const cancelStart = () => { startingMatch.value = null; };
 
+// Live scoring
+const scoringMatchId = ref(null);
+const scoringMatch = computed(() =>
+  props.pools.flatMap(p => p.matches).find(m => m.id === scoringMatchId.value) ?? null
+);
+const openScoring = (m) => { scoringMatchId.value = m.id; };
+const closeScoring = () => { scoringMatchId.value = null; };
+
+const frame = (matchId, player) => {
+  router.post(`/admin/poules/matchs/${matchId}/frame`, { player }, { preserveScroll: true });
+};
+const undo = (matchId, player) => {
+  router.post(`/admin/poules/matchs/${matchId}/undo`, { player }, { preserveScroll: true });
+};
+const closeMatch = (m) => {
+  scoringMatchId.value = null;
+  startEdit(m);
+};
+
 const confirmingReset = ref(null);
 const resetMatch = (m) => {
   if (confirmingReset.value === m.id) {
@@ -74,7 +93,7 @@ const resetMatch = (m) => {
 let pollInterval;
 onMounted(() => {
   pollInterval = setInterval(() => {
-    if (editingMatch.value || startingMatch.value) return;
+    if (editingMatch.value || startingMatch.value || scoringMatchId.value) return;
     router.reload({ only: ['pools'], preserveScroll: true });
   }, 15000);
 });
@@ -168,6 +187,11 @@ const playerLabel = (pool, playerId) => {
                           @click="startEdit(m)" title="Saisir directement sans live">
                     Saisir
                   </button>
+                  <button v-if="m.status === 'live'" class="btn btn-felt"
+                          style="padding: 4px 10px; font-size: 11px; display:inline-flex; align-items:center; gap:4px;"
+                          @click="openScoring(m)">
+                    <Plus :size="12" /> Scorer
+                  </button>
                   <button v-if="m.status === 'live'" class="btn"
                           style="padding: 4px 10px; font-size: 11px; border-color: var(--live); color: var(--live); display:inline-flex; align-items:center; gap:4px;"
                           @click="startEdit(m)">
@@ -242,6 +266,106 @@ const playerLabel = (pool, playerId) => {
           <div style="display: flex; gap: 10px; margin-top: 24px;">
             <button class="btn" @click="cancel">Annuler</button>
             <button class="btn btn-felt" style="margin-left: auto;" @click="saveScore">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modale : scoring en direct -->
+      <div v-if="scoringMatchId && scoringMatch" @click.self="closeScoring"
+           style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center;
+                  justify-content: center; z-index: 60;">
+        <div style="background: var(--ink-2); border: 1px solid var(--line-strong); padding: 36px;
+                    width: 600px; max-width: 95vw;">
+
+          <!-- Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px;">
+            <div>
+              <div class="mono" style="font-size: 9px; letter-spacing: 0.22em; color: var(--live); margin-bottom: 6px;
+                                        display:flex; align-items:center; gap:6px;">
+                <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;"></span>
+                EN DIRECT · POULE {{ currentPool?.name }}
+              </div>
+              <div class="disp-a" style="font-size: 22px;">
+                {{ scoringMatch.player_a?.first_name }} {{ scoringMatch.player_a?.last_name }}
+                <span style="color:var(--mute);">vs</span>
+                {{ scoringMatch.player_b?.first_name }} {{ scoringMatch.player_b?.last_name }}
+              </div>
+            </div>
+            <div class="mono" style="font-size: 10px; color: var(--mute);">
+              RACE TO {{ competition.pool_race_to ?? competition.race_to }}
+            </div>
+          </div>
+
+          <!-- Scores -->
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-bottom: 28px;">
+
+            <!-- Joueur A -->
+            <div style="text-align: center;">
+              <div style="font-size: 13px; font-weight: 700; margin-bottom: 12px; color: var(--chalk-2);">
+                {{ scoringMatch.player_a?.first_name?.toUpperCase() }}
+              </div>
+              <div class="disp-a tnum" :style="{
+                fontSize: '80px', lineHeight: 1,
+                color: scoringMatch.score_a >= (competition.pool_race_to ?? competition.race_to) ? 'var(--felt-2)' : 'var(--chalk)'
+              }">{{ scoringMatch.score_a }}</div>
+              <div style="display: flex; gap: 8px; justify-content: center; margin-top: 16px;">
+                <button class="btn btn-felt" style="padding: 10px 22px; font-size: 16px; display:inline-flex; align-items:center; gap:6px;"
+                        @click="frame(scoringMatch.id, 'A')">
+                  <Plus :size="16" /> +1
+                </button>
+                <button class="btn" style="padding: 10px 14px; font-size: 13px; display:inline-flex; align-items:center; gap:4px;"
+                        :disabled="scoringMatch.score_a === 0" @click="undo(scoringMatch.id, 'A')">
+                  <Minus :size="13" />
+                </button>
+              </div>
+              <label style="display:flex; align-items:center; gap:8px; justify-content:center; margin-top:14px; font-size:12px; color:var(--live); cursor:pointer;"
+                     v-if="competition.enable_warnings">
+                <input type="checkbox" :checked="scoringMatch.warning_a"
+                       @change="router.patch(`/admin/poules/matchs/${scoringMatch.id}`, { ...scoringMatch, warning_a: $event.target.checked, status: scoringMatch.status }, { preserveScroll: true })"
+                       style="width:auto;margin:0;" />
+                Avertissement
+              </label>
+            </div>
+
+            <!-- Séparateur -->
+            <div class="disp-a" style="font-size: 42px; color: var(--mute-2);">—</div>
+
+            <!-- Joueur B -->
+            <div style="text-align: center;">
+              <div style="font-size: 13px; font-weight: 700; margin-bottom: 12px; color: var(--chalk-2);">
+                {{ scoringMatch.player_b?.first_name?.toUpperCase() }}
+              </div>
+              <div class="disp-a tnum" :style="{
+                fontSize: '80px', lineHeight: 1,
+                color: scoringMatch.score_b >= (competition.pool_race_to ?? competition.race_to) ? 'var(--felt-2)' : 'var(--chalk)'
+              }">{{ scoringMatch.score_b }}</div>
+              <div style="display: flex; gap: 8px; justify-content: center; margin-top: 16px;">
+                <button class="btn btn-felt" style="padding: 10px 22px; font-size: 16px; display:inline-flex; align-items:center; gap:6px;"
+                        @click="frame(scoringMatch.id, 'B')">
+                  <Plus :size="16" /> +1
+                </button>
+                <button class="btn" style="padding: 10px 14px; font-size: 13px; display:inline-flex; align-items:center; gap:4px;"
+                        :disabled="scoringMatch.score_b === 0" @click="undo(scoringMatch.id, 'B')">
+                  <Minus :size="13" />
+                </button>
+              </div>
+              <label style="display:flex; align-items:center; gap:8px; justify-content:center; margin-top:14px; font-size:12px; color:var(--live); cursor:pointer;"
+                     v-if="competition.enable_warnings">
+                <input type="checkbox" :checked="scoringMatch.warning_b"
+                       @change="router.patch(`/admin/poules/matchs/${scoringMatch.id}`, { ...scoringMatch, warning_b: $event.target.checked, status: scoringMatch.status }, { preserveScroll: true })"
+                       style="width:auto;margin:0;" />
+                Avertissement
+              </label>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div style="display: flex; gap: 10px; padding-top: 20px; border-top: 1px solid var(--line);">
+            <button class="btn" @click="closeScoring">Fermer</button>
+            <button class="btn btn-felt" style="margin-left: auto; display:inline-flex; align-items:center; gap:6px;"
+                    @click="closeMatch(scoringMatch)">
+              <Trophy :size="13" /> Terminer &amp; saisir score final
+            </button>
           </div>
         </div>
       </div>
