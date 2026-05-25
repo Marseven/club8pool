@@ -16,7 +16,7 @@ const items = [
   ['import', 'Import Excel', '↓', '/admin/import'],
   ['players', 'Joueurs', '○', '/admin/joueurs'],
   ['referees', 'Arbitres', '△', '/admin/arbitres'],
-  ['draw', 'Tirage final', '◉', '/admin/tirage'],
+  ['knockout', 'Phase finale', '◉', '/admin/phase-finale'],
 ];
 
 const initials = (s) => (s || '??').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();

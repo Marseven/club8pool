@@ -111,6 +111,7 @@ class RefereeApiController extends Controller
             'duration_seconds' => $match->started_at ? now()->diffInSeconds($match->started_at) : null,
             'referee_note' => $data['referee_note'] ?? null,
         ]);
+        (new \App\Services\BracketProgression())->advanceWinner($match->fresh());
 
         return response()->json($match->fresh());
     }

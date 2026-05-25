@@ -47,6 +47,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/tirage', [DrawController::class, 'show'])->name('draw');
     Route::post('/tirage', [DrawController::class, 'commit'])->name('draw.commit');
 
+    Route::get('/phase-finale', [\App\Http\Controllers\Admin\KnockoutController::class, 'show'])->name('knockout.show');
+    Route::post('/phase-finale', [\App\Http\Controllers\Admin\KnockoutController::class, 'generate'])->name('knockout.generate');
+
     Route::get('/poules', [\App\Http\Controllers\Admin\PoolController::class, 'index'])->name('pools.index');
     Route::patch('/poules/matchs/{match}', [\App\Http\Controllers\Admin\PoolController::class, 'updateMatch'])->name('pools.matches.update');
     Route::post('/poules/matchs/{match}/lancer', [\App\Http\Controllers\Admin\PoolController::class, 'startMatch'])->name('pools.matches.start');

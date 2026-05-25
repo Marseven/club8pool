@@ -30,6 +30,7 @@ class MatchController extends Controller
         }
 
         $match->update($data);
+        (new \App\Services\BracketProgression())->advanceWinner($match->fresh());
 
         return back()->with('success', 'Match mis à jour.');
     }

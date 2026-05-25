@@ -83,6 +83,7 @@ class PoolController extends Controller
         $data['ended_at'] = now();
 
         $match->update($data);
+        (new \App\Services\BracketProgression())->advanceWinner($match->fresh());
 
         return back()->with('success', 'Score enregistré.');
     }
