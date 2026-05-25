@@ -79,4 +79,5 @@ Route::middleware(['auth', 'referee'])->prefix('arbitre')->name('referee.')->gro
     Route::get('/match/{match}/fin', [RefereeController::class, 'endMatch'])->name('match.end');
     Route::post('/match/{match}/frame', [RefereeController::class, 'commitFrame'])->name('match.frame');
     Route::post('/match/{match}/signer', [RefereeController::class, 'sign'])->name('match.sign');
+    Route::post('/match/{match}/claim', [RefereeController::class, 'claim'])->name('match.claim');
 });
