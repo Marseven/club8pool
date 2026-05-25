@@ -51,7 +51,7 @@ class PlayerController extends Controller
                         'diff' => $s['diff'] ?? 0,
                         'qualified' => $s && $s['rank'] <= ($competition?->qualifiers_per_pool ?? 2),
                     ];
-                }),
+                })->sortBy('rank')->values(),
             ];
         });
 
