@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -18,23 +20,55 @@ class LoginController extends Controller
 
     public function login(Request $request): RedirectResponse
     {
+        $mode = $request->input('mode', 'admin');
+
+        return $mode === 'referee'
+            ? $this->loginReferee($request)
+            : $this->loginAdmin($request);
+    }
+
+    private function loginAdmin(Request $request): RedirectResponse
+    {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
-            $user = $request->user();
-
-            return $user->isReferee()
-                ? redirect()->route('referee.queue')
-                : redirect()->route('admin.dashboard');
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+            return back()->withErrors([
+                'email' => 'Identifiants invalides.',
+            ])->onlyInput('email');
         }
 
-        return back()->withErrors([
-            'email' => 'Identifiants invalides.',
-        ])->onlyInput('email');
+        $request->session()->regenerate();
+        $user = $request->user();
+
+        return $user->isReferee()
+            ? redirect()->route('referee.queue')
+            : redirect()->route('admin.dashboard');
+    }
+
+    private function loginReferee(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'fgb_card' => ['required', 'string'],
+            'pin' => ['required', 'string'],
+        ]);
+
+        $user = User::where('fgb_card', $data['fgb_card'])
+            ->where('role', 'referee')
+            ->first();
+
+        if (! $user || ! $user->pin || ! Hash::check($data['pin'], $user->pin)) {
+            return back()->withErrors([
+                'fgb_card' => 'Carte ou PIN invalide.',
+            ])->onlyInput('fgb_card');
+        }
+
+        Auth::login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
+
+        return redirect()->route('referee.queue');
     }
 
     public function logout(Request $request): RedirectResponse

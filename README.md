@@ -114,11 +114,12 @@ php artisan config:cache && php artisan route:cache && php artisan view:cache
 
 ## Comptes de démo
 
-| Rôle | Identifiants |
+L'écran de connexion `/login` a deux onglets :
+
+| Mode | Identifiants |
 | --- | --- |
-| Admin | `admin@club8pool.ga` / `password` |
-| Arbitre (web) | `olivier@club8pool.ga` / `password` |
-| Arbitre (mobile API) | `FGB-ARB-2026-0024` / PIN `12345` |
+| Administrateur | `admin@club8pool.ga` · `password` |
+| Arbitre (web ou mobile) | `ICN-ARB-001` · PIN `12345` (Eric) ou `ICN-ARB-002` · PIN `12345` (T-One) |
 
 ## Données seed
 
