@@ -30,7 +30,7 @@ const props = defineProps({
           <th style="text-align: right; width: 36px;">W</th>
           <th style="text-align: right; width: 36px;">L</th>
           <th style="text-align: right; width: 44px;">Diff</th>
-          <th v-if="!compact" style="text-align: right; width: 28px;" title="Avertissements">⚠</th>
+          <th v-if="!compact" style="text-align: right; width: 28px;" title="Avertissements">!</th>
         </tr>
       </thead>
       <tbody>

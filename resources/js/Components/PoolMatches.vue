@@ -15,7 +15,7 @@ const lbl = (p) => p ? p.first_name + (p.last_name ? ' ' + p.last_name : '') : '
           <th>Joueur 2</th>
           <th style="text-align: center; width: 36px;">Score</th>
           <th>Vainqueur</th>
-          <th style="text-align: center; width: 28px;">⚠</th>
+          <th style="text-align: center; width: 28px;">!</th>
         </tr>
       </thead>
       <tbody>
@@ -59,7 +59,7 @@ const lbl = (p) => p ? p.first_name + (p.last_name ? ' ' + p.last_name : '') : '
             </template>
           </td>
           <td style="text-align: center;">
-            <span v-if="m.warning_a || m.warning_b" style="color: var(--live);">⚠</span>
+            <span v-if="m.warning_a || m.warning_b" style="color: var(--live);">!</span>
           </td>
         </tr>
       </tbody>

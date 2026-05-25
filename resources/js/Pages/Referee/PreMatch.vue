@@ -86,7 +86,7 @@ defineProps({ match: Object });
 
     <div style="padding: 14px 22px; border-top: 1px solid var(--line); background: var(--ink-2);">
       <Link :href="`/arbitre/match/${match.id}/live`" class="btn btn-felt"
-            style="width: 100%; padding: 16px; justify-content: center;">▶ Démarrer le match</Link>
+            style="width: 100%; padding: 16px; justify-content: center;">▸ Démarrer le match</Link>
     </div>
   </div>
 </template>

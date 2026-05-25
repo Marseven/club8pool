@@ -79,7 +79,7 @@ const raceFor = (m) => m.phase === 'knockout'
     <!-- Section : matchs en direct -->
     <section style="padding: 32px;">
       <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px;">
-        <h2 class="disp-a" style="font-size: 32px;">▶ Matchs en direct</h2>
+        <h2 class="disp-a" style="font-size: 32px;">▸ Matchs en direct</h2>
         <div v-if="competition?.structure === 'pools_knockout'" class="mono" style="font-size: 11px; color: var(--mute);">
           POULES RACE TO {{ competition?.pool_race_to ?? competition?.race_to }} · FINALE RACE TO {{ competition?.knockout_race_to ?? competition?.race_to }}
         </div>

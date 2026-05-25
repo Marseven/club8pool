@@ -64,7 +64,7 @@ const allSigned = computed(() => signed.value.has(props.match.player_a?.id) && s
             <span style="font-size: 12px; font-weight: 700;">{{ p?.first_name }} {{ p?.last_name }}</span>
             <span class="mono" :style="{ fontSize: '9px', letterSpacing: '0.14em',
                   color: signed.has(p?.id) ? 'var(--felt-2)' : 'var(--live)' }">
-              {{ signed.has(p?.id) ? '✓ SIGNÉ' : '⚠ EN ATTENTE' }}
+              {{ signed.has(p?.id) ? '✓ SIGNÉ' : '! EN ATTENTE' }}
             </span>
           </div>
           <button @click="sign(p.id)" :disabled="signed.has(p?.id)" :style="{

@@ -121,7 +121,7 @@ const closesLabel = computed(() => {
           <div style="display: flex; align-items: center; gap: 12px;">
             <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(229,72,77,0.12);
                         border: 1px solid rgba(229,72,77,0.4); display: flex; align-items: center; justify-content: center;
-                        font-family: var(--font-display-a); font-size: 28px; color: var(--live);">⊘</div>
+                        font-family: var(--font-display-a); font-size: 28px; color: var(--live);">×</div>
             <div>
               <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--live);">INSCRIPTIONS FERMÉES</div>
               <div class="disp-a" style="font-size: 26px; margin-top: 6px;">

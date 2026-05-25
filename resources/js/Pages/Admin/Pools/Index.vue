@@ -135,12 +135,12 @@ const playerLabel = (pool, playerId) => {
                   <span v-else-if="m.status === 'done' && m.score_a > m.score_b">{{ m.player_a?.first_name }}</span>
                   <span v-else-if="m.status === 'done' && m.score_b > m.score_a">{{ m.player_b?.first_name }}</span>
                   <span v-else style="color: var(--mute-2);">·</span>
-                  <span v-if="m.warning_a || m.warning_b" style="color: var(--live); margin-left: 8px;">⚠</span>
+                  <span v-if="m.warning_a || m.warning_b" style="color: var(--live); margin-left: 8px;">!</span>
                 </td>
                 <td style="text-align: right; white-space: nowrap;">
                   <button v-if="m.status === 'scheduled'" class="btn btn-felt"
                           style="padding: 4px 10px; font-size: 11px;" @click="startStart(m)">
-                    ▶ Démarrer
+                    ▸ Démarrer
                   </button>
                   <button v-if="m.status === 'live'" class="btn"
                           style="padding: 4px 10px; font-size: 11px; border-color: var(--live); color: var(--live);"
@@ -219,7 +219,7 @@ const playerLabel = (pool, playerId) => {
                   justify-content: center; z-index: 50;">
         <div style="background: var(--ink-2); border: 1px solid var(--felt-2); padding: 32px;
                     width: 520px; max-width: 90vw;">
-          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--felt-2);">▶ DÉMARRER LE MATCH</div>
+          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--felt-2);">▸ DÉMARRER LE MATCH</div>
           <div class="disp-a" style="font-size: 26px; margin-top: 8px;">
             {{ startingMatch.player_a?.first_name }} {{ startingMatch.player_a?.last_name }}
             <span style="color: var(--mute);">vs</span>
@@ -241,7 +241,7 @@ const playerLabel = (pool, playerId) => {
                 }">
                 <div class="disp-a" style="font-size: 18px;">{{ t.name }}</div>
                 <div class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.14em; margin-top: 4px;">
-                  {{ t.location?.toUpperCase() }} · {{ t.status === 'maint' ? 'MAINTENANCE' : t.status === 'live' ? '⚠ OCCUPÉE' : 'LIBRE' }}
+                  {{ t.location?.toUpperCase() }} · {{ t.status === 'maint' ? 'MAINTENANCE' : t.status === 'live' ? '! OCCUPÉE' : 'LIBRE' }}
                 </div>
               </button>
             </div>
@@ -258,7 +258,7 @@ const playerLabel = (pool, playerId) => {
           <div style="display: flex; gap: 10px; margin-top: 28px;">
             <button class="btn" @click="cancelStart">Annuler</button>
             <button class="btn btn-felt" style="margin-left: auto;" @click="launch" :disabled="!starter.pool_table_id">
-              ▶ Lancer le match
+              ▸ Lancer le match
             </button>
           </div>
         </div>

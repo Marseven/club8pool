@@ -109,7 +109,7 @@ const winFrame = (side) => {
     <div style="margin-top: auto; padding: 12px 16px; border-top: 1px solid var(--line);
                 display: flex; justify-content: space-between; align-items: center; background: var(--ink-2);">
       <button class="mono" style="background: transparent; border: none; color: var(--mute);
-                                   font-size: 11px; letter-spacing: 0.14em; cursor: pointer;">⏸ PAUSE</button>
+                                   font-size: 11px; letter-spacing: 0.14em; cursor: pointer;">‖ PAUSE</button>
       <a :href="`/arbitre/match/${match.id}/fin`" class="btn" style="border-color: var(--felt-2); color: var(--felt-2);">
         FIN DE MATCH
       </a>
