@@ -81,6 +81,9 @@ class PoolController extends Controller
 
         $data['status'] = 'done';
         $data['ended_at'] = now();
+        if ($match->started_at && ! $match->ended_at) {
+            $data['duration_seconds'] = (int) $match->started_at->diffInSeconds(now());
+        }
 
         $match->update($data);
         (new \App\Services\BracketProgression())->advanceWinner($match->fresh());
