@@ -90,6 +90,10 @@ class PoolController extends Controller
 
     public function startMatch(Request $request, GameMatch $match): RedirectResponse
     {
+        if ($match->status === 'done') {
+            return back()->with('error', 'Ce match est déjà terminé. Utilisez la correction de score pour modifier le résultat.');
+        }
+
         $data = $request->validate([
             'pool_table_id' => ['required', 'exists:pool_tables,id'],
             'referee_id' => ['nullable', 'exists:users,id'],

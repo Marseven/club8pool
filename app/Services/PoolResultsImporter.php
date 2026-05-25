@@ -52,7 +52,13 @@ class PoolResultsImporter
         $applied = 0;
         $errors = [];
 
+        // Deduplicate by match_id — last occurrence wins (most specific row in Excel)
+        $deduped = [];
         foreach ($operations as $op) {
+            $deduped[$op['match_id']] = $op;
+        }
+
+        foreach ($deduped as $op) {
             $match = GameMatch::find($op['match_id']);
             if (! $match) {
                 $errors[] = "Match #{$op['match_id']} introuvable";
@@ -102,21 +108,40 @@ class PoolResultsImporter
 
     private function resolveColumns(array $headerCells): array
     {
-        // Returns 0-based indices for each known column.
-        $cols = ['match' => 0, 'player1' => 1, 'score1' => 2, 'player2' => 3, 'score2' => 4, 'winner' => 5, 'note' => 6];
-        // Variant of pool A first sheet uses (Joueur 1 | Score | Joueur 2 | Score)
-        // which is exactly our default. Other sheets sometimes have :
-        // Match | Joueur 1 | <blank> | Joueur 2 | Score J1 | Vainqueur — skip those.
-        $score1Header = strtolower($headerCells[2] ?? '');
-        $score2Header = strtolower($headerCells[4] ?? '');
+        $defaults = ['match' => 0, 'player1' => 1, 'score1' => 2, 'player2' => 3, 'score2' => 4, 'winner' => 5, 'note' => 6];
 
-        if (str_starts_with($score1Header, 'joueur')) {
-            // shape: Match | Joueur1 | ... | Joueur2 | Score | Vainqueur (no score on J1 col)
-            // means score1 is at index 2 but blank, score2 at index 4 holds the J1 score in some variants…
-            // Pour rester simple, on essaie le format standard. Si vide on skip.
+        $matchIdx = $scoreCount = $playerCount = null;
+        $scoreIdxs = [];
+        $playerIdxs = [];
+        $winnerIdx = null;
+
+        foreach ($headerCells as $i => $raw) {
+            $h = strtolower(trim($raw));
+            if ($matchIdx === null && str_starts_with($h, 'match')) {
+                $matchIdx = $i;
+            } elseif (str_starts_with($h, 'joueur') || str_starts_with($h, 'player') || str_starts_with($h, 'nom')) {
+                $playerIdxs[] = $i;
+            } elseif (str_starts_with($h, 'score') || str_starts_with($h, 'pts') || $h === 'résultat' || $h === 'resultat') {
+                $scoreIdxs[] = $i;
+            } elseif (str_starts_with($h, 'vainqueur') || str_starts_with($h, 'winner') || str_starts_with($h, 'gagnant')) {
+                $winnerIdx = $i;
+            }
         }
 
-        return $cols;
+        // Need at least: 1 match col + 2 player cols + 2 score cols
+        if ($matchIdx !== null && count($playerIdxs) >= 2 && count($scoreIdxs) >= 2) {
+            return [
+                'match'   => $matchIdx,
+                'player1' => $playerIdxs[0],
+                'score1'  => $scoreIdxs[0],
+                'player2' => $playerIdxs[1],
+                'score2'  => $scoreIdxs[1],
+                'winner'  => $winnerIdx ?? ($scoreIdxs[1] + 1),
+                'note'    => ($winnerIdx ?? ($scoreIdxs[1] + 1)) + 1,
+            ];
+        }
+
+        return $defaults;
     }
 
     private function parseRow(array $cells, array $cols, Pool $pool, array &$stats): void
