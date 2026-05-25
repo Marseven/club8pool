@@ -52,13 +52,30 @@ class DashboardController extends Controller
             ];
         });
 
-        $schedule = [
-            ['time' => '14:00', 'round' => 'Poule A', 'status' => 'done'],
-            ['time' => '17:00', 'round' => 'Poule B & D', 'status' => 'live'],
-            ['time' => '20:30', 'round' => 'Poule C (suite)', 'status' => 'next'],
-            ['time' => '22:00', 'round' => 'Quarts (qualifiés)', 'status' => 'next'],
-            ['time' => '23:30', 'round' => 'Demi & finale', 'status' => 'next'],
-        ];
+        // Programme par jour (horaires souples, pas de timing strict)
+        $today = now()->format('Y-m-d');
+        $playDays = $competition->settings['play_days'] ?? [];
+        $restDays = $competition->settings['rest_days'] ?? [];
+        $schedule = [];
+        foreach ($playDays as $day) {
+            $dt = \Carbon\Carbon::parse($day);
+            $schedule[] = [
+                'date' => $day,
+                'label' => $dt->translatedFormat('D d/m'),
+                'kind' => 'play',
+                'status' => $day < $today ? 'done' : ($day === $today ? 'live' : 'next'),
+            ];
+        }
+        foreach ($restDays as $day) {
+            $dt = \Carbon\Carbon::parse($day);
+            $schedule[] = [
+                'date' => $day,
+                'label' => $dt->translatedFormat('D d/m'),
+                'kind' => 'rest',
+                'status' => 'rest',
+            ];
+        }
+        usort($schedule, fn ($a, $b) => strcmp($a['date'], $b['date']));
 
         return Inertia::render('Admin/Dashboard', [
             'competition' => $competition,

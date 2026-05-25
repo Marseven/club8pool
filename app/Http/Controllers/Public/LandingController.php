@@ -36,13 +36,27 @@ class LandingController extends Controller
             ] : null,
         ]) ?? collect();
 
-        $schedule = [
-            ['time' => '14:00', 'round' => 'Poule A', 'status' => 'done'],
-            ['time' => '17:00', 'round' => 'Poule B & D', 'status' => 'live'],
-            ['time' => '20:30', 'round' => 'Poule C (suite)', 'status' => 'next'],
-            ['time' => '22:00', 'round' => 'Quarts (qualifiés)', 'status' => 'next'],
-            ['time' => '23:30', 'round' => 'Demi & finale', 'status' => 'next'],
-        ];
+        $today = now()->format('Y-m-d');
+        $playDays = $competition?->settings['play_days'] ?? [];
+        $restDays = $competition?->settings['rest_days'] ?? [];
+        $schedule = [];
+        foreach ($playDays as $day) {
+            $dt = \Carbon\Carbon::parse($day);
+            $schedule[] = [
+                'time' => $dt->translatedFormat('D d/m'),
+                'round' => 'Journée de compétition',
+                'status' => $day < $today ? 'done' : ($day === $today ? 'live' : 'next'),
+            ];
+        }
+        foreach ($restDays as $day) {
+            $dt = \Carbon\Carbon::parse($day);
+            $schedule[] = [
+                'time' => $dt->translatedFormat('D d/m'),
+                'round' => 'Journée de repos',
+                'status' => 'rest',
+            ];
+        }
+        usort($schedule, fn ($a, $b) => strcmp($a['time'], $b['time']));
 
         return Inertia::render('Public/Landing', [
             'competition' => $competition,

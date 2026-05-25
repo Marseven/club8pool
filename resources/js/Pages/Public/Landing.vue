@@ -21,7 +21,7 @@ const fmtFcfa = (n) => {
   return n + ' FCFA';
 };
 
-const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENIR' }[s] ?? '');
+const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENIR', rest: 'REPOS' }[s] ?? '');
 </script>
 
 <template>

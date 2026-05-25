@@ -179,14 +179,18 @@ const adjust = (match, side, delta) => {
 
         <div style="padding: 24px 28px; display: flex; flex-direction: column; gap: 24px;">
           <div>
-            <h3 class="disp-a" style="font-size: 24px; margin-bottom: 14px;">Agenda</h3>
+            <h3 class="disp-a" style="font-size: 24px; margin-bottom: 6px;">Calendrier</h3>
+            <p style="font-size: 11px; color: var(--mute); margin-bottom: 12px;" class="mono">HORAIRES SOUPLES · TIMING NON STRICT</p>
             <div v-for="(s, i) in schedule" :key="i"
-                 :style="{ display: 'grid', gridTemplateColumns: '60px 1fr auto', alignItems: 'center',
-                          padding: '12px 0', borderTop: i ? '1px solid var(--line)' : '1px solid var(--line-strong)' }">
-              <span class="disp-a tnum" style="font-size: 18px;">{{ s.time }}</span>
-              <span style="font-size: 13px;">{{ s.round }}</span>
-              <Chip :variant="s.status === 'live' ? 'live' : ''" style="padding: 1px 5px; font-size: 8px;">
-                {{ s.status === 'done' ? '✓' : s.status === 'live' ? 'LIVE' : '→' }}
+                 :style="{ display: 'grid', gridTemplateColumns: '90px 1fr auto', alignItems: 'center',
+                          padding: '12px 0', borderTop: i ? '1px solid var(--line)' : '1px solid var(--line-strong)',
+                          opacity: s.kind === 'rest' ? 0.5 : 1 }">
+              <span class="disp-a tnum" style="font-size: 16px; text-transform: uppercase;">{{ s.label }}</span>
+              <span :style="{ fontSize: '13px', fontStyle: s.kind === 'rest' ? 'italic' : 'normal' }">
+                {{ s.kind === 'rest' ? 'Journée de repos' : 'Journée de compétition' }}
+              </span>
+              <Chip :variant="s.status === 'live' ? 'live' : s.status === 'done' ? 'felt' : ''" style="padding: 1px 6px; font-size: 9px;">
+                {{ s.status === 'done' ? '✓' : s.status === 'live' ? 'EN COURS' : s.status === 'rest' ? 'REPOS' : 'À VENIR' }}
               </Chip>
             </div>
           </div>
