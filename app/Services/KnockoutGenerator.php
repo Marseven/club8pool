@@ -76,14 +76,17 @@ class KnockoutGenerator
     }
 
     /**
-     * Cross-poules standard pour 4 poules × 4 qualifiés = 16 → R16 :
-     *   R16-1 : A1 vs B4      R16-5 : B1 vs A4
-     *   R16-2 : C1 vs D4      R16-6 : D1 vs C4
-     *   R16-3 : A2 vs B3      R16-7 : B2 vs A3
-     *   R16-4 : C2 vs D3      R16-8 : D2 vs C3
+     * Cross-poules pour 4 poules × 4 qualifiés = 16 → R16 :
+     *   A vs C  et  B vs D  (les poules opposées s'affrontent)
+     *   Interleaved pour garantir QF cross-group (A/C winner vs B/D winner) :
      *
-     * Pour d'autres formats (2x4, 4x2, 8x2…) on tombe en repli sur un
-     * seeding 1-vs-N en alternant les poules.
+     *   pos 0 : A1 vs C4   pos 1 : B1 vs D4   → QF 0
+     *   pos 2 : A2 vs C3   pos 3 : B2 vs D3   → QF 1
+     *   pos 4 : A3 vs C2   pos 5 : B3 vs D2   → QF 2
+     *   pos 6 : A4 vs C1   pos 7 : B4 vs D1   → QF 3
+     *
+     * Pour d'autres formats on tombe en repli sur un seeding 1-vs-N
+     * en alternant les poules.
      */
     public function seedPairs(array $qualifiers): array
     {
@@ -97,14 +100,14 @@ class KnockoutGenerator
             $C = $qualifiers['C'] ?? [];
             $D = $qualifiers['D'] ?? [];
             return [
-                [$A[0] ?? null, $B[3] ?? null],
-                [$C[0] ?? null, $D[3] ?? null],
-                [$A[1] ?? null, $B[2] ?? null],
-                [$C[1] ?? null, $D[2] ?? null],
-                [$B[0] ?? null, $A[3] ?? null],
-                [$D[0] ?? null, $C[3] ?? null],
-                [$B[1] ?? null, $A[2] ?? null],
-                [$D[1] ?? null, $C[2] ?? null],
+                [$A[0] ?? null, $C[3] ?? null],  // pos 0 : A1 vs C4
+                [$B[0] ?? null, $D[3] ?? null],  // pos 1 : B1 vs D4  → QF 0
+                [$A[1] ?? null, $C[2] ?? null],  // pos 2 : A2 vs C3
+                [$B[1] ?? null, $D[2] ?? null],  // pos 3 : B2 vs D3  → QF 1
+                [$A[2] ?? null, $C[1] ?? null],  // pos 4 : A3 vs C2
+                [$B[2] ?? null, $D[1] ?? null],  // pos 5 : B3 vs D2  → QF 2
+                [$A[3] ?? null, $C[0] ?? null],  // pos 6 : A4 vs C1
+                [$B[3] ?? null, $D[0] ?? null],  // pos 7 : B4 vs D1  → QF 3
             ];
         }
 
