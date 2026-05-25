@@ -26,6 +26,18 @@ class RefereeController extends Controller
         ]);
     }
 
+    public function tables(): Response
+    {
+        $tables = \App\Models\PoolTable::with([
+            'liveMatch.playerA', 'liveMatch.playerB', 'liveMatch.referee', 'liveMatch.pool',
+            'competition',
+        ])->orderBy('id')->get();
+
+        return Inertia::render('Referee/Tables', [
+            'tables' => $tables,
+        ]);
+    }
+
     public function preMatch(GameMatch $match): Response
     {
         return Inertia::render('Referee/PreMatch', [

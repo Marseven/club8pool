@@ -67,6 +67,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 // Référee (espace mobile web fallback)
 Route::middleware(['auth', 'referee'])->prefix('arbitre')->name('referee.')->group(function () {
     Route::get('/', [RefereeController::class, 'queue'])->name('queue');
+    Route::get('/tables', [RefereeController::class, 'tables'])->name('tables');
     Route::get('/match/{match}/pre', [RefereeController::class, 'preMatch'])->name('match.pre');
     Route::get('/match/{match}/live', [RefereeController::class, 'live'])->name('match.live');
     Route::get('/match/{match}/fin', [RefereeController::class, 'endMatch'])->name('match.end');

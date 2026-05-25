@@ -2,6 +2,7 @@
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import Ball8 from '@/Components/Ball8.vue';
+import RefereeNav from '@/Components/RefereeNav.vue';
 
 const props = defineProps({ matches: Array });
 const page = usePage();
@@ -90,20 +91,6 @@ const initials = (s) => (s || '').split(' ').map(w => w[0]).slice(0, 2).join('')
       </div>
     </div>
 
-    <nav style="display: flex; justify-content: space-around; padding: 10px 16px;
-                border-top: 1px solid var(--line); background: var(--ink-2);">
-      <div style="text-align: center; color: var(--felt-2);">
-        <div style="font-size: 16px;">◰</div>
-        <div class="mono" style="font-size: 10px; margin-top: 4px; letter-spacing: 0.12em;">MATCHS</div>
-      </div>
-      <div style="text-align: center; color: var(--mute);">
-        <div style="font-size: 16px;">▢</div>
-        <div class="mono" style="font-size: 10px; margin-top: 4px; letter-spacing: 0.12em;">TABLES</div>
-      </div>
-      <Link as="button" method="post" href="/logout" style="text-align: center; color: var(--mute); background: transparent; border: none;">
-        <div style="font-size: 16px;">↪</div>
-        <div class="mono" style="font-size: 10px; margin-top: 4px; letter-spacing: 0.12em;">DÉCO.</div>
-      </Link>
-    </nav>
+    <RefereeNav active="queue" />
   </div>
 </template>
