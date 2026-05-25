@@ -97,7 +97,7 @@ class RefereeApiController extends Controller
     public function start(GameMatch $match): JsonResponse
     {
         $match->update(['status' => 'live', 'started_at' => now()]);
-        return response()->json($match->fresh());
+        return response()->json($match->fresh()->load(['playerA.club', 'playerB.club', 'table', 'pool', 'competition']));
     }
 
     public function end(Request $request, GameMatch $match): JsonResponse
@@ -130,5 +130,59 @@ class RefereeApiController extends Controller
         );
 
         return response()->json($sig);
+    }
+
+    public function available(Request $request): JsonResponse
+    {
+        $userId = $request->user()->id;
+
+        // Pool IDs already taken by a DIFFERENT referee
+        $blockedPools = GameMatch::whereNotNull('referee_id')
+            ->where('referee_id', '!=', $userId)
+            ->whereNotNull('pool_id')
+            ->pluck('pool_id')
+            ->unique();
+
+        $matches = GameMatch::with(['playerA.club', 'playerB.club', 'table', 'pool', 'competition'])
+            ->whereIn('status', ['pending', 'scheduled'])
+            ->whereNull('referee_id')
+            ->when($blockedPools->isNotEmpty(), fn($q) => $q->whereNotIn('pool_id', $blockedPools))
+            ->orderBy('scheduled_at')
+            ->get();
+
+        return response()->json($matches);
+    }
+
+    public function claim(Request $request, GameMatch $match): JsonResponse
+    {
+        $userId = $request->user()->id;
+
+        if ($match->referee_id === $userId) {
+            return response()->json($match->load(['playerA.club', 'playerB.club', 'table', 'pool', 'competition']));
+        }
+        if ($match->referee_id) {
+            return response()->json(['message' => 'Ce match est déjà pris en charge par un autre arbitre.'], 403);
+        }
+        if ($match->pool_id) {
+            $conflict = GameMatch::where('pool_id', $match->pool_id)
+                ->whereNotNull('referee_id')
+                ->where('referee_id', '!=', $userId)
+                ->exists();
+            if ($conflict) {
+                return response()->json(['message' => 'Cette poule est déjà arbitrée par un autre arbitre.'], 403);
+            }
+        }
+
+        $match->update(['referee_id' => $userId]);
+        return response()->json($match->fresh()->load(['playerA.club', 'playerB.club', 'table', 'pool', 'competition']));
+    }
+
+    public function assignTable(Request $request, GameMatch $match): JsonResponse
+    {
+        $data = $request->validate([
+            'table_id' => ['required', 'exists:pool_tables,id'],
+        ]);
+        $match->update(['pool_table_id' => $data['table_id']]);
+        return response()->json($match->fresh()->load(['playerA.club', 'playerB.club', 'table', 'pool', 'competition']));
     }
 }
