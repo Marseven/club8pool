@@ -1,60 +1,60 @@
 {
-  "_AdminSidebar-D5hBmFvh.js": {
-    "file": "assets/AdminSidebar-D5hBmFvh.js",
+  "_AdminSidebar-DKTbtCjk.js": {
+    "file": "assets/AdminSidebar-DKTbtCjk.js",
     "name": "AdminSidebar",
     "imports": [
       "resources/js/app.js",
-      "_Logo-BOyPiq0Q.js"
+      "_Logo-DRGnEzeG.js"
     ]
   },
-  "_Ball8-B9WsFfSK.js": {
-    "file": "assets/Ball8-B9WsFfSK.js",
+  "_Ball8-CYfX5Khz.js": {
+    "file": "assets/Ball8-CYfX5Khz.js",
     "name": "Ball8",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_Chip-rao5uPtV.js": {
-    "file": "assets/Chip-rao5uPtV.js",
+  "_Chip-DSEne6mA.js": {
+    "file": "assets/Chip-DSEne6mA.js",
     "name": "Chip",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_GabonFlag-CKZtypNt.js": {
-    "file": "assets/GabonFlag-CKZtypNt.js",
+  "_GabonFlag-BcjSjTQA.js": {
+    "file": "assets/GabonFlag-BcjSjTQA.js",
     "name": "GabonFlag",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_Logo-BOyPiq0Q.js": {
-    "file": "assets/Logo-BOyPiq0Q.js",
+  "_Logo-DRGnEzeG.js": {
+    "file": "assets/Logo-DRGnEzeG.js",
     "name": "Logo",
     "imports": [
-      "_Ball8-B9WsFfSK.js",
+      "_Ball8-CYfX5Khz.js",
       "resources/js/app.js"
     ]
   },
-  "_PoolStandings-CKXrue8T.js": {
-    "file": "assets/PoolStandings-CKXrue8T.js",
+  "_PoolStandings-8S7Cxzim.js": {
+    "file": "assets/PoolStandings-8S7Cxzim.js",
     "name": "PoolStandings",
     "imports": [
-      "_Chip-rao5uPtV.js",
+      "_Chip-DSEne6mA.js",
       "resources/js/app.js"
     ]
   },
-  "_PublicNav-CbhNQmdl.js": {
-    "file": "assets/PublicNav-CbhNQmdl.js",
+  "_PublicNav-BJxe5H6K.js": {
+    "file": "assets/PublicNav-BJxe5H6K.js",
     "name": "PublicNav",
     "imports": [
       "resources/js/app.js",
-      "_Logo-BOyPiq0Q.js",
-      "_GabonFlag-CKZtypNt.js"
+      "_Logo-DRGnEzeG.js",
+      "_GabonFlag-BcjSjTQA.js"
     ]
   },
-  "_RefereeNav--2quIfHO.js": {
-    "file": "assets/RefereeNav--2quIfHO.js",
+  "_RefereeNav-CtIym9Sv.js": {
+    "file": "assets/RefereeNav-CtIym9Sv.js",
     "name": "RefereeNav",
     "imports": [
       "resources/js/app.js"
@@ -66,255 +66,255 @@
     "isEntry": true
   },
   "resources/js/Pages/Admin/Competitions/Create.vue": {
-    "file": "assets/Create-Vxog1vGu.js",
+    "file": "assets/Create-D5sTEc8o.js",
     "name": "Create",
     "src": "resources/js/Pages/Admin/Competitions/Create.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_AdminSidebar-D5hBmFvh.js",
-      "_Ball8-B9WsFfSK.js",
-      "_Logo-BOyPiq0Q.js"
+      "_AdminSidebar-DKTbtCjk.js",
+      "_Ball8-CYfX5Khz.js",
+      "_Logo-DRGnEzeG.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Admin/Competitions/Edit.vue": {
-    "file": "assets/Edit-CiDVvJnh.js",
+    "file": "assets/Edit-ltP2ByeK.js",
     "name": "Edit",
     "src": "resources/js/Pages/Admin/Competitions/Edit.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_AdminSidebar-D5hBmFvh.js",
-      "_Logo-BOyPiq0Q.js",
-      "_Ball8-B9WsFfSK.js"
+      "_AdminSidebar-DKTbtCjk.js",
+      "_Logo-DRGnEzeG.js",
+      "_Ball8-CYfX5Khz.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Admin/Competitions/Index.vue": {
-    "file": "assets/Index-uDoaXey0.js",
+    "file": "assets/Index-BAqyXQHn.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Competitions/Index.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_AdminSidebar-D5hBmFvh.js",
-      "_Chip-rao5uPtV.js",
-      "_Logo-BOyPiq0Q.js",
-      "_Ball8-B9WsFfSK.js"
+      "_AdminSidebar-DKTbtCjk.js",
+      "_Chip-DSEne6mA.js",
+      "_Logo-DRGnEzeG.js",
+      "_Ball8-CYfX5Khz.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Admin/Competitions/Show.vue": {
-    "file": "assets/Show-CzWJFt_M.js",
+    "file": "assets/Show-CtaThCW5.js",
     "name": "Show",
     "src": "resources/js/Pages/Admin/Competitions/Show.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_AdminSidebar-D5hBmFvh.js",
-      "_Chip-rao5uPtV.js",
-      "_Logo-BOyPiq0Q.js",
-      "_Ball8-B9WsFfSK.js"
+      "_AdminSidebar-DKTbtCjk.js",
+      "_Chip-DSEne6mA.js",
+      "_Logo-DRGnEzeG.js",
+      "_Ball8-CYfX5Khz.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Admin/Dashboard.vue": {
-    "file": "assets/Dashboard-DR3mbMXK.js",
+    "file": "assets/Dashboard-DY5_IPdK.js",
     "name": "Dashboard",
     "src": "resources/js/Pages/Admin/Dashboard.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_AdminSidebar-D5hBmFvh.js",
-      "_Ball8-B9WsFfSK.js",
-      "_Chip-rao5uPtV.js",
-      "_Logo-BOyPiq0Q.js"
+      "_AdminSidebar-DKTbtCjk.js",
+      "_Ball8-CYfX5Khz.js",
+      "_Chip-DSEne6mA.js",
+      "_Logo-DRGnEzeG.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Admin/Draw.vue": {
-    "file": "assets/Draw-B9ak7sgc.js",
+    "file": "assets/Draw-2kaD8WwC.js",
     "name": "Draw",
     "src": "resources/js/Pages/Admin/Draw.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_AdminSidebar-D5hBmFvh.js",
-      "_Ball8-B9WsFfSK.js",
-      "_Chip-rao5uPtV.js",
-      "_Logo-BOyPiq0Q.js"
+      "_AdminSidebar-DKTbtCjk.js",
+      "_Ball8-CYfX5Khz.js",
+      "_Chip-DSEne6mA.js",
+      "_Logo-DRGnEzeG.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Admin/Import.vue": {
-    "file": "assets/Import-DjPuGRFi.js",
+    "file": "assets/Import-BV7Pr66Z.js",
     "name": "Import",
     "src": "resources/js/Pages/Admin/Import.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_AdminSidebar-D5hBmFvh.js",
-      "_Chip-rao5uPtV.js",
-      "_Logo-BOyPiq0Q.js",
-      "_Ball8-B9WsFfSK.js"
+      "_AdminSidebar-DKTbtCjk.js",
+      "_Chip-DSEne6mA.js",
+      "_Logo-DRGnEzeG.js",
+      "_Ball8-CYfX5Khz.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Admin/Players/Index.vue": {
-    "file": "assets/Index-EErOxKCI.js",
+    "file": "assets/Index-CH0O3cle.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Players/Index.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_AdminSidebar-D5hBmFvh.js",
-      "_Logo-BOyPiq0Q.js",
-      "_Ball8-B9WsFfSK.js"
+      "_AdminSidebar-DKTbtCjk.js",
+      "_Logo-DRGnEzeG.js",
+      "_Ball8-CYfX5Khz.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Admin/Pools/Index.vue": {
-    "file": "assets/Index-BUQuPmnU.js",
+    "file": "assets/Index-C4FTMZ0z.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Pools/Index.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_AdminSidebar-D5hBmFvh.js",
-      "_PoolStandings-CKXrue8T.js",
-      "_Chip-rao5uPtV.js",
-      "_Logo-BOyPiq0Q.js",
-      "_Ball8-B9WsFfSK.js"
+      "_AdminSidebar-DKTbtCjk.js",
+      "_PoolStandings-8S7Cxzim.js",
+      "_Chip-DSEne6mA.js",
+      "_Logo-DRGnEzeG.js",
+      "_Ball8-CYfX5Khz.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Admin/Referees/Index.vue": {
-    "file": "assets/Index-CXwLX36u.js",
+    "file": "assets/Index-BBPhMa7t.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Referees/Index.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_AdminSidebar-D5hBmFvh.js",
-      "_Logo-BOyPiq0Q.js",
-      "_Ball8-B9WsFfSK.js"
+      "_AdminSidebar-DKTbtCjk.js",
+      "_Logo-DRGnEzeG.js",
+      "_Ball8-CYfX5Khz.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Auth/Login.vue": {
-    "file": "assets/Login-DqiiSdHK.js",
+    "file": "assets/Login-B1xolLTw.js",
     "name": "Login",
     "src": "resources/js/Pages/Auth/Login.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_Ball8-B9WsFfSK.js",
-      "_GabonFlag-CKZtypNt.js"
+      "_Ball8-CYfX5Khz.js",
+      "_GabonFlag-BcjSjTQA.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Public/Competition.vue": {
-    "file": "assets/Competition-V9AY0URW.js",
+    "file": "assets/Competition-BwqkOYne.js",
     "name": "Competition",
     "src": "resources/js/Pages/Public/Competition.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_PublicNav-CbhNQmdl.js",
-      "_PoolStandings-CKXrue8T.js",
-      "_Ball8-B9WsFfSK.js",
-      "_Chip-rao5uPtV.js",
-      "_Logo-BOyPiq0Q.js",
-      "_GabonFlag-CKZtypNt.js"
+      "_PublicNav-BJxe5H6K.js",
+      "_PoolStandings-8S7Cxzim.js",
+      "_Ball8-CYfX5Khz.js",
+      "_Chip-DSEne6mA.js",
+      "_Logo-DRGnEzeG.js",
+      "_GabonFlag-BcjSjTQA.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Public/Landing.vue": {
-    "file": "assets/Landing-DK_YSQmL.js",
+    "file": "assets/Landing-Bey6p-w1.js",
     "name": "Landing",
     "src": "resources/js/Pages/Public/Landing.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_PublicNav-CbhNQmdl.js",
-      "_GabonFlag-CKZtypNt.js",
-      "_Chip-rao5uPtV.js",
-      "_Logo-BOyPiq0Q.js",
-      "_Ball8-B9WsFfSK.js"
+      "_PublicNav-BJxe5H6K.js",
+      "_GabonFlag-BcjSjTQA.js",
+      "_Chip-DSEne6mA.js",
+      "_Logo-DRGnEzeG.js",
+      "_Ball8-CYfX5Khz.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Public/Live.vue": {
-    "file": "assets/Live-DrDT6ABh.js",
+    "file": "assets/Live-DW9A4dr5.js",
     "name": "Live",
     "src": "resources/js/Pages/Public/Live.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_Ball8-B9WsFfSK.js",
-      "_GabonFlag-CKZtypNt.js",
-      "_Chip-rao5uPtV.js"
+      "_Ball8-CYfX5Khz.js",
+      "_GabonFlag-BcjSjTQA.js",
+      "_Chip-DSEne6mA.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Public/Player.vue": {
-    "file": "assets/Player-WTppZS_K.js",
+    "file": "assets/Player-CaC6H7hH.js",
     "name": "Player",
     "src": "resources/js/Pages/Public/Player.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_PublicNav-CbhNQmdl.js",
-      "_GabonFlag-CKZtypNt.js",
-      "_Chip-rao5uPtV.js",
-      "_Logo-BOyPiq0Q.js",
-      "_Ball8-B9WsFfSK.js"
+      "_PublicNav-BJxe5H6K.js",
+      "_GabonFlag-BcjSjTQA.js",
+      "_Chip-DSEne6mA.js",
+      "_Logo-DRGnEzeG.js",
+      "_Ball8-CYfX5Khz.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Public/Players.vue": {
-    "file": "assets/Players-CvDitPre.js",
+    "file": "assets/Players-B2w_ol8U.js",
     "name": "Players",
     "src": "resources/js/Pages/Public/Players.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_PublicNav-CbhNQmdl.js",
-      "_Chip-rao5uPtV.js",
-      "_Logo-BOyPiq0Q.js",
-      "_Ball8-B9WsFfSK.js",
-      "_GabonFlag-CKZtypNt.js"
+      "_PublicNav-BJxe5H6K.js",
+      "_Chip-DSEne6mA.js",
+      "_Logo-DRGnEzeG.js",
+      "_Ball8-CYfX5Khz.js",
+      "_GabonFlag-BcjSjTQA.js"
     ],
     "css": [
       "assets/Players-CXVpqNKh.css",
@@ -322,39 +322,56 @@
     ]
   },
   "resources/js/Pages/Public/Register.vue": {
-    "file": "assets/Register-kxrGNwUt.js",
+    "file": "assets/Register-Mncp2iGm.js",
     "name": "Register",
     "src": "resources/js/Pages/Public/Register.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_PublicNav-CbhNQmdl.js",
-      "_Chip-rao5uPtV.js",
-      "_Logo-BOyPiq0Q.js",
-      "_Ball8-B9WsFfSK.js",
-      "_GabonFlag-CKZtypNt.js"
+      "_PublicNav-BJxe5H6K.js",
+      "_Chip-DSEne6mA.js",
+      "_Logo-DRGnEzeG.js",
+      "_Ball8-CYfX5Khz.js",
+      "_GabonFlag-BcjSjTQA.js"
+    ],
+    "css": [
+      "assets/app-D6Evy7m9.css"
+    ]
+  },
+  "resources/js/Pages/Public/RegisterIndex.vue": {
+    "file": "assets/RegisterIndex-Bb-2oq3e.js",
+    "name": "RegisterIndex",
+    "src": "resources/js/Pages/Public/RegisterIndex.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_PublicNav-BJxe5H6K.js",
+      "_Chip-DSEne6mA.js",
+      "_Logo-DRGnEzeG.js",
+      "_Ball8-CYfX5Khz.js",
+      "_GabonFlag-BcjSjTQA.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Public/Tv.vue": {
-    "file": "assets/Tv-C1LeXWlI.js",
+    "file": "assets/Tv-DByS0nLg.js",
     "name": "Tv",
     "src": "resources/js/Pages/Public/Tv.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_Ball8-B9WsFfSK.js",
-      "_GabonFlag-CKZtypNt.js",
-      "_Chip-rao5uPtV.js"
+      "_Ball8-CYfX5Khz.js",
+      "_GabonFlag-BcjSjTQA.js",
+      "_Chip-DSEne6mA.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Referee/EndMatch.vue": {
-    "file": "assets/EndMatch-CMId37-1.js",
+    "file": "assets/EndMatch-2qcBVekV.js",
     "name": "EndMatch",
     "src": "resources/js/Pages/Referee/EndMatch.vue",
     "isDynamicEntry": true,
@@ -366,7 +383,7 @@
     ]
   },
   "resources/js/Pages/Referee/Live.vue": {
-    "file": "assets/Live-4Hiu78lX.js",
+    "file": "assets/Live-CTXEV1QT.js",
     "name": "Live",
     "src": "resources/js/Pages/Referee/Live.vue",
     "isDynamicEntry": true,
@@ -378,7 +395,7 @@
     ]
   },
   "resources/js/Pages/Referee/PreMatch.vue": {
-    "file": "assets/PreMatch-CRc09O14.js",
+    "file": "assets/PreMatch-DQDyBHXF.js",
     "name": "PreMatch",
     "src": "resources/js/Pages/Referee/PreMatch.vue",
     "isDynamicEntry": true,
@@ -390,36 +407,36 @@
     ]
   },
   "resources/js/Pages/Referee/Queue.vue": {
-    "file": "assets/Queue-BhGQuSBK.js",
+    "file": "assets/Queue-Bft0nrd1.js",
     "name": "Queue",
     "src": "resources/js/Pages/Referee/Queue.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_Ball8-B9WsFfSK.js",
-      "_RefereeNav--2quIfHO.js"
+      "_Ball8-CYfX5Khz.js",
+      "_RefereeNav-CtIym9Sv.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/Pages/Referee/Tables.vue": {
-    "file": "assets/Tables-DEPxUc45.js",
+    "file": "assets/Tables-Di3HWlOh.js",
     "name": "Tables",
     "src": "resources/js/Pages/Referee/Tables.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_Ball8-B9WsFfSK.js",
-      "_RefereeNav--2quIfHO.js",
-      "_Chip-rao5uPtV.js"
+      "_Ball8-CYfX5Khz.js",
+      "_RefereeNav-CtIym9Sv.js",
+      "_Chip-DSEne6mA.js"
     ],
     "css": [
       "assets/app-D6Evy7m9.css"
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-Bs8yFGWj.js",
+    "file": "assets/app-Y1C92U0Y.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -441,6 +458,7 @@
       "resources/js/Pages/Public/Player.vue",
       "resources/js/Pages/Public/Players.vue",
       "resources/js/Pages/Public/Register.vue",
+      "resources/js/Pages/Public/RegisterIndex.vue",
       "resources/js/Pages/Public/Tv.vue",
       "resources/js/Pages/Referee/EndMatch.vue",
       "resources/js/Pages/Referee/Live.vue",

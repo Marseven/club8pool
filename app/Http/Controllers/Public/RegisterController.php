@@ -14,9 +14,31 @@ use Inertia\Response;
 
 class RegisterController extends Controller
 {
-    public function show(): Response
+    /**
+     * Liste des compétitions ouvertes à l'inscription.
+     * - 0 ouverte : page "aucune inscription possible" + comps en cours/terminées
+     * - 1 ouverte : redirige vers son formulaire
+     * - 2+ ouvertes : liste à choisir
+     */
+    public function index(): Response|RedirectResponse
     {
-        $competition = Competition::firstOrFail();
+        $all = Competition::orderByDesc('starts_on')->get();
+        $open = $all->filter(fn ($c) => $this->registrationsOpen($c));
+
+        if ($open->count() === 1) {
+            return redirect()->route('register.show', ['competition' => $open->first()->slug]);
+        }
+
+        return Inertia::render('Public/RegisterIndex', [
+            'open' => $open->values()->map(fn ($c) => $this->payload($c)),
+            'others' => $all->reject(fn ($c) => $this->registrationsOpen($c))
+                ->values()
+                ->map(fn ($c) => $this->payload($c)),
+        ]);
+    }
+
+    public function show(Competition $competition): Response
+    {
         $slots = $competition->player_slots;
         $registered = Registration::where('competition_id', $competition->id)->count();
 
@@ -27,13 +49,15 @@ class RegisterController extends Controller
             'registered' => $registered,
             'isOpen' => $this->registrationsOpen($competition),
             'closedReason' => $this->closedReason($competition, $registered, $slots),
+            'other' => Competition::where('id', '!=', $competition->id)
+                ->orderByDesc('starts_on')
+                ->get()
+                ->map(fn ($c) => $this->payload($c)),
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, Competition $competition): RedirectResponse
     {
-        $competition = Competition::findOrFail($request->input('competition_id'));
-
         if (! $this->registrationsOpen($competition)) {
             return back()->with('error', $this->closedReason(
                 $competition,
@@ -52,20 +76,44 @@ class RegisterController extends Controller
             'address' => ['required', 'string'],
             'club_id' => ['nullable', 'exists:clubs,id'],
             'cue' => ['nullable', 'string'],
-            'competition_id' => ['required', 'exists:competitions,id'],
         ]);
 
         $player = Player::firstOrCreate(
             ['fgb_card' => $data['fgb_card']],
-            collect($data)->except('competition_id')->toArray()
+            $data
         );
 
         Registration::firstOrCreate(
-            ['competition_id' => $data['competition_id'], 'player_id' => $player->id],
+            ['competition_id' => $competition->id, 'player_id' => $player->id],
             ['status' => 'pending', 'registered_at' => now()]
         );
 
         return back()->with('success', 'Inscription envoyée. En attente de validation.');
+    }
+
+    private function payload(Competition $c): array
+    {
+        $registered = Registration::where('competition_id', $c->id)->count();
+        return [
+            'id' => $c->id,
+            'name' => $c->name,
+            'slug' => $c->slug,
+            'discipline' => $c->discipline,
+            'structure' => $c->structure,
+            'status' => $c->status,
+            'starts_on' => $c->starts_on?->toIso8601String(),
+            'ends_on' => $c->ends_on?->toIso8601String(),
+            'venue' => $c->venue,
+            'city' => $c->city,
+            'race_to' => $c->race_to,
+            'player_slots' => $c->player_slots,
+            'registered' => $registered,
+            'remaining' => max(0, $c->player_slots - $registered),
+            'entry_fee' => $c->entry_fee,
+            'prize_pool' => $c->prize_pool,
+            'is_open' => $this->registrationsOpen($c),
+            'closed_reason' => $this->closedReason($c, $registered, $c->player_slots),
+        ];
     }
 
     private function registrationsOpen(Competition $competition): bool

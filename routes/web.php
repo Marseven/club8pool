@@ -22,8 +22,9 @@ Route::get('/competitions', [CompetitionController::class, 'show'])->name('compe
 Route::get('/competitions/{slug}', [CompetitionController::class, 'show'])->name('competition.show');
 Route::get('/joueurs', [PlayerController::class, 'index'])->name('players.index');
 Route::get('/joueurs/{player}', [PlayerController::class, 'show'])->name('player.show');
-Route::get('/inscription', [RegisterController::class, 'show'])->name('register.show');
-Route::post('/inscription', [RegisterController::class, 'store'])->name('register.store');
+Route::get('/inscription', [RegisterController::class, 'index'])->name('register.index');
+Route::get('/inscription/{competition:slug}', [RegisterController::class, 'show'])->name('register.show');
+Route::post('/inscription/{competition:slug}', [RegisterController::class, 'store'])->name('register.store');
 Route::get('/live', LiveController::class)->name('live');
 Route::get('/tv', [TvController::class, 'show'])->name('tv');
 Route::get('/tv/table/{tableId}', [TvController::class, 'show'])->name('tv.table');

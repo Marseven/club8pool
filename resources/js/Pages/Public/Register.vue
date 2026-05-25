@@ -26,12 +26,11 @@ const form = useForm({
   address: '',
   club_id: null,
   cue: '',
-  competition_id: props.competition?.id,
 });
 
 const remaining = computed(() => Math.max(0, props.slots - props.registered));
 
-const submit = () => form.post('/inscription', {
+const submit = () => form.post(`/inscription/${props.competition?.slug}`, {
   onSuccess: () => step.value = 3,
 });
 
