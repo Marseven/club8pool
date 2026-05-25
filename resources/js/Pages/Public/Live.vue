@@ -4,11 +4,13 @@ import { ref, onMounted, onUnmounted, computed } from 'vue';
 import Ball8 from '@/Components/Ball8.vue';
 import GabonFlag from '@/Components/GabonFlag.vue';
 import Chip from '@/Components/Chip.vue';
+import { Play, Pause, ChevronRight, ChevronLeft } from 'lucide-vue-next';
 
 const props = defineProps({
   competition: Object,
   liveMatches: Array,
   nextMatches: Array,
+  pools: Array,
   knockoutBracket: Object,
 });
 
@@ -17,14 +19,28 @@ const lastRefresh = ref(new Date());
 const isFullscreen = ref(false);
 let pollInterval, tickInterval;
 
-const POLL_MS = 10000;
+// ── Carousel poules ──────────────────────────────────────────
+const currentPoolIdx   = ref(0);
+const carouselCountdown = ref(10);
+const carouselPaused    = ref(false);
+const POLL_MS      = 10000;
+const CAROUSEL_MS  = 10000;
 
 onMounted(() => {
-  tickInterval = setInterval(() => { tick.value++; }, 1000);
+  tickInterval = setInterval(() => {
+    tick.value++;
+    if (!hasBracket.value && !carouselPaused.value && (props.pools?.length ?? 0) > 1) {
+      carouselCountdown.value--;
+      if (carouselCountdown.value <= 0) {
+        currentPoolIdx.value = (currentPoolIdx.value + 1) % props.pools.length;
+        carouselCountdown.value = CAROUSEL_MS / 1000;
+      }
+    }
+  }, 1000);
 
   pollInterval = setInterval(() => {
     router.reload({
-      only: ['liveMatches', 'nextMatches', 'knockoutBracket'],
+      only: ['liveMatches', 'nextMatches', 'pools', 'knockoutBracket'],
       preserveScroll: true,
       onSuccess: () => { lastRefresh.value = new Date(); },
     });
@@ -53,7 +69,20 @@ const toggleFullscreen = () => {
   }
 };
 
-// Bracket — rounds présents dans l'ordre chronologique
+const prevPool = () => {
+  if (!(props.pools?.length)) return;
+  currentPoolIdx.value = (currentPoolIdx.value - 1 + props.pools.length) % props.pools.length;
+  carouselCountdown.value = CAROUSEL_MS / 1000;
+};
+const nextPool = () => {
+  if (!(props.pools?.length)) return;
+  currentPoolIdx.value = (currentPoolIdx.value + 1) % props.pools.length;
+  carouselCountdown.value = CAROUSEL_MS / 1000;
+};
+const selectPool = (i) => { currentPoolIdx.value = i; carouselCountdown.value = CAROUSEL_MS / 1000; };
+const currentPool = computed(() => props.pools?.[currentPoolIdx.value] ?? null);
+
+// ── Bracket ──────────────────────────────────────────────────
 const ROUND_ORDER = ['R16', 'QF', 'SF', 'F'];
 const bracketRounds = computed(() =>
   ROUND_ORDER.filter(r => (props.knockoutBracket?.[r]?.length ?? 0) > 0)
@@ -62,6 +91,7 @@ const hasBracket = computed(() => bracketRounds.value.length > 0);
 
 const roundLabel = (r) => ({ R16: '8es DE FINALE', QF: 'QUARTS', SF: 'DEMIS', F: 'FINALE' }[r] ?? r);
 
+// ── Utilitaires ───────────────────────────────────────────────
 const secondsAgo = computed(() => {
   void tick.value;
   return Math.floor((Date.now() - lastRefresh.value.getTime()) / 1000);
@@ -201,62 +231,122 @@ const playerName = (p) => p ? `${p.first_name} ${p.last_name}` : '—';
       </template>
     </section>
 
-    <!-- Section : bracket phase finale -->
+    <!-- ══ Section du bas : poules OU bracket selon la phase ══ -->
     <section style="flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
                     padding: clamp(8px,1.2vh,16px) clamp(12px,2.5vw,32px) clamp(6px,1vh,12px);
                     border-top: 1px solid var(--line); background: var(--ink-2);">
 
-      <!-- Header -->
-      <div style="flex-shrink: 0; display: flex; justify-content: space-between; align-items: center;
-                  margin-bottom: clamp(8px,1.2vh,16px);">
-        <div style="display: flex; align-items: baseline; gap: 14px;">
-          <h2 class="disp-a bracket-title">TABLEAU FINAL</h2>
-          <Chip variant="felt">PHASE FINALE</Chip>
-        </div>
-        <span class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.18em;">MAJ · {{ secondsAgo }}s</span>
-      </div>
-
-      <!-- Bracket (colonnes par tour) -->
-      <div v-if="hasBracket" class="bracket-grid"
-           :style="{ '--cols': bracketRounds.length }">
-        <div v-for="round in bracketRounds" :key="round" class="bracket-col">
-          <!-- Label du tour -->
-          <div class="mono bracket-round-label">{{ roundLabel(round) }}</div>
-          <!-- Cartes match -->
-          <div v-for="m in knockoutBracket[round]" :key="m.id"
-               class="bracket-card"
-               :class="{
-                 'bc-live': m.status === 'live',
-                 'bc-done': m.status === 'done',
-                 'bc-pending': m.status === 'pending',
-               }">
-            <!-- Joueur A -->
-            <div class="bc-player"
-                 :class="{ 'bc-winner': m.status === 'done' && m.score_a > m.score_b }">
-              <span class="bc-name">{{ playerName(m.player_a) }}</span>
-              <span v-if="m.status !== 'pending'" class="disp-a tnum bc-score">{{ m.score_a }}</span>
-            </div>
-            <!-- Joueur B -->
-            <div class="bc-player"
-                 :class="{ 'bc-winner': m.status === 'done' && m.score_b > m.score_a }">
-              <span class="bc-name">{{ playerName(m.player_b) }}</span>
-              <span v-if="m.status !== 'pending'" class="disp-a tnum bc-score">{{ m.score_b }}</span>
-            </div>
-            <!-- Badge statut -->
-            <div v-if="m.status === 'live'" class="bc-badge bc-badge-live mono">● LIVE</div>
-            <div v-else-if="m.status === 'done'" class="bc-badge bc-badge-done mono">{{ fmtTime(m.ended_at) }}</div>
+      <!-- ─── PHASE DE POULES : carousel des classements ─────── -->
+      <template v-if="!hasBracket && currentPool">
+        <!-- Toolbar -->
+        <div style="flex-shrink: 0; display: flex; justify-content: space-between; align-items: center;
+                    margin-bottom: clamp(6px,1vh,14px); gap: 10px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: baseline; gap: 18px;">
+            <h2 class="disp-a pool-title">POULE {{ currentPool.name }}</h2>
+            <span class="mono" style="font-size: 12px; color: var(--mute); letter-spacing: 0.18em;">
+              {{ currentPoolIdx + 1 }}/{{ pools.length }} · SUIVANT DANS {{ Math.max(0, carouselCountdown) }}s
+            </span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button @click="prevPool" class="btn" style="padding: 8px 12px;"><ChevronLeft :size="14" /></button>
+            <button @click="carouselPaused = !carouselPaused" class="btn" style="padding: 8px 12px;">
+              <Play v-if="carouselPaused" :size="14" /><Pause v-else :size="14" />
+            </button>
+            <button @click="nextPool" class="btn" style="padding: 8px 12px;"><ChevronRight :size="14" /></button>
+            <span style="width:16px;"></span>
+            <button v-for="(p, i) in pools" :key="p.id" @click="selectPool(i)" class="pool-btn"
+                    :style="{
+                      width:'36px', height:'36px', cursor:'pointer',
+                      background: i===currentPoolIdx ? 'var(--felt-2)' : 'transparent',
+                      color:      i===currentPoolIdx ? 'var(--ink)'   : 'var(--chalk-2)',
+                      border: '1px solid ' + (i===currentPoolIdx ? 'var(--felt-2)' : 'var(--line-strong)'),
+                      fontFamily:'var(--font-display-a)', fontSize:'16px', fontWeight:700,
+                    }">{{ p.name }}</button>
           </div>
         </div>
-      </div>
 
-      <!-- Pas encore de bracket généré -->
-      <div v-else style="flex: 1; display: flex; align-items: center; justify-content: center;">
-        <div style="text-align: center;">
-          <div class="disp-a" style="font-size: clamp(18px,3vh,32px); color: var(--mute);">PHASE FINALE À VENIR</div>
-          <div class="mono" style="font-size: 11px; color: var(--mute-2); margin-top: 8px; letter-spacing: 0.18em;">
-            EN ATTENTE DE LA FIN DES POULES
+        <!-- Progress bar -->
+        <div style="flex-shrink:0; height:3px; background:var(--ink-3); margin-bottom:clamp(6px,1vh,14px);">
+          <div :style="{
+            height:'100%', background:'var(--felt-2)',
+            width: ((10 - Math.max(0, carouselCountdown)) / 10 * 100) + '%',
+            transition: carouselPaused ? 'none' : 'width 1s linear',
+          }" />
+        </div>
+
+        <!-- Classement -->
+        <div class="standings-wrap" style="flex:1; min-height:0; display:flex; flex-direction:column;
+                                            border:1px solid var(--line); background:var(--ink); overflow:hidden;">
+          <div class="standings-head" style="background:var(--ink-2); border-bottom:1px solid var(--line);">
+            <div class="mono col-rank" style="font-size:11px;color:var(--mute);letter-spacing:.22em;">RANG</div>
+            <div class="mono col-name" style="font-size:11px;color:var(--mute);letter-spacing:.22em;">JOUEUR</div>
+            <div class="mono col-v"    style="font-size:11px;color:var(--mute);letter-spacing:.22em;text-align:right;">V</div>
+            <div class="mono col-w"    style="font-size:11px;color:var(--mute);letter-spacing:.22em;text-align:right;">W</div>
+            <div class="mono col-l"    style="font-size:11px;color:var(--mute);letter-spacing:.22em;text-align:right;">L</div>
+            <div class="mono col-diff" style="font-size:11px;color:var(--mute);letter-spacing:.22em;text-align:right;">DIFF</div>
+          </div>
+          <div v-for="(s, i) in currentPool.standings" :key="s.player_id" class="standings-row" :style="{
+            alignItems:'center',
+            borderTop: i ? '1px solid var(--line)' : 'none',
+            background: s.rank <= (competition?.qualifiers_per_pool ?? 2) ? 'rgba(45,168,118,0.06)' : 'transparent',
+            borderLeft: s.rank <= (competition?.qualifiers_per_pool ?? 2) ? '4px solid var(--felt-2)' : '4px solid transparent',
+          }">
+            <div class="disp-a tnum col-rank rank-num"
+                 :style="{ color: s.rank <= (competition?.qualifiers_per_pool ?? 2) ? 'var(--felt-2)' : 'var(--chalk)' }">
+              {{ s.rank }}
+            </div>
+            <div class="col-name">
+              <div class="row-name">{{ s.name }}</div>
+              <div class="mono" style="font-size:10px;color:var(--mute);letter-spacing:.18em;margin-top:4px;">
+                {{ currentPool.name }}{{ s.pool_slot }}
+              </div>
+            </div>
+            <div class="disp-a tnum col-v  row-v"    style="text-align:right;">{{ s.v }}</div>
+            <div class="disp-a tnum col-w  row-w"    style="color:var(--felt-2);text-align:right;">{{ s.w }}</div>
+            <div class="disp-a tnum col-l  row-l"    style="color:var(--mute);text-align:right;">{{ s.l }}</div>
+            <div class="disp-a tnum col-diff row-diff"
+                 :style="{ textAlign:'right', color: s.diff>0?'var(--felt-2)':s.diff<0?'var(--live)':'var(--chalk-2)' }">
+              {{ s.diff > 0 ? '+' : '' }}{{ s.diff }}
+            </div>
           </div>
         </div>
+      </template>
+
+      <!-- ─── PHASE FINALE : bracket ──────────────────────────── -->
+      <template v-else-if="hasBracket">
+        <div style="flex-shrink:0; display:flex; justify-content:space-between; align-items:center;
+                    margin-bottom:clamp(8px,1.2vh,16px);">
+          <div style="display:flex; align-items:baseline; gap:14px;">
+            <h2 class="disp-a bracket-title">TABLEAU FINAL</h2>
+            <Chip variant="felt">PHASE FINALE</Chip>
+          </div>
+          <span class="mono" style="font-size:10px;color:var(--mute);letter-spacing:.18em;">MAJ · {{ secondsAgo }}s</span>
+        </div>
+
+        <div class="bracket-grid" :style="{ '--cols': bracketRounds.length }">
+          <div v-for="round in bracketRounds" :key="round" class="bracket-col">
+            <div class="mono bracket-round-label">{{ roundLabel(round) }}</div>
+            <div v-for="m in knockoutBracket[round]" :key="m.id"
+                 class="bracket-card"
+                 :class="{ 'bc-live': m.status==='live', 'bc-done': m.status==='done', 'bc-pending': m.status==='pending' }">
+              <div class="bc-player" :class="{ 'bc-winner': m.status==='done' && m.score_a > m.score_b }">
+                <span class="bc-name">{{ m.player_a ? m.player_a.first_name+' '+m.player_a.last_name : '—' }}</span>
+                <span v-if="m.status!=='pending'" class="disp-a tnum bc-score">{{ m.score_a }}</span>
+              </div>
+              <div class="bc-player" :class="{ 'bc-winner': m.status==='done' && m.score_b > m.score_a }">
+                <span class="bc-name">{{ m.player_b ? m.player_b.first_name+' '+m.player_b.last_name : '—' }}</span>
+                <span v-if="m.status!=='pending'" class="disp-a tnum bc-score">{{ m.score_b }}</span>
+              </div>
+              <div v-if="m.status==='live'" class="bc-badge bc-badge-live mono">● LIVE</div>
+              <div v-else-if="m.status==='done'" class="bc-badge bc-badge-done mono">{{ fmtTime(m.ended_at) }}</div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- ─── Rien encore : placeholder ──────────────────────── -->
+      <div v-else style="flex:1;display:flex;align-items:center;justify-content:center;">
+        <div class="disp-a" style="font-size:clamp(18px,3vh,28px);color:var(--mute);">EN ATTENTE DES MATCHS</div>
       </div>
 
     </section>
@@ -309,6 +399,48 @@ const playerName = (p) => p ? `${p.first_name} ${p.last_name}` : '—';
 
 /* ── Header on small screens ── */
 @media (max-width: 640px) { header { flex-wrap: wrap; gap: 8px; } }
+
+/* ── Pool title + selector ── */
+.pool-title { font-size: clamp(20px, 5vh, 64px) !important; line-height: 0.92; }
+.pool-btn {
+  width:  clamp(24px, 3.2vw, 36px) !important;
+  height: clamp(24px, 3.2vw, 36px) !important;
+  font-size: clamp(11px, 1.4vw, 16px) !important;
+}
+
+/* ── Standings ── */
+.standings-head {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: clamp(32px,5vw,70px) 1fr clamp(36px,6vw,80px) clamp(36px,6vw,80px) clamp(36px,6vw,80px) clamp(48px,7vw,100px);
+  align-items: center;
+  padding: clamp(6px,1vh,12px) clamp(10px,2vw,24px);
+}
+.standings-row {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: clamp(32px,5vw,70px) 1fr clamp(36px,6vw,80px) clamp(36px,6vw,80px) clamp(36px,6vw,80px) clamp(48px,7vw,100px);
+  align-items: center;
+  padding: 0 clamp(10px,2vw,24px);
+}
+.rank-num  { font-size: clamp(14px, 3.2vh, 38px); }
+.row-name  { font-size: clamp(11px, 2vh, 22px); font-weight: 700; }
+.row-v     { font-size: clamp(13px, 2.6vh, 30px); }
+.row-w     { font-size: clamp(12px, 2.2vh, 26px); color: var(--felt-2); }
+.row-l     { font-size: clamp(12px, 2.2vh, 26px); color: var(--mute); }
+.row-diff  { font-size: clamp(12px, 2.4vh, 28px); }
+.standings-row .mono { font-size: clamp(9px, 1.1vh, 11px); }
+
+@media (max-width: 860px) {
+  .standings-head,
+  .standings-row { grid-template-columns: clamp(28px,4vw,44px) 1fr clamp(32px,5vw,56px) clamp(44px,7vw,76px); }
+  .col-w, .col-l { display: none; }
+}
+@media (max-width: 480px) {
+  .standings-head,
+  .standings-row { grid-template-columns: clamp(24px,4vw,36px) 1fr clamp(30px,5vw,44px) clamp(40px,7vw,60px); }
+}
 
 /* ────────────────────────────────────────────────────────────
    Bracket phase finale
