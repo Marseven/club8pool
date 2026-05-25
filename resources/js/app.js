@@ -11,7 +11,11 @@ import { ZiggyVue } from 'ziggy-js';
 const appName = 'Club 8 Pool';
 
 createInertiaApp({
-    title: (title) => (title ? `${title} · ${appName}` : appName),
+    title: (title) => {
+      if (!title) return appName;
+      // évite 'Live · Club 8 Pool · Club 8 Pool' quand le titre contient déjà l'app name
+      return title.includes(appName) ? title : `${title} · ${appName}`;
+    },
     resolve: (name) =>
         resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
