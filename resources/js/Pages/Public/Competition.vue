@@ -42,14 +42,25 @@ const hasKnockout = computed(() => Object.keys(props.knockoutMatches || {}).leng
           {{ competition?.name }}
         </h1>
         <div style="display: flex; gap: 28px; padding-bottom: 14px;">
-          <div v-for="(item, i) in [
-            [String(competition?.pool_count ?? 0).padStart(2, '0'), 'POULES'],
-            [String(competition?.player_slots ?? 0).padStart(2, '0'), 'JOUEURS'],
-            [`RACE TO ${competition?.race_to ?? 3}`, 'FORMAT'],
-            [String(competition?.qualifiers_per_pool ?? 2), 'QUALIFIÉS / POULE'],
-          ]" :key="i">
-            <div class="disp-a tnum" style="font-size: 26px;">{{ item[0] }}</div>
-            <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">{{ item[1] }}</div>
+          <div>
+            <div class="disp-a tnum" style="font-size: 26px;">{{ String(competition?.pool_count ?? 0).padStart(2, '0') }}</div>
+            <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">POULES</div>
+          </div>
+          <div>
+            <div class="disp-a tnum" style="font-size: 26px;">{{ String(competition?.player_slots ?? 0).padStart(2, '0') }}</div>
+            <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">JOUEURS</div>
+          </div>
+          <div v-if="competition?.structure === 'pools_knockout'">
+            <div class="disp-a tnum" style="font-size: 26px;">{{ competition?.pool_race_to ?? competition?.race_to }} / {{ competition?.knockout_race_to ?? competition?.race_to }}</div>
+            <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">RACE POULES / FINALE</div>
+          </div>
+          <div v-else>
+            <div class="disp-a tnum" style="font-size: 26px;">RACE TO {{ competition?.race_to ?? 3 }}</div>
+            <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">FORMAT</div>
+          </div>
+          <div>
+            <div class="disp-a tnum" style="font-size: 26px;">{{ competition?.qualifiers_per_pool ?? 2 }}</div>
+            <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">QUALIFIÉS / POULE</div>
           </div>
         </div>
       </div>
@@ -112,7 +123,9 @@ const hasKnockout = computed(() => Object.keys(props.knockoutMatches || {}).leng
             <span style="font-size: 18px; font-weight: 600; text-align: right;">{{ m.player_b?.first_name }} {{ m.player_b?.last_name }}</span>
           </div>
           <div class="mono" style="font-size: 10px; color: var(--mute); margin-top: 12px;">
-            RACE TO {{ competition?.race_to }}
+            RACE TO {{ m.phase === 'knockout'
+              ? (competition?.knockout_race_to ?? competition?.race_to)
+              : (competition?.pool_race_to ?? competition?.race_to) }}
           </div>
         </div>
       </div>

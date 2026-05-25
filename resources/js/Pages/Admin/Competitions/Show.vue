@@ -50,10 +50,25 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
 
         <div style="padding: 20px; border: 1px solid var(--felt-2); background: rgba(45,168,118,0.04);">
           <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">RACE</div>
-          <div class="disp-a tnum" style="font-size: 56px; margin-top: 10px; color: var(--felt-2);">RACE TO {{ competition.race_to }}</div>
-          <div class="mono" style="font-size: 11px; color: var(--mute); margin-top: 8px;">
-            PREMIER À {{ competition.race_to }} MANCHES GAGNÉES
-          </div>
+          <template v-if="competition.structure === 'pools_knockout'">
+            <div style="display: flex; gap: 32px; margin-top: 10px; align-items: baseline;">
+              <div>
+                <div class="disp-a tnum" style="font-size: 44px; color: var(--felt-2);">{{ competition.pool_race_to ?? competition.race_to }}</div>
+                <div class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.2em; margin-top: 4px;">POULES</div>
+              </div>
+              <div style="font-family: var(--font-display-a); font-size: 32px; color: var(--mute-2);">·</div>
+              <div>
+                <div class="disp-a tnum" style="font-size: 44px; color: var(--felt-2);">{{ competition.knockout_race_to ?? competition.race_to }}</div>
+                <div class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.2em; margin-top: 4px;">FINALE</div>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div class="disp-a tnum" style="font-size: 56px; margin-top: 10px; color: var(--felt-2);">RACE TO {{ competition.race_to }}</div>
+            <div class="mono" style="font-size: 11px; color: var(--mute); margin-top: 8px;">
+              PREMIER À {{ competition.race_to }} MANCHES GAGNÉES
+            </div>
+          </template>
         </div>
 
         <div style="padding: 20px; border: 1px solid var(--line); background: var(--ink-2);">

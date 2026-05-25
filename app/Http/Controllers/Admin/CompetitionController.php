@@ -96,6 +96,8 @@ class CompetitionController extends Controller
             'pool_size' => ['nullable', 'integer', 'min:0', 'max:32'],
             'qualifiers_per_pool' => ['nullable', 'integer', 'min:0', 'max:16'],
             'race_to' => ['required', 'integer', 'min:1', 'max:25'],
+            'pool_race_to' => ['nullable', 'integer', 'min:1', 'max:25'],
+            'knockout_race_to' => ['nullable', 'integer', 'min:1', 'max:25'],
             'shot_clock' => ['required', 'integer', 'min:5', 'max:120'],
             'alternate_break' => ['boolean'],
             'allow_draw' => ['boolean'],

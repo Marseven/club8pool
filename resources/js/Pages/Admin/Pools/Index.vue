@@ -52,7 +52,9 @@ const playerLabel = (pool, playerId) => {
       <header style="display: flex; justify-content: space-between; align-items: center;
                      padding: 20px 32px; border-bottom: 1px solid var(--line);">
         <div>
-          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">PHASE DE POULES</div>
+          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">
+            PHASE DE POULES · RACE TO {{ competition.pool_race_to ?? competition.race_to }}
+          </div>
           <div class="disp-a" style="font-size: 28px; margin-top: 6px;">{{ competition.name }}</div>
         </div>
         <div style="display: flex; gap: 8px;">
@@ -138,11 +140,11 @@ const playerLabel = (pool, playerId) => {
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px;">
             <label>
               <div class="mono" style="font-size: 10px; color: var(--mute); margin-bottom: 6px;">SCORE {{ editingMatch.player_a?.first_name?.toUpperCase() }}</div>
-              <input v-model.number="editor.score_a" type="number" min="0" :max="competition.race_to" />
+              <input v-model.number="editor.score_a" type="number" min="0" :max="competition.pool_race_to ?? competition.race_to" />
             </label>
             <label>
               <div class="mono" style="font-size: 10px; color: var(--mute); margin-bottom: 6px;">SCORE {{ editingMatch.player_b?.first_name?.toUpperCase() }}</div>
-              <input v-model.number="editor.score_b" type="number" min="0" :max="competition.race_to" />
+              <input v-model.number="editor.score_b" type="number" min="0" :max="competition.pool_race_to ?? competition.race_to" />
             </label>
           </div>
 

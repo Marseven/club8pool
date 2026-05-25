@@ -73,6 +73,8 @@ class DatabaseSeeder extends Seeder
             'pool_size' => 7,
             'qualifiers_per_pool' => 2,
             'race_to' => 3,
+            'pool_race_to' => 3,
+            'knockout_race_to' => 7,
             'shot_clock' => 30,
             'alternate_break' => true,
             'allow_draw' => true,

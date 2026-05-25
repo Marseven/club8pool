@@ -16,6 +16,8 @@ const form = useForm({
   pool_size: props.competition.pool_size,
   qualifiers_per_pool: props.competition.qualifiers_per_pool,
   race_to: props.competition.race_to,
+  pool_race_to: props.competition.pool_race_to ?? props.competition.race_to,
+  knockout_race_to: props.competition.knockout_race_to ?? props.competition.race_to,
   shot_clock: props.competition.shot_clock,
   alternate_break: !!props.competition.alternate_break,
   allow_draw: !!props.competition.allow_draw,
@@ -33,7 +35,14 @@ const form = useForm({
 
 const racePresets = [3, 5, 7, 9, 11];
 
-const submit = () => form.patch(`/admin/competitions/${props.competition.id}`);
+const submit = () => {
+  if (form.structure === 'pools_knockout' || form.structure === 'pools_only') {
+    form.race_to = form.pool_race_to;
+  } else if (form.structure === 'knockout') {
+    form.race_to = form.knockout_race_to;
+  }
+  form.patch(`/admin/competitions/${props.competition.id}`);
+};
 </script>
 
 <template>
@@ -67,11 +76,43 @@ const submit = () => form.patch(`/admin/competitions/${props.competition.id}`);
           </label>
         </div>
 
-        <h3 class="disp-a" style="font-size: 20px; margin-bottom: 8px;">Race to · Manches gagnantes</h3>
-        <p style="font-size: 13px; color: var(--mute); margin-bottom: 16px;">
-          Premier joueur à <strong style="color: var(--chalk);">{{ form.race_to }} manches</strong> remporte le match.
-        </p>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px;">
+        <h3 class="disp-a" style="font-size: 20px; margin-bottom: 14px;">Race to · Manches gagnantes</h3>
+
+        <div v-if="['pools_knockout', 'pools_only'].includes(form.structure)" style="margin-bottom: 20px;">
+          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--felt-2); margin-bottom: 10px;">▤ PHASE DE POULES</div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button v-for="n in racePresets" :key="'p'+n" type="button" @click="form.pool_race_to = n" :style="{
+              width: '64px', height: '64px', cursor: 'pointer',
+              border: '1px solid ' + (form.pool_race_to === n ? 'var(--felt-2)' : 'var(--line-strong)'),
+              background: form.pool_race_to === n ? 'rgba(45,168,118,0.08)' : 'var(--ink-2)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            }">
+              <div class="mono" style="font-size: 8px; letter-spacing: 0.2em; color: var(--mute);">RACE</div>
+              <div class="disp-a tnum" :style="{ fontSize: '24px', color: form.pool_race_to === n ? 'var(--felt-2)' : 'var(--chalk)' }">{{ n }}</div>
+            </button>
+            <input v-model.number="form.pool_race_to" type="number" min="1" max="25"
+                   style="width: 70px; text-align: center; font-family: var(--font-display-a); font-size: 18px;" />
+          </div>
+        </div>
+
+        <div v-if="['pools_knockout', 'knockout'].includes(form.structure)" style="margin-bottom: 28px;">
+          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--felt-2); margin-bottom: 10px;">◇ PHASE FINALE</div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button v-for="n in racePresets" :key="'k'+n" type="button" @click="form.knockout_race_to = n" :style="{
+              width: '64px', height: '64px', cursor: 'pointer',
+              border: '1px solid ' + (form.knockout_race_to === n ? 'var(--felt-2)' : 'var(--line-strong)'),
+              background: form.knockout_race_to === n ? 'rgba(45,168,118,0.08)' : 'var(--ink-2)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            }">
+              <div class="mono" style="font-size: 8px; letter-spacing: 0.2em; color: var(--mute);">RACE</div>
+              <div class="disp-a tnum" :style="{ fontSize: '24px', color: form.knockout_race_to === n ? 'var(--felt-2)' : 'var(--chalk)' }">{{ n }}</div>
+            </button>
+            <input v-model.number="form.knockout_race_to" type="number" min="1" max="25"
+                   style="width: 70px; text-align: center; font-family: var(--font-display-a); font-size: 18px;" />
+          </div>
+        </div>
+
+        <div v-if="form.structure === 'round_robin'" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px;">
           <button v-for="n in racePresets" :key="n" type="button" @click="form.race_to = n" :style="{
             width: '72px', height: '72px', cursor: 'pointer',
             border: '1px solid ' + (form.race_to === n ? 'var(--felt-2)' : 'var(--line-strong)'),
@@ -81,13 +122,6 @@ const submit = () => form.patch(`/admin/competitions/${props.competition.id}`);
             <div class="mono" style="font-size: 8px; letter-spacing: 0.2em; color: var(--mute);">RACE TO</div>
             <div class="disp-a tnum" :style="{ fontSize: '30px', color: form.race_to === n ? 'var(--felt-2)' : 'var(--chalk)' }">{{ n }}</div>
           </button>
-          <div style="width: 72px; height: 72px; border: 1px dashed var(--line-strong);
-                      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
-            <div class="mono" style="font-size: 8px; letter-spacing: 0.2em; color: var(--mute);">CUSTOM</div>
-            <input v-model.number="form.race_to" type="number" min="1" max="25"
-                   style="width: 50px; padding: 4px; text-align: center; font-family: var(--font-display-a);
-                          font-size: 18px; background: transparent; border: 1px solid var(--line); color: var(--chalk);" />
-          </div>
         </div>
 
         <h3 class="disp-a" style="font-size: 20px; margin-bottom: 14px;">Réglages</h3>

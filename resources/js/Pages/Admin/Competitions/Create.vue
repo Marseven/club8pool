@@ -19,6 +19,8 @@ const form = useForm({
   pool_size: 7,
   qualifiers_per_pool: 2,
   race_to: 3,
+  pool_race_to: 3,
+  knockout_race_to: 7,
   shot_clock: 30,
   alternate_break: true,
   allow_draw: true,
@@ -77,7 +79,15 @@ watch([() => form.pool_count, () => form.pool_size], () => {
   if (usesPools.value) form.player_slots = form.pool_count * form.pool_size;
 });
 
-const submit = () => form.post('/admin/competitions');
+const submit = () => {
+  // race_to (legacy field) tracks the dominant phase
+  if (form.structure === 'pools_knockout' || form.structure === 'pools_only') {
+    form.race_to = form.pool_race_to;
+  } else if (form.structure === 'knockout') {
+    form.race_to = form.knockout_race_to;
+  }
+  form.post('/admin/competitions');
+};
 
 const formatFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
 </script>
@@ -216,11 +226,74 @@ const formatFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
             <div style="margin-bottom: 36px;">
               <h3 class="disp-a" style="font-size: 22px; margin-bottom: 6px;">Race to · Manches gagnantes</h3>
               <p style="font-size: 13px; color: var(--mute); margin-bottom: 18px;">
-                Premier joueur à atteindre <strong style="color: var(--chalk); font-weight: 700;">{{ form.race_to }} manches gagnées</strong> remporte le match.
+                <template v-if="form.structure === 'pools_knockout'">
+                  Premier joueur à <strong style="color: var(--chalk);">{{ form.pool_race_to }} manches</strong> en phase de poules,
+                  <strong style="color: var(--chalk);">{{ form.knockout_race_to }} manches</strong> en phase finale.
+                </template>
+                <template v-else-if="form.structure === 'pools_only'">
+                  Premier joueur à <strong style="color: var(--chalk);">{{ form.pool_race_to }} manches</strong> remporte le match.
+                </template>
+                <template v-else-if="form.structure === 'knockout'">
+                  Premier joueur à <strong style="color: var(--chalk);">{{ form.knockout_race_to }} manches</strong> remporte le match.
+                </template>
+                <template v-else>
+                  Premier joueur à <strong style="color: var(--chalk);">{{ form.race_to }} manches</strong> remporte le match.
+                </template>
               </p>
 
-              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button v-for="n in racePresets" :key="n" type="button" @click="form.race_to = n" :style="{
+              <!-- Race poules -->
+              <div v-if="['pools_knockout', 'pools_only'].includes(form.structure)" style="margin-bottom: 24px;">
+                <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--felt-2); margin-bottom: 10px;">
+                  ▤ PHASE DE POULES
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  <button v-for="n in racePresets" :key="'p'+n" type="button" @click="form.pool_race_to = n; if (form.structure === 'pools_only') form.race_to = n" :style="{
+                    width: '70px', height: '70px', cursor: 'pointer',
+                    border: '1px solid ' + (form.pool_race_to === n ? 'var(--felt-2)' : 'var(--line-strong)'),
+                    background: form.pool_race_to === n ? 'rgba(45,168,118,0.08)' : 'var(--ink-2)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  }">
+                    <div class="mono" style="font-size: 8px; letter-spacing: 0.2em; color: var(--mute);">RACE TO</div>
+                    <div class="disp-a tnum" :style="{ fontSize: '28px', color: form.pool_race_to === n ? 'var(--felt-2)' : 'var(--chalk)' }">{{ n }}</div>
+                  </button>
+                  <div style="width: 70px; height: 70px; border: 1px dashed var(--line-strong);
+                              display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                    <div class="mono" style="font-size: 8px; letter-spacing: 0.2em; color: var(--mute);">CUSTOM</div>
+                    <input v-model.number="form.pool_race_to" type="number" min="1" max="25"
+                           style="width: 50px; padding: 3px; text-align: center; font-family: var(--font-display-a);
+                                  font-size: 18px; background: transparent; border: 1px solid var(--line); color: var(--chalk);" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Race phase finale -->
+              <div v-if="['pools_knockout', 'knockout'].includes(form.structure)">
+                <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--felt-2); margin-bottom: 10px;">
+                  ◇ PHASE FINALE
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  <button v-for="n in racePresets" :key="'k'+n" type="button" @click="form.knockout_race_to = n; if (form.structure === 'knockout') form.race_to = n" :style="{
+                    width: '70px', height: '70px', cursor: 'pointer',
+                    border: '1px solid ' + (form.knockout_race_to === n ? 'var(--felt-2)' : 'var(--line-strong)'),
+                    background: form.knockout_race_to === n ? 'rgba(45,168,118,0.08)' : 'var(--ink-2)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  }">
+                    <div class="mono" style="font-size: 8px; letter-spacing: 0.2em; color: var(--mute);">RACE TO</div>
+                    <div class="disp-a tnum" :style="{ fontSize: '28px', color: form.knockout_race_to === n ? 'var(--felt-2)' : 'var(--chalk)' }">{{ n }}</div>
+                  </button>
+                  <div style="width: 70px; height: 70px; border: 1px dashed var(--line-strong);
+                              display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                    <div class="mono" style="font-size: 8px; letter-spacing: 0.2em; color: var(--mute);">CUSTOM</div>
+                    <input v-model.number="form.knockout_race_to" type="number" min="1" max="25"
+                           style="width: 50px; padding: 3px; text-align: center; font-family: var(--font-display-a);
+                                  font-size: 18px; background: transparent; border: 1px solid var(--line); color: var(--chalk);" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Race round-robin -->
+              <div v-if="form.structure === 'round_robin'" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button v-for="n in racePresets" :key="'r'+n" type="button" @click="form.race_to = n" :style="{
                   width: '80px', height: '80px', cursor: 'pointer',
                   border: '1px solid ' + (form.race_to === n ? 'var(--felt-2)' : 'var(--line-strong)'),
                   background: form.race_to === n ? 'rgba(45,168,118,0.08)' : 'var(--ink-2)',
@@ -304,7 +377,22 @@ const formatFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
               <tr><th>Structure</th><td>{{ structures.find(s => s.v === form.structure)?.l }}</td></tr>
               <tr v-if="usesPools"><th>Poules</th><td>{{ form.pool_count }} × {{ form.pool_size }} joueurs · {{ form.qualifiers_per_pool }} qualifiés</td></tr>
               <tr v-else><th>Joueurs</th><td>{{ form.player_slots }}</td></tr>
-              <tr><th>Race to</th><td><strong>{{ form.race_to }}</strong> manches gagnantes</td></tr>
+              <tr v-if="form.structure === 'pools_knockout'">
+                <th>Race to</th>
+                <td>
+                  Poules : <strong>{{ form.pool_race_to }}</strong> manches ·
+                  Phase finale : <strong>{{ form.knockout_race_to }}</strong> manches
+                </td>
+              </tr>
+              <tr v-else-if="form.structure === 'pools_only'">
+                <th>Race to</th><td><strong>{{ form.pool_race_to }}</strong> manches (poules)</td>
+              </tr>
+              <tr v-else-if="form.structure === 'knockout'">
+                <th>Race to</th><td><strong>{{ form.knockout_race_to }}</strong> manches</td>
+              </tr>
+              <tr v-else>
+                <th>Race to</th><td><strong>{{ form.race_to }}</strong> manches</td>
+              </tr>
               <tr><th>Shot clock</th><td>{{ form.shot_clock }} sec</td></tr>
               <tr><th>Options</th><td>
                 <template v-if="form.alternate_break">Break alterné · </template>
@@ -324,7 +412,21 @@ const formatFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
             <div class="mono" style="font-size: 9px; letter-spacing: 0.22em; color: var(--mute); margin-top: 14px;">STRUCTURE</div>
             <div style="font-size: 14px; font-weight: 600; margin-top: 4px;">{{ structures.find(s => s.v === form.structure)?.l }}</div>
             <div class="mono" style="font-size: 9px; letter-spacing: 0.22em; color: var(--mute); margin-top: 14px;">RACE</div>
-            <div class="disp-a tnum" style="font-size: 36px; margin-top: 4px; color: var(--felt-2);">RACE TO {{ form.race_to }}</div>
+            <template v-if="form.structure === 'pools_knockout'">
+              <div style="display: flex; gap: 14px; margin-top: 4px; align-items: baseline;">
+                <div>
+                  <div class="disp-a tnum" style="font-size: 30px; color: var(--felt-2);">{{ form.pool_race_to }}</div>
+                  <div class="mono" style="font-size: 8px; color: var(--mute); letter-spacing: 0.2em;">POULES</div>
+                </div>
+                <div>
+                  <div class="disp-a tnum" style="font-size: 30px; color: var(--felt-2);">{{ form.knockout_race_to }}</div>
+                  <div class="mono" style="font-size: 8px; color: var(--mute); letter-spacing: 0.2em;">FINALE</div>
+                </div>
+              </div>
+            </template>
+            <div v-else class="disp-a tnum" style="font-size: 36px; margin-top: 4px; color: var(--felt-2);">
+              RACE TO {{ form.structure === 'pools_only' ? form.pool_race_to : (form.structure === 'knockout' ? form.knockout_race_to : form.race_to) }}
+            </div>
             <div v-if="usesPools" class="mono" style="font-size: 10px; color: var(--mute); margin-top: 12px;">
               {{ form.pool_count }} poules · {{ form.player_slots }} joueurs
             </div>
