@@ -109,12 +109,18 @@ class RefereeApiController extends Controller
         $match->update([
             'status' => 'done',
             'ended_at' => now(),
-            'duration_seconds' => $match->started_at ? now()->diffInSeconds($match->started_at) : null,
+            'duration_seconds' => $match->started_at ? (int) now()->diffInSeconds($match->started_at) : null,
             'referee_note' => $data['referee_note'] ?? null,
         ]);
-        (new \App\Services\BracketProgression())->advanceWinner($match->fresh());
 
-        return response()->json($match->fresh());
+        // Advance bracket winner — non-fatal: a crash here must never 500 the endpoint
+        try {
+            (new \App\Services\BracketProgression())->advanceWinner($match->fresh());
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('BracketProgression failed on match #' . $match->id . ': ' . $e->getMessage());
+        }
+
+        return response()->json($match->fresh()->load(['playerA.club', 'playerB.club', 'table', 'pool', 'competition', 'signatures']));
     }
 
     public function sign(Request $request, GameMatch $match): JsonResponse
