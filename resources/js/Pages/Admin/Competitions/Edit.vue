@@ -124,6 +124,26 @@ const submit = () => {
           </button>
         </div>
 
+        <h3 v-if="['pools_knockout', 'pools_only'].includes(form.structure)" class="disp-a" style="font-size: 20px; margin-bottom: 14px;">Poules</h3>
+        <div v-if="['pools_knockout', 'pools_only'].includes(form.structure)" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px;">
+          <label>
+            <div class="mono" style="font-size: 10px; color: var(--mute); margin-bottom: 6px;">NB POULES</div>
+            <input v-model.number="form.pool_count" type="number" min="2" max="16" />
+          </label>
+          <label>
+            <div class="mono" style="font-size: 10px; color: var(--mute); margin-bottom: 6px;">JOUEURS / POULE</div>
+            <input v-model.number="form.pool_size" type="number" min="3" max="12" />
+          </label>
+          <label v-if="form.structure === 'pools_knockout'">
+            <div class="mono" style="font-size: 10px; color: var(--mute); margin-bottom: 6px;">QUALIFIÉS / POULE</div>
+            <input v-model.number="form.qualifiers_per_pool" type="number" min="1" :max="form.pool_size - 1" />
+          </label>
+          <label>
+            <div class="mono" style="font-size: 10px; color: var(--mute); margin-bottom: 6px;">JOUEURS TOTAL</div>
+            <input v-model.number="form.player_slots" type="number" min="2" max="256" />
+          </label>
+        </div>
+
         <h3 class="disp-a" style="font-size: 20px; margin-bottom: 14px;">Réglages</h3>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px;">
           <label>

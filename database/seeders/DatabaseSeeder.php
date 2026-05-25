@@ -71,7 +71,7 @@ class DatabaseSeeder extends Seeder
             'player_slots' => 28,
             'pool_count' => 4,
             'pool_size' => 7,
-            'qualifiers_per_pool' => 2,
+            'qualifiers_per_pool' => 4,
             'race_to' => 3,
             'pool_race_to' => 3,
             'knockout_race_to' => 7,
@@ -98,8 +98,6 @@ class DatabaseSeeder extends Seeder
         foreach ([
             ['Table 1', 'Salle principale', 'live'],
             ['Table 2', 'Salle principale', 'live'],
-            ['Table 3', 'Salle annexe', 'idle'],
-            ['Table 4', 'Salle annexe', 'idle'],
         ] as $t) {
             $tableModels->push(PoolTable::create([
                 'competition_id' => $competition->id,
