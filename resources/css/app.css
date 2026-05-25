@@ -199,11 +199,41 @@ input, textarea, select, button {
   [style*="padding: 32px 48px"], [style*="padding: 24px 32px"],
   [style*="padding: 20px 32px"], [style*="padding: 18px 32px"],
   [style*="padding: 64px"], [style*="padding: 56px 64px"],
-  [style*="padding: 36px 40px"], [style*="padding: 32px"] {
+  [style*="padding: 36px 40px"], [style*="padding: 32px"],
+  [style*="padding: 40px 48px"], [style*="padding: 28px 24px"],
+  [style*="padding: 18px 48px"], [style*="padding: 20px 48px"],
+  [style*="padding: 14px 24px"], [style*="padding: 16px 20px"] {
     padding: 18px 16px !important;
   }
-  [style*="padding: 56px 48px"], [style*="padding: 64px 48px 48px"] {
+  [style*="padding: 56px 48px"], [style*="padding: 64px 48px 48px"],
+  [style*="padding: 56px 48px 48px"] {
     padding: 28px 16px !important;
+  }
+
+  /* Flex rows : la plupart sont 'title + meta' qui devraient s'empiler sur mobile */
+  [style*="display: flex"][style*="justify-content: space-between"]:not(.no-wrap) {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  /* Chip rows + button rows wrap aussi */
+  [style*="display: flex"][style*="gap: 14px"][style*="align-items: center"],
+  [style*="display: flex"][style*="gap: 12px"][style*="margin-top"],
+  [style*="display: flex"][style*="gap: 28px"][style*="padding-bottom"] {
+    flex-wrap: wrap;
+  }
+
+  /* Schedule rows : grid pixel fixe → empiler proprement */
+  [style*="grid-template-columns: 120px 1fr 160px 28px"],
+  [style*="grid-template-columns: 60px 1fr auto"],
+  [style*="grid-template-columns: 90px 1fr auto"],
+  [style*="grid-template-columns: 100px 1fr auto"] {
+    grid-template-columns: 1fr auto !important;
+    row-gap: 4px;
+  }
+  [style*="grid-template-columns: 120px 1fr 160px 28px"] > :nth-child(4),
+  [style*="grid-template-columns: 120px 1fr 160px 28px"] > :nth-child(3) {
+    /* On garde toute l'info mais regroupée à droite */
+    grid-column: auto;
   }
 
   /* Tous les grids multi-colonnes deviennent 1 colonne par défaut */

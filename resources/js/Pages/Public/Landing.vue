@@ -33,7 +33,7 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
     <PublicNav />
 
     <section style="position: relative; padding: 64px 48px 48px; border-bottom: 1px solid var(--line);">
-      <div style="display: flex; gap: 14px; align-items: center; margin-bottom: 32px;">
+      <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 32px; flex-wrap: wrap;">
         <Chip variant="live">EN DIRECT · {{ liveMatches?.length || 0 }} TABLES</Chip>
         <Chip>{{ competition?.pool_count }} POULES · {{ stats?.players }} JOUEURS</Chip>
         <Chip>{{ competition?.city?.toUpperCase() }}</Chip>
@@ -43,7 +43,7 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
           <div class="mono" style="font-size: 12px; letter-spacing: 0.2em; color: var(--mute); margin-bottom: 18px;">
             {{ competition?.discipline?.toUpperCase() }} · POULES + PHASE FINALE
           </div>
-          <h1 class="disp-a" style="font-size: 132px; line-height: 0.82;">
+          <h1 class="disp-a" style="font-size: clamp(48px, 13vw, 132px); line-height: 0.85; word-break: break-word;">
             ICONE POOL<br /><span style="color: var(--felt-2);">CHAMPIONSHIP</span>
           </h1>
           <p style="margin-top: 28px; font-size: 16px; max-width: 520px; color: var(--chalk-2); line-height: 1.5;">
@@ -111,7 +111,7 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
     </section>
 
     <section v-if="pools?.length" style="padding: 56px 48px; border-bottom: 1px solid var(--line);">
-      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 28px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 28px; gap: 14px; flex-wrap: wrap;">
         <h2 class="disp-a" style="font-size: 56px;">En tête de poule</h2>
         <Link href="/competitions" style="font-size: 13px; color: var(--mute); text-decoration: underline; text-underline-offset: 6px;">
           Voir tous les classements →
@@ -130,26 +130,26 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
     </section>
 
     <section style="padding: 56px 48px; border-bottom: 1px solid var(--line);">
-      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 28px;">
-        <h2 class="disp-a" style="font-size: 56px;">Programme du jour</h2>
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 28px; gap: 14px; flex-wrap: wrap;">
+        <h2 class="disp-a" style="font-size: 56px;">Programme</h2>
         <span class="mono" style="font-size: 12px; color: var(--mute); letter-spacing: 0.16em;">
-          SAM. 06 JUIN · {{ competition?.venue?.toUpperCase() }}
+          {{ competition?.venue?.toUpperCase() }}
         </span>
       </div>
       <div>
         <div v-for="(s, i) in schedule" :key="i"
-          style="display: grid; grid-template-columns: 120px 1fr 160px 28px;
-                 align-items: center; padding: 18px 0; border-top: 1px solid var(--line);">
-          <span class="disp-a tnum" style="font-size: 32px;">{{ s.time }}</span>
-          <span style="font-size: 18px; font-weight: 500;">{{ s.round }}</span>
+          style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+                 padding: 18px 0; border-top: 1px solid var(--line);">
+          <span class="disp-a tnum" style="font-size: 32px; min-width: 90px; text-transform: uppercase;">{{ s.time }}</span>
+          <span style="font-size: 16px; font-weight: 500; flex: 1; min-width: 140px;">{{ s.round }}</span>
           <Chip :variant="s.status === 'live' ? 'live' : ''" style="width: fit-content;">{{ statusLabel(s.status) }}</Chip>
-          <span style="color: var(--mute);">→</span>
         </div>
       </div>
     </section>
 
-    <footer style="padding: 40px 48px; display: flex; justify-content: space-between;
-                   align-items: center; color: var(--mute); font-size: 12px;">
+    <footer style="padding: 32px 24px; display: flex; justify-content: space-between;
+                   align-items: center; color: var(--mute); font-size: 12px;
+                   gap: 14px; flex-wrap: wrap;">
       <div style="display: flex; align-items: center; gap: 12px;">
         <GabonFlag :width="26" :height="18" />
         <span class="mono" style="letter-spacing: 0.18em; text-transform: uppercase;">
