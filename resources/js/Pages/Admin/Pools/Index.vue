@@ -145,7 +145,7 @@ const playerLabel = (pool, playerId) => {
                   <button v-if="m.status === 'live'" class="btn"
                           style="padding: 4px 10px; font-size: 11px; border-color: var(--live); color: var(--live);"
                           @click="startEdit(m)">
-                    ⏹ Clore
+                    ■ Clore
                   </button>
                   <button v-if="m.status === 'done'" class="btn"
                           style="padding: 4px 10px; font-size: 11px;" @click="startEdit(m)">

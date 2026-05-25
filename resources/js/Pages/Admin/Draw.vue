@@ -57,7 +57,7 @@ const reset = () => { drawn.value = 0; };
         <div style="display: flex; gap: 10px; align-items: center;">
           <Chip variant="live">EN COURS · {{ drawn }}/{{ players.length }}</Chip>
           <button class="btn" @click="paused = !paused">{{ paused ? '▸ Reprendre' : '‖ Pause' }}</button>
-          <button class="btn" @click="reset">↺ Re-tirer</button>
+          <button class="btn" @click="reset">⟲ Re-tirer</button>
         </div>
       </header>
 
