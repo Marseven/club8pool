@@ -65,13 +65,14 @@ class PoolStanding
             return $b['w'] <=> $a['w'];
         })->values();
 
-        // Rang à la convention Excel : par V uniquement, ex-aequo possible.
+        // Rang : V puis Diff. Ex-aequo seulement si V ET Diff sont identiques.
         $rank = 0;
-        $prevV = null;
-        $sorted = $sorted->map(function ($r, $i) use (&$rank, &$prevV) {
-            if ($r['v'] !== $prevV) {
+        $prevKey = null;
+        $sorted = $sorted->map(function ($r, $i) use (&$rank, &$prevKey) {
+            $key = $r['v'] . '|' . $r['diff'];
+            if ($key !== $prevKey) {
                 $rank = $i + 1;
-                $prevV = $r['v'];
+                $prevKey = $key;
             }
             $r['rank'] = $rank;
             return $r;
