@@ -46,7 +46,7 @@ class RefereeApiController extends Controller
 
     public function queue(Request $request): JsonResponse
     {
-        $matches = GameMatch::with(['playerA.club', 'playerB.club', 'table', 'competition'])
+        $matches = GameMatch::with(['playerA.club', 'playerB.club', 'table', 'competition', 'pool'])
             ->where('referee_id', $request->user()->id)
             ->orderBy('scheduled_at')
             ->get();
@@ -184,5 +184,35 @@ class RefereeApiController extends Controller
         ]);
         $match->update(['pool_table_id' => $data['table_id']]);
         return response()->json($match->fresh()->load(['playerA.club', 'playerB.club', 'table', 'pool', 'competition']));
+    }
+
+    public function undoFrame(Request $request, GameMatch $match): JsonResponse
+    {
+        $data = $request->validate([
+            'player' => ['required', 'in:A,B'],
+        ]);
+
+        if ($data['player'] === 'A' && $match->score_a > 0) {
+            $match->decrement('score_a');
+        } elseif ($data['player'] === 'B' && $match->score_b > 0) {
+            $match->decrement('score_b');
+        }
+
+        return response()->json(['match' => $match->fresh()]);
+    }
+
+    public function addWarning(Request $request, GameMatch $match): JsonResponse
+    {
+        $data = $request->validate([
+            'player' => ['required', 'in:A,B'],
+        ]);
+
+        if ($data['player'] === 'A') {
+            $match->update(['warning_a' => true]);
+        } else {
+            $match->update(['warning_b' => true]);
+        }
+
+        return response()->json(['match' => $match->fresh()]);
     }
 }

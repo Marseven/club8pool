@@ -17,4 +17,6 @@ Route::middleware('auth:sanctum')->prefix('referee')->group(function () {
     Route::get('/available', [RefereeApiController::class, 'available']);
     Route::post('/matches/{match}/claim', [RefereeApiController::class, 'claim']);
     Route::post('/matches/{match}/table', [RefereeApiController::class, 'assignTable']);
+    Route::post('/matches/{match}/undo-frame', [RefereeApiController::class, 'undoFrame']);
+    Route::post('/matches/{match}/warning', [RefereeApiController::class, 'addWarning']);
 });
