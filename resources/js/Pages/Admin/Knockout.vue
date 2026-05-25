@@ -1,9 +1,9 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3';
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import Chip from '@/Components/Chip.vue';
-import { AlertTriangle, RotateCcw, Check } from 'lucide-vue-next';
+import { AlertTriangle, RotateCcw, Check, Pencil } from 'lucide-vue-next';
 
 const props = defineProps({
   competition: Object,
@@ -61,6 +61,28 @@ const generate = () => {
 
 const labelOf = (q) => q ? `${q.pool_name}${q.pool_slot}` : '—';
 const roundLabel = (r) => ({ R16: '8e de finale', QF: 'Quart de finale', SF: 'Demi-finale', F: 'Finale' }[r] ?? r);
+
+// ── Score correction modal ──────────────────────────────────────────
+const editingMatch = ref(null);
+const scoreEdit = ref({ score_a: 0, score_b: 0 });
+const saving = ref(false);
+
+const openEdit = (m) => {
+  editingMatch.value = m;
+  scoreEdit.value = { score_a: m.score_a, score_b: m.score_b };
+};
+const closeEdit = () => { editingMatch.value = null; };
+const saveEdit = () => {
+  saving.value = true;
+  router.patch(`/admin/matchs/${editingMatch.value.id}`, {
+    score_a: scoreEdit.value.score_a,
+    score_b: scoreEdit.value.score_b,
+    status: 'done',
+  }, {
+    onSuccess: () => { closeEdit(); },
+    onFinish: () => { saving.value = false; },
+  });
+};
 </script>
 
 <template>
@@ -92,23 +114,56 @@ const roundLabel = (r) => ({ R16: '8e de finale', QF: 'Quart de finale', SF: 'De
       </div>
 
       <!-- Existing knockout -->
-      <section v-if="hasExisting" style="margin: 24px 32px; padding: 16px 20px;
-           border: 1px solid var(--felt-2); background: rgba(45,168,118,0.04);">
-        <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--felt-2);">BRACKET ACTUEL</div>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 14px;">
-          <div v-for="round in ['R16', 'QF', 'SF', 'F']" :key="round">
-            <div class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.18em;">
+      <section v-if="hasExisting" style="margin: 24px 32px;">
+        <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--felt-2); margin-bottom: 14px;">BRACKET ACTUEL</div>
+
+        <div v-for="round in ['R16', 'QF', 'SF', 'F']" :key="round">
+          <template v-if="(existing[round] || []).length">
+            <div class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.22em;
+                                     padding: 8px 0 6px; border-bottom: 1px solid var(--line);">
               {{ roundLabel(round) }}
             </div>
-            <div class="disp-a tnum" style="font-size: 28px; margin-top: 6px;">
-              {{ (existing[round] || []).length }}<span style="color: var(--mute); font-size: 14px;"> match{{ (existing[round] || []).length > 1 ? 'es' : '' }}</span>
-            </div>
-          </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <tbody>
+                <tr v-for="m in (existing[round] || [])" :key="m.id"
+                    style="border-bottom: 1px solid var(--line);">
+                  <td style="padding: 10px 0; width: 40%;">
+                    <span :style="{ fontWeight: m.score_a > m.score_b ? 700 : 400 }">
+                      {{ m.player_a?.first_name }} {{ m.player_a?.last_name }}
+                    </span>
+                  </td>
+                  <td style="padding: 10px 12px; text-align: center; width: 80px;">
+                    <template v-if="m.status === 'done'">
+                      <span class="disp-a tnum" style="font-size: 18px;">
+                        {{ m.score_a }} — {{ m.score_b }}
+                      </span>
+                    </template>
+                    <template v-else>
+                      <span class="mono" style="font-size: 10px; color: var(--mute);">
+                        {{ m.status === 'live' ? 'EN COURS' : 'ATTENTE' }}
+                      </span>
+                    </template>
+                  </td>
+                  <td style="padding: 10px 0; width: 40%; text-align: right;">
+                    <span :style="{ fontWeight: m.score_b > m.score_a ? 700 : 400 }">
+                      {{ m.player_b?.first_name }} {{ m.player_b?.last_name }}
+                    </span>
+                  </td>
+                  <td style="padding: 10px 0 10px 14px; text-align: right; white-space: nowrap;">
+                    <button v-if="m.status === 'done'" class="btn"
+                            @click="openEdit(m)"
+                            style="padding: 4px 10px; font-size: 11px; display: inline-flex; align-items: center; gap: 5px;">
+                      <Pencil :size="11" /> Corriger
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </template>
         </div>
-        <p style="font-size: 12px; color: var(--mute); margin-top: 12px;">
-          Le bracket a déjà été généré. Régénérer écrasera tous les matchs knockout (les scores
-          existants seront perdus). Tu peux aussi continuer à jouer le bracket actuel via
-          /admin/poules ou directement dans les matchs.
+
+        <p style="font-size: 12px; color: var(--mute);">
+          Régénérer le bracket écrasera tous ces matchs et leurs scores.
         </p>
       </section>
 
@@ -211,5 +266,47 @@ const roundLabel = (r) => ({ R16: '8e de finale', QF: 'Quart de finale', SF: 'De
         </button>
       </section>
     </main>
+  </div>
+
+  <!-- ── Score correction modal ─────────────────────────────────── -->
+  <div v-if="editingMatch" @click.self="closeEdit"
+       style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;
+              align-items:center;justify-content:center;z-index:200;">
+    <div style="background:var(--ink-2);border:1px solid var(--line-strong);
+                padding:28px;width:380px;max-width:calc(100vw - 32px);">
+      <div class="mono" style="font-size:10px;letter-spacing:.22em;color:var(--mute);margin-bottom:4px;">
+        CORRECTION DE SCORE
+      </div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:20px;">
+        {{ editingMatch.player_a?.first_name }}
+        <span style="color:var(--mute);font-weight:400;"> vs </span>
+        {{ editingMatch.player_b?.first_name }}
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+        <div>
+          <div class="mono" style="font-size:10px;color:var(--mute);margin-bottom:6px;">
+            SCORE · {{ editingMatch.player_a?.first_name?.toUpperCase() }}
+          </div>
+          <input v-model.number="scoreEdit.score_a" type="number" min="0"
+                 :max="competition.knockout_race_to ?? competition.race_to" />
+        </div>
+        <div>
+          <div class="mono" style="font-size:10px;color:var(--mute);margin-bottom:6px;">
+            SCORE · {{ editingMatch.player_b?.first_name?.toUpperCase() }}
+          </div>
+          <input v-model.number="scoreEdit.score_b" type="number" min="0"
+                 :max="competition.knockout_race_to ?? competition.race_to" />
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button class="btn" @click="closeEdit" style="flex:1;padding:10px;">Annuler</button>
+        <button class="btn btn-felt" @click="saveEdit" :disabled="saving"
+                style="flex:2;padding:10px;">
+          {{ saving ? 'Enregistrement…' : 'Enregistrer' }}
+        </button>
+      </div>
+    </div>
   </div>
 </template>
