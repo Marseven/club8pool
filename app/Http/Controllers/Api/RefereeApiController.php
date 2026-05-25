@@ -91,7 +91,7 @@ class RefereeApiController extends Controller
             'warning_b' => $data['warning_b'] ?? $match->warning_b,
         ]);
 
-        return response()->json(['match' => $match->fresh()]);
+        return response()->json(['match' => $match->fresh()->load(['playerA.club', 'playerB.club', 'table', 'pool', 'competition'])]);
     }
 
     public function start(GameMatch $match): JsonResponse
@@ -198,7 +198,7 @@ class RefereeApiController extends Controller
             $match->decrement('score_b');
         }
 
-        return response()->json(['match' => $match->fresh()]);
+        return response()->json(['match' => $match->fresh()->load(['playerA.club', 'playerB.club', 'table', 'pool', 'competition'])]);
     }
 
     public function addWarning(Request $request, GameMatch $match): JsonResponse
@@ -213,6 +213,6 @@ class RefereeApiController extends Controller
             $match->update(['warning_b' => true]);
         }
 
-        return response()->json(['match' => $match->fresh()]);
+        return response()->json(['match' => $match->fresh()->load(['playerA.club', 'playerB.club', 'table', 'pool', 'competition'])]);
     }
 }
