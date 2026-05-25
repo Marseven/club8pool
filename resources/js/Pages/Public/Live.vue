@@ -109,8 +109,12 @@ const raceFor = (m) => m.phase === 'knockout'
 
 // Nom complet
 const playerName = (p) => p ? `${p.first_name} ${p.last_name}` : '—';
-// Abréviation 3 lettres du nom de famille (style tableau foot)
-const abbrev = (p) => p ? p.last_name.slice(0, 3).toUpperCase() : '—';
+// Abréviation 3 lettres : last_name si renseigné, sinon first_name
+const abbrev = (p) => {
+  if (!p) return '—';
+  const src = (p.last_name?.trim() || p.first_name?.trim() || '').toUpperCase();
+  return src.slice(0, 3) || '—';
+};
 </script>
 
 <template>
