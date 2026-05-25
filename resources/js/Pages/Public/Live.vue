@@ -130,7 +130,8 @@ const raceFor = (m) => m.phase === 'knockout'
         </div>
       </div>
       <div style="display: flex; gap: 14px; align-items: center;">
-        <Chip variant="live">EN DIRECT · {{ liveMatches?.length || 0 }} {{ (liveMatches?.length || 0) > 1 ? 'TABLES' : 'TABLE' }}</Chip>
+        <Chip v-if="liveMatches?.length" variant="live">EN DIRECT · {{ liveMatches.length }} {{ liveMatches.length > 1 ? 'TABLES' : 'TABLE' }}</Chip>
+        <Chip v-else>PAUSE · {{ nextMatches?.length || 0 }} À VENIR</Chip>
         <span class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.14em;">
           MAJ · {{ secondsAgo }}s
         </span>
@@ -146,7 +147,7 @@ const raceFor = (m) => m.phase === 'knockout'
     <!-- Section : matchs en direct (toujours visible, haut de page) -->
     <section class="section-live" style="flex-shrink: 0; padding: clamp(8px,1.4vh,20px) clamp(12px,2.5vw,32px);">
       <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
-        <h2 class="disp-a" style="font-size: 28px;">MATCHS EN DIRECT</h2>
+        <h2 class="disp-a" style="font-size: 28px;">{{ liveMatches?.length ? 'MATCHS EN DIRECT' : 'PROCHAINS MATCHS' }}</h2>
         <div v-if="competition?.structure === 'pools_knockout'" class="mono" style="font-size: 11px; color: var(--mute);">
           POULES RACE TO {{ competition?.pool_race_to ?? competition?.race_to }} · FINALE RACE TO {{ competition?.knockout_race_to ?? competition?.race_to }}
         </div>
@@ -188,9 +189,44 @@ const raceFor = (m) => m.phase === 'knockout'
         </div>
       </div>
 
-      <div v-else style="padding: 32px; text-align: center; border: 1px dashed var(--line);">
-        <div class="disp-a" style="font-size: 28px; color: var(--mute);">AUCUN MATCH EN DIRECT</div>
-      </div>
+      <!-- Pas de match live : affiche les prochains -->
+      <template v-else>
+        <div v-if="nextMatches?.length" class="live-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+          <div v-for="m in nextMatches" :key="m.id"
+               style="border: 1px solid var(--line); background: var(--ink-2); padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div>
+                <div class="disp-a" style="font-size: 22px;">{{ m.table?.name?.toUpperCase() ?? 'TABLE À DÉFINIR' }}</div>
+                <div class="mono" style="font-size: 10px; letter-spacing: 0.18em; color: var(--mute); margin-top: 4px;">
+                  {{ m.phase === 'pool' ? 'POULE · ROUND-ROBIN' : m.round?.replace('R16','8e').replace('QF','QUARTS').replace('SF','DEMI').replace('F','FINALE') }}
+                  · RACE TO {{ raceFor(m) }}
+                  <template v-if="fmtTime(m.scheduled_at)"> · {{ fmtTime(m.scheduled_at) }}</template>
+                </div>
+              </div>
+              <span class="mono" style="font-size: 9px; letter-spacing: 0.18em; padding: 3px 8px;
+                                        border: 1px solid var(--line-strong); color: var(--mute);">À VENIR</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 18px;">
+              <div style="text-align: left; min-width: 0;">
+                <div style="font-size: 22px; font-weight: 700; color: var(--chalk-2);">
+                  {{ m.player_a?.first_name }} {{ m.player_a?.last_name }}
+                </div>
+                <div style="font-size: 12px; color: var(--mute); margin-top: 4px;">{{ m.player_a?.club?.name }}</div>
+              </div>
+              <div class="disp-a" style="font-size: clamp(24px,4vh,48px); color: var(--mute-2);">VS</div>
+              <div style="text-align: right; min-width: 0;">
+                <div style="font-size: 22px; font-weight: 700; color: var(--chalk-2);">
+                  {{ m.player_b?.first_name }} {{ m.player_b?.last_name }}
+                </div>
+                <div style="font-size: 12px; color: var(--mute); margin-top: 4px;">{{ m.player_b?.club?.name }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else style="padding: 32px; text-align: center; border: 1px dashed var(--line);">
+          <div class="disp-a" style="font-size: 28px; color: var(--mute);">AUCUN MATCH EN DIRECT</div>
+        </div>
+      </template>
     </section>
 
     <!-- Section : carousel de poules (1 à la fois, rotation 10s) -->
@@ -276,8 +312,8 @@ const raceFor = (m) => m.phase === 'knockout'
 
     </section>
 
-    <!-- Prochains matchs (optionnel, petit) -->
-    <section v-if="nextMatches?.length && !isFullscreen" style="flex-shrink: 0; padding: clamp(8px,1.2vh,16px) clamp(12px,2.5vw,32px); border-top: 1px solid var(--line);">
+    <!-- Prochains matchs (seulement si des matchs live sont affichés en haut) -->
+    <section v-if="nextMatches?.length && liveMatches?.length && !isFullscreen" style="flex-shrink: 0; padding: clamp(8px,1.2vh,16px) clamp(12px,2.5vw,32px); border-top: 1px solid var(--line);">
       <h3 class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute); margin-bottom: 10px;">PROCHAINEMENT</h3>
       <div class="next-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
         <div v-for="m in nextMatches" :key="m.id"
