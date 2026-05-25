@@ -44,7 +44,10 @@ const fmtTime = (iso) => {
 </script>
 
 <template>
-  <Head title="TV · Scoreboard" />
+  <Head title="TV · Scoreboard">
+    <meta name="description" content="Scoreboard en direct du Icone Pool Championship — diffusion plein écran pour projection en salle." head-key="description" />
+    <meta name="robots" content="noindex" head-key="robots" />
+  </Head>
   <div style="width: 100vw; height: 100vh; background: #000;
               display: grid; grid-template-rows: 88px 1fr 92px; overflow: hidden;">
     <header style="display: flex; justify-content: space-between; align-items: center;

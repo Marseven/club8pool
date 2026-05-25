@@ -25,7 +25,10 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
 </script>
 
 <template>
-  <Head :title="competition?.name ?? 'Club 8 Pool'" />
+  <Head :title="competition?.name ?? 'Club 8 Pool'">
+    <meta name="description" :content="`${competition?.name ?? 'Club 8 Pool'} — ${competition?.pool_count} poules, ${stats?.players} joueurs, race to ${competition?.race_to}. Suivez classements et matchs en direct à ${competition?.venue}.`" head-key="description" />
+    <meta property="og:description" :content="`${competition?.name ?? 'Club 8 Pool'} — ${competition?.pool_count} poules, ${stats?.players} joueurs, race to ${competition?.race_to}.`" head-key="og:description" />
+  </Head>
   <div style="background: var(--ink); min-height: 100vh;">
     <PublicNav />
 

@@ -27,7 +27,10 @@ const hasKnockout = computed(() => Object.keys(props.knockoutMatches || {}).leng
 </script>
 
 <template>
-  <Head :title="competition?.name ?? 'Compétition'" />
+  <Head :title="competition?.name ?? 'Compétition'">
+    <meta name="description" :content="`Bracket, classements de poules et résultats live du ${competition?.name}. ${competition?.pool_count} poules, ${competition?.qualifiers_per_pool} qualifiés par poule.`" head-key="description" />
+    <meta property="og:description" :content="`Bracket, classements de poules et résultats live du ${competition?.name}.`" head-key="og:description" />
+  </Head>
   <div style="background: var(--ink); min-height: 100vh;">
     <PublicNav />
     <section style="padding: 32px 48px 0; border-bottom: 1px solid var(--line);">

@@ -1,2 +1,7 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin
+Disallow: /arbitre
+Disallow: /login
+
+Sitemap: https://club8pool.com/sitemap.xml

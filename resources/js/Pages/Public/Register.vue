@@ -37,7 +37,9 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
 </script>
 
 <template>
-  <Head title="Inscription" />
+  <Head title="Inscription">
+    <meta name="description" :content="`Inscrivez-vous au ${competition?.name}. ${slots - registered} places restantes. Frais d'inscription ${competition?.entry_fee} FCFA. Dotation ${competition?.prize_pool} FCFA.`" head-key="description" />
+  </Head>
   <div style="background: var(--ink); min-height: 100vh;">
     <PublicNav />
     <section style="display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 73px);">

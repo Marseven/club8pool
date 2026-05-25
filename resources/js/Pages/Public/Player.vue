@@ -20,7 +20,10 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString('fr-FR', { day: '2-dig
 </script>
 
 <template>
-  <Head :title="`${player.first_name} ${player.last_name}`" />
+  <Head :title="`${player.first_name} ${player.last_name}`">
+    <meta name="description" :content="`Fiche joueur ${player.first_name} ${player.last_name} (${player.club?.name}) — palmarès, classement Elo, historique des matchs sur Club 8 Pool.`" head-key="description" />
+    <meta property="og:type" content="profile" head-key="og:type" />
+  </Head>
   <div style="background: var(--ink); min-height: 100vh;">
     <PublicNav />
     <div style="padding: 20px 48px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: center;">
