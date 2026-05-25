@@ -22,9 +22,13 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
     <main style="flex: 1;">
       <header style="display: flex; justify-content: space-between; align-items: center;
                      padding: 20px 32px; border-bottom: 1px solid var(--line);">
-        <div>
-          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">COMPÉTITION</div>
-          <div class="disp-a" style="font-size: 24px; margin-top: 6px;">{{ competition.name }}</div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <img v-if="competition.logo_url" :src="competition.logo_url" :alt="competition.name + ' logo'"
+               style="height: 48px; width: 48px; object-fit: contain;" />
+          <div>
+            <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">COMPÉTITION</div>
+            <div class="disp-a" style="font-size: 24px; margin-top: 6px;">{{ competition.name }}</div>
+          </div>
         </div>
         <div style="display: flex; gap: 10px;">
           <Link :href="`/competitions/${competition.slug}`" class="btn">Aperçu public ↗</Link>

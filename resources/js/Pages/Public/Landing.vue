@@ -33,6 +33,10 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
     <PublicNav />
 
     <section style="position: relative; padding: 64px 48px 48px; border-bottom: 1px solid var(--line);">
+      <div v-if="competition?.logo_url" style="margin-bottom: 24px;">
+        <img :src="competition.logo_url" :alt="competition.name + ' logo'"
+             style="max-height: 96px; max-width: 200px; object-fit: contain;" />
+      </div>
       <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 32px; flex-wrap: wrap;">
         <Chip variant="live">EN DIRECT · {{ liveMatches?.length || 0 }} TABLES</Chip>
         <Chip>{{ competition?.pool_count }} POULES · {{ stats?.players }} JOUEURS</Chip>

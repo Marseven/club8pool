@@ -17,6 +17,15 @@ class Competition extends Model
         'push_out' => 'boolean',
     ];
 
+    protected $appends = ['logo_url'];
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        return $this->logo_path
+            ? asset('storage/' . $this->logo_path)
+            : null;
+    }
+
     public function tables()
     {
         return $this->hasMany(PoolTable::class);

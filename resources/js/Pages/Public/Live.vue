@@ -119,7 +119,9 @@ const raceFor = (m) => m.phase === 'knockout'
                    background: rgba(10,10,11,0.85); backdrop-filter: blur(8px);
                    position: sticky; top: 0; z-index: 10;">
       <div style="display: flex; align-items: center; gap: 16px;">
-        <Ball8 :size="40" />
+        <img v-if="competition?.logo_url" :src="competition.logo_url" :alt="competition.name + ' logo'"
+             style="height: 44px; width: 44px; object-fit: contain;" />
+        <Ball8 v-else :size="40" />
         <div>
           <div class="disp-a" style="font-size: 22px;">{{ competition?.name?.toUpperCase() }}</div>
           <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute); margin-top: 4px;">

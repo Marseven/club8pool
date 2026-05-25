@@ -41,9 +41,13 @@ const hasKnockout = computed(() => Object.keys(props.knockoutMatches || {}).leng
         </span>
       </div>
       <div style="display: flex; justify-content: space-between; align-items: end;">
-        <h1 class="disp-a" style="font-size: 72px;">
-          {{ competition?.name }}
-        </h1>
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+          <img v-if="competition?.logo_url" :src="competition.logo_url" :alt="competition.name + ' logo'"
+               style="height: 80px; width: auto; max-width: 160px; object-fit: contain;" />
+          <h1 class="disp-a" style="font-size: 72px;">
+            {{ competition?.name }}
+          </h1>
+        </div>
         <div style="display: flex; gap: 28px; padding-bottom: 14px;">
           <div>
             <div class="disp-a tnum" style="font-size: 26px;">{{ String(competition?.pool_count ?? 0).padStart(2, '0') }}</div>

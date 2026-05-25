@@ -7,6 +7,7 @@ use App\Models\Competition;
 use App\Models\Pool;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -72,6 +73,32 @@ class CompetitionController extends Controller
         $data['format'] = $this->mapFormat($data['structure']);
         $competition->update($data);
         return redirect()->route('admin.competitions.show', $competition)->with('success', 'Compétition mise à jour.');
+    }
+
+    public function uploadLogo(Request $request, Competition $competition): RedirectResponse
+    {
+        $request->validate([
+            'logo' => ['required', 'image', 'mimes:png,jpg,jpeg,svg,webp', 'max:2048'],
+        ]);
+
+        if ($competition->logo_path && Storage::disk('public')->exists($competition->logo_path)) {
+            Storage::disk('public')->delete($competition->logo_path);
+        }
+
+        $path = $request->file('logo')->store('competitions/logos', 'public');
+        $competition->update(['logo_path' => $path]);
+
+        return back()->with('success', 'Logo mis à jour.');
+    }
+
+    public function removeLogo(Competition $competition): RedirectResponse
+    {
+        if ($competition->logo_path && Storage::disk('public')->exists($competition->logo_path)) {
+            Storage::disk('public')->delete($competition->logo_path);
+        }
+        $competition->update(['logo_path' => null]);
+
+        return back()->with('success', 'Logo retiré.');
     }
 
     private function mapFormat(string $structure): string

@@ -1,8 +1,34 @@
 <script setup>
-import { Head, useForm, Link } from '@inertiajs/vue3';
+import { Head, useForm, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 
 const props = defineProps({ competition: Object });
+
+const logoForm = useForm({ logo: null });
+const logoPreview = ref(null);
+
+const onLogoChange = (e) => {
+  const file = e.target.files?.[0] ?? null;
+  logoForm.logo = file;
+  logoPreview.value = file ? URL.createObjectURL(file) : null;
+};
+
+const uploadLogo = () => {
+  if (! logoForm.logo) return;
+  logoForm.post(`/admin/competitions/${props.competition.id}/logo`, {
+    forceFormData: true,
+    onSuccess: () => {
+      logoForm.reset();
+      logoPreview.value = null;
+    },
+  });
+};
+
+const removeLogo = () => {
+  if (! confirm('Retirer le logo actuel ?')) return;
+  router.delete(`/admin/competitions/${props.competition.id}/logo`);
+};
 
 const form = useForm({
   name: props.competition.name,
@@ -60,7 +86,46 @@ const submit = () => {
         <Link :href="`/admin/competitions/${competition.id}`" class="btn">← Retour</Link>
       </header>
 
-      <form @submit.prevent="submit" style="max-width: 920px; padding: 32px;">
+      <section style="max-width: 920px; padding: 32px 32px 0;">
+        <h3 class="disp-a" style="font-size: 20px; margin-bottom: 14px;">Logo du tournoi</h3>
+        <div style="display: grid; grid-template-columns: 140px 1fr; gap: 20px; align-items: start;
+                    padding: 18px; border: 1px solid var(--line); background: var(--ink-2); margin-bottom: 28px;">
+          <div style="width: 140px; height: 140px; border: 1px solid var(--line-strong);
+                      display: flex; align-items: center; justify-content: center;
+                      background: var(--ink); overflow: hidden;">
+            <img v-if="logoPreview" :src="logoPreview" alt="Aperçu"
+                 style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+            <img v-else-if="competition.logo_url" :src="competition.logo_url" alt="Logo"
+                 style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+            <span v-else class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.18em;">SANS LOGO</span>
+          </div>
+          <div>
+            <p style="font-size: 12px; color: var(--mute); margin-bottom: 12px; line-height: 1.5;">
+              PNG, JPG, SVG ou WebP · 2 Mo max · Format carré recommandé.
+              Affiché sur la home, la page compétition et le scoreboard live.
+            </p>
+            <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                   @change="onLogoChange"
+                   style="display: block; margin-bottom: 12px; font-size: 12px; color: var(--chalk-2);" />
+            <div v-if="logoForm.errors.logo" style="font-size: 11px; color: var(--live); margin-bottom: 10px;">
+              {{ logoForm.errors.logo }}
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button type="button" class="btn btn-felt" :disabled="!logoForm.logo || logoForm.processing"
+                      @click="uploadLogo">
+                {{ logoForm.processing ? 'Envoi…' : 'Téléverser' }}
+              </button>
+              <button type="button" v-if="competition.logo_url" class="btn"
+                      @click="removeLogo"
+                      style="border-color: rgba(229,72,77,0.4); color: var(--live);">
+                Retirer le logo
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <form @submit.prevent="submit" style="max-width: 920px; padding: 0 32px 32px;">
         <h3 class="disp-a" style="font-size: 20px; margin-bottom: 16px;">Identité</h3>
         <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; margin-bottom: 24px;">
           <label>
