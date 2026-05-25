@@ -50,8 +50,8 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
             Quatre poules de sept joueurs. Race to {{ competition?.race_to }}. Les {{ competition?.qualifiers_per_pool }} meilleurs
             de chaque poule se qualifient pour le tableau final. Tout commence à {{ competition?.venue }}.
           </p>
-          <div style="display: flex; gap: 12px; margin-top: 28px;">
-            <Link href="/tv" class="btn btn-felt">Suivre le live →</Link>
+          <div style="display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap;">
+            <a href="/live" target="_blank" rel="noopener" class="btn btn-felt">Suivre le live ↗</a>
             <Link href="/competitions" class="btn">Voir le bracket</Link>
           </div>
         </div>
