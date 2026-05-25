@@ -9,6 +9,8 @@ const props = defineProps({
   clubs: Array,
   slots: Number,
   registered: Number,
+  isOpen: Boolean,
+  closedReason: String,
 });
 
 const step = ref(0);
@@ -45,7 +47,8 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
     <section style="display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 73px);">
       <div style="padding: 48px 56px; border-right: 1px solid var(--line);
                   background: var(--ink-2); display: flex; flex-direction: column;">
-        <Chip style="width: fit-content;">INSCRIPTIONS OUVERTES · J-12</Chip>
+        <Chip v-if="isOpen" style="width: fit-content;" variant="felt">INSCRIPTIONS OUVERTES</Chip>
+        <Chip v-else style="width: fit-content;" variant="live">INSCRIPTIONS FERMÉES</Chip>
         <h1 class="disp-a" style="font-size: 80px; line-height: 0.92; margin-top: 24px;">
           {{ competition?.name?.split(' — ')[0] }}<br />
           <span style="color: var(--felt-2);">2026</span>
@@ -82,7 +85,34 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
       </div>
 
       <div style="padding: 48px 56px;">
-        <div style="display: flex; gap: 0; margin-bottom: 36px;">
+        <!-- État : inscriptions fermées -->
+        <div v-if="!isOpen" style="display: flex; flex-direction: column; align-items: flex-start; gap: 22px; padding: 40px 0;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(229,72,77,0.12);
+                        border: 1px solid rgba(229,72,77,0.4); display: flex; align-items: center; justify-content: center;
+                        font-family: var(--font-display-a); font-size: 28px; color: var(--live);">⊘</div>
+            <div>
+              <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--live);">INSCRIPTIONS FERMÉES</div>
+              <div class="disp-a" style="font-size: 26px; margin-top: 6px;">
+                {{ competition?.status === 'in_progress' ? 'La compétition a démarré' : competition?.status === 'finished' ? 'Compétition terminée' : 'Tableau complet' }}
+              </div>
+            </div>
+          </div>
+          <p style="font-size: 14px; color: var(--chalk-2); max-width: 480px; line-height: 1.6;">
+            {{ closedReason }}
+          </p>
+          <p style="font-size: 13px; color: var(--mute); line-height: 1.6;">
+            Vous pouvez suivre la compétition en direct ou consulter le bracket et les classements de poules.
+          </p>
+          <div style="display: flex; gap: 10px; margin-top: 8px;">
+            <a href="/live" target="_blank" class="btn btn-felt">Suivre le live →</a>
+            <a href="/competitions" class="btn">Voir la compétition</a>
+            <a href="/joueurs" class="btn">Liste des joueurs</a>
+          </div>
+        </div>
+
+        <!-- Formulaire d'inscription -->
+        <div v-if="isOpen" style="display: flex; gap: 0; margin-bottom: 36px;">
           <div v-for="(s, i) in steps" :key="i" style="flex: 1; display: flex; align-items: center; gap: 10px;">
             <span :style="{
               width: '28px', height: '28px', borderRadius: '50%',
@@ -98,7 +128,7 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
           </div>
         </div>
 
-        <form @submit.prevent="submit" v-if="step !== 3">
+        <form v-if="isOpen && step !== 3" @submit.prevent="submit">
           <template v-if="step === 0">
             <h2 class="disp-a" style="font-size: 40px;">Identité du joueur</h2>
             <p style="font-size: 13px; color: var(--mute); margin-top: 8px;">
@@ -180,7 +210,7 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
           </div>
         </form>
 
-        <div v-else style="padding: 60px 0; text-align: center;">
+        <div v-if="isOpen && step === 3" style="padding: 60px 0; text-align: center;">
           <div class="disp-a" style="font-size: 64px; color: var(--felt-2);">✓</div>
           <h2 class="disp-a" style="font-size: 40px; margin-top: 18px;">Inscription envoyée</h2>
           <p style="font-size: 14px; color: var(--mute); margin-top: 12px;">

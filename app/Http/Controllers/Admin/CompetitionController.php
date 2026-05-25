@@ -110,6 +110,7 @@ class CompetitionController extends Controller
             'entry_fee' => ['nullable', 'integer'],
             'deposit' => ['nullable', 'integer'],
             'prize_pool' => ['nullable', 'integer'],
+            'status' => ['nullable', 'in:draft,registration,in_progress,finished'],
             'starts_on' => ['nullable', 'date'],
             'ends_on' => ['nullable', 'date'],
             'registration_closes_at' => ['nullable', 'date'],

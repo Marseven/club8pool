@@ -10,7 +10,7 @@ const auth = computed(() => page.props.auth?.user);
 const links = [
   { label: 'Compétitions', href: '/competitions', external: false },
   { label: 'Classement', href: '/competitions#ranking', external: false },
-  { label: 'Joueurs', href: '/joueurs/1', external: false },
+  { label: 'Joueurs', href: '/joueurs', external: false },
   { label: 'Inscription', href: '/inscription', external: false },
   { label: 'Live ↗', href: '/live', external: true },
 ];

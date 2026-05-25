@@ -25,11 +25,23 @@ class RegisterController extends Controller
             'clubs' => Club::orderBy('name')->get(),
             'slots' => $slots,
             'registered' => $registered,
+            'isOpen' => $this->registrationsOpen($competition),
+            'closedReason' => $this->closedReason($competition, $registered, $slots),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $competition = Competition::findOrFail($request->input('competition_id'));
+
+        if (! $this->registrationsOpen($competition)) {
+            return back()->with('error', $this->closedReason(
+                $competition,
+                Registration::where('competition_id', $competition->id)->count(),
+                $competition->player_slots
+            ));
+        }
+
         $data = $request->validate([
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
@@ -54,5 +66,34 @@ class RegisterController extends Controller
         );
 
         return back()->with('success', 'Inscription envoyée. En attente de validation.');
+    }
+
+    private function registrationsOpen(Competition $competition): bool
+    {
+        if (! in_array($competition->status, ['draft', 'registration'])) {
+            return false;
+        }
+        if ($competition->registration_closes_at && $competition->registration_closes_at->isPast()) {
+            return false;
+        }
+        $registered = Registration::where('competition_id', $competition->id)->count();
+        return $registered < $competition->player_slots;
+    }
+
+    private function closedReason(Competition $competition, int $registered, int $slots): ?string
+    {
+        if ($registered >= $slots) {
+            return 'Tableau complet — '.$slots.' joueurs déjà inscrits.';
+        }
+        if ($competition->registration_closes_at && $competition->registration_closes_at->isPast()) {
+            return 'Inscriptions closes depuis le '.$competition->registration_closes_at->format('d/m/Y à H\\hi').'.';
+        }
+        if ($competition->status === 'in_progress') {
+            return 'La compétition a démarré — les inscriptions sont fermées.';
+        }
+        if ($competition->status === 'finished') {
+            return 'Compétition terminée.';
+        }
+        return null;
     }
 }

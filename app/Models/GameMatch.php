@@ -37,6 +37,11 @@ class GameMatch extends Model
         return $this->belongsTo(PoolTable::class, 'pool_table_id');
     }
 
+    public function pool()
+    {
+        return $this->belongsTo(Pool::class);
+    }
+
     public function referee()
     {
         return $this->belongsTo(User::class, 'referee_id');

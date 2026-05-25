@@ -28,6 +28,7 @@ const form = useForm({
   entry_fee: props.competition.entry_fee,
   deposit: props.competition.deposit,
   prize_pool: props.competition.prize_pool,
+  status: props.competition.status,
   starts_on: props.competition.starts_on?.slice(0, 10),
   ends_on: props.competition.ends_on?.slice(0, 10),
   registration_closes_at: props.competition.registration_closes_at?.slice(0, 16),
@@ -74,6 +75,26 @@ const submit = () => {
             <div class="mono" style="font-size: 10px; color: var(--mute); margin-bottom: 6px;">VILLE</div>
             <input v-model="form.city" />
           </label>
+        </div>
+
+        <h3 class="disp-a" style="font-size: 20px; margin-bottom: 6px;">Statut de la compétition</h3>
+        <p style="font-size: 12px; color: var(--mute); margin-bottom: 14px;">
+          Quand le statut est <strong style="color: var(--chalk);">« En cours »</strong> ou <strong style="color: var(--chalk);">« Terminée »</strong>, les inscriptions publiques sont automatiquement fermées.
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 28px;">
+          <button v-for="opt in [
+            { v: 'draft', l: 'Brouillon', sub: 'Non visible' },
+            { v: 'registration', l: 'Inscriptions', sub: 'Ouvertes' },
+            { v: 'in_progress', l: 'En cours', sub: 'Inscriptions fermées' },
+            { v: 'finished', l: 'Terminée', sub: 'Archive' },
+          ]" :key="opt.v" type="button" @click="form.status = opt.v" :style="{
+            padding: '14px', cursor: 'pointer', textAlign: 'left',
+            border: '1px solid ' + (form.status === opt.v ? 'var(--felt-2)' : 'var(--line-strong)'),
+            background: form.status === opt.v ? 'rgba(45,168,118,0.08)' : 'var(--ink-2)',
+          }">
+            <div class="disp-a" :style="{ fontSize: '16px', color: form.status === opt.v ? 'var(--felt-2)' : 'var(--chalk)' }">{{ opt.l }}</div>
+            <div class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.14em; margin-top: 6px;">{{ opt.sub.toUpperCase() }}</div>
+          </button>
         </div>
 
         <h3 class="disp-a" style="font-size: 20px; margin-bottom: 14px;">Race to · Manches gagnantes</h3>

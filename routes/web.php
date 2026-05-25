@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', LandingController::class)->name('home');
 Route::get('/competitions', [CompetitionController::class, 'show'])->name('competition.current');
 Route::get('/competitions/{slug}', [CompetitionController::class, 'show'])->name('competition.show');
+Route::get('/joueurs', [PlayerController::class, 'index'])->name('players.index');
 Route::get('/joueurs/{player}', [PlayerController::class, 'show'])->name('player.show');
 Route::get('/inscription', [RegisterController::class, 'show'])->name('register.show');
 Route::post('/inscription', [RegisterController::class, 'store'])->name('register.store');
