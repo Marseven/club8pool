@@ -59,17 +59,33 @@ class PoolStanding
         }
         unset($row);
 
-        $sorted = collect($rows)->sort(function ($a, $b) {
+        // Index matches by unordered player pair for O(1) H2H lookup
+        $h2h = [];
+        foreach ($matches as $m) {
+            if ($m->status !== 'done') continue;
+            $key = min($m->player_a_id, $m->player_b_id) . '_' . max($m->player_a_id, $m->player_b_id);
+            $h2h[$key] = $m;
+        }
+
+        $sorted = collect($rows)->sort(function ($a, $b) use ($h2h) {
             if ($a['v'] !== $b['v']) return $b['v'] <=> $a['v'];
             if ($a['diff'] !== $b['diff']) return $b['diff'] <=> $a['diff'];
+            // Confrontation directe
+            $key = min($a['player_id'], $b['player_id']) . '_' . max($a['player_id'], $b['player_id']);
+            if (isset($h2h[$key]) && ! $h2h[$key]->is_draw) {
+                $m = $h2h[$key];
+                $winner = $m->score_a > $m->score_b ? $m->player_a_id : $m->player_b_id;
+                return $winner === $a['player_id'] ? -1 : 1;
+            }
             return $b['w'] <=> $a['w'];
         })->values();
 
-        // Rang : V puis Diff. Ex-aequo seulement si V ET Diff sont identiques.
+        // Rang : V > Diff > H2H > W. Ex-aequo seulement si tous ces critères sont identiques.
         $rank = 0;
         $prevKey = null;
-        $sorted = $sorted->map(function ($r, $i) use (&$rank, &$prevKey) {
-            $key = $r['v'] . '|' . $r['diff'];
+        $sorted = $sorted->map(function ($r, $i) use (&$rank, &$prevKey, $h2h, $sorted) {
+            // Two players share a rank only when V and diff are equal AND no H2H result separates them
+            $key = $r['v'] . '|' . $r['diff'] . '|' . $r['w'];
             if ($key !== $prevKey) {
                 $rank = $i + 1;
                 $prevKey = $key;
