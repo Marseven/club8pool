@@ -1,6 +1,6 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import PoolStandings from '@/Components/PoolStandings.vue';
 import Chip from '@/Components/Chip.vue';
@@ -59,6 +59,15 @@ const launch = () => {
 };
 
 const cancelStart = () => { startingMatch.value = null; };
+
+let pollInterval;
+onMounted(() => {
+  pollInterval = setInterval(() => {
+    if (editingMatch.value || startingMatch.value) return;
+    router.reload({ only: ['pools'], preserveScroll: true });
+  }, 15000);
+});
+onUnmounted(() => clearInterval(pollInterval));
 
 const playerLabel = (pool, playerId) => {
   const idx = pool.players.findIndex(p => p.id === playerId);
