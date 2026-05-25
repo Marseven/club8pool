@@ -165,3 +165,162 @@ label .label {
   display: block;
   margin-bottom: 8px;
 }
+
+/* ───────────────────────────────────────────────────────────────────────
+ * RESPONSIVE LAYER
+ * Beaucoup d'inline styles sont utilisés dans le code Vue ; cette section
+ * surcharge en !important les patterns de layout les plus courants sur
+ * mobile pour rendre le site utilisable sur smartphone sans toucher
+ * chaque template individuellement.
+ * ─────────────────────────────────────────────────────────────────────── */
+
+.mobile-only { display: none; }
+@media (max-width: 768px) { .mobile-only { display: block; } .mobile-hidden { display: none !important; } }
+
+/* Inputs touch-friendly */
+input, textarea, select, button {
+  font-size: 16px; /* prevent iOS auto-zoom on focus */
+}
+
+@media (max-width: 768px) {
+  /* Forcer tout body en col scroll plutôt que des layouts horizontaux qui débordent */
+  html { -webkit-text-size-adjust: 100%; }
+
+  /* Layouts admin : sidebar + main → empilé verticalement */
+  div[style*="display: flex"][style*="min-height: 100vh"] {
+    flex-direction: column;
+  }
+
+  /* Padding réduit partout */
+  section, header, footer, main, .c8p {
+    --pad: 16px;
+  }
+  [style*="padding: 48px 56px"], [style*="padding: 48px 64px"],
+  [style*="padding: 32px 48px"], [style*="padding: 24px 32px"],
+  [style*="padding: 20px 32px"], [style*="padding: 18px 32px"],
+  [style*="padding: 64px"], [style*="padding: 56px 64px"],
+  [style*="padding: 36px 40px"], [style*="padding: 32px"] {
+    padding: 18px 16px !important;
+  }
+  [style*="padding: 56px 48px"], [style*="padding: 64px 48px 48px"] {
+    padding: 28px 16px !important;
+  }
+
+  /* Tous les grids multi-colonnes deviennent 1 colonne par défaut */
+  [style*="grid-template-columns: 1fr 1fr"]:not(.keep-cols),
+  [style*="grid-template-columns: 1.4fr 1fr"]:not(.keep-cols),
+  [style*="grid-template-columns: 1.3fr 1fr"]:not(.keep-cols),
+  [style*="grid-template-columns: 1.5fr 1fr"]:not(.keep-cols),
+  [style*="grid-template-columns: 2fr 1fr"]:not(.keep-cols),
+  [style*="grid-template-columns: 420px 1fr 280px"],
+  [style*="grid-template-columns: 280px 1fr 320px"],
+  [style*="grid-template-columns: 300px 1fr 380px"],
+  [style*="grid-template-columns: 1fr 360px"],
+  [style*="grid-template-columns: minmax(0, 1fr) 380px"],
+  [style*="grid-template-columns: 1fr 320px"] {
+    grid-template-columns: 1fr !important;
+  }
+  [style*="grid-template-columns: repeat(2, 1fr)"]:not(.keep-cols),
+  [style*="grid-template-columns: repeat(3, 1fr)"]:not(.keep-cols),
+  [style*="grid-template-columns: repeat(4, 1fr)"]:not(.keep-cols),
+  [style*="grid-template-columns: repeat(5, 1fr)"]:not(.keep-cols) {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  /* Sections avec trop de KPIs sur mobile : empile complètement */
+  section[style*="grid-template-columns: repeat(5, 1fr)"]:not(.keep-cols) {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Bordures latérales redondantes sur mobile */
+  [style*="border-right: 1px solid var(--line)"][style*="grid"] > * {
+    border-right: none !important;
+  }
+
+  /* Bracket horizontal scroll au lieu de déborder */
+  .bracket-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Tableaux : scroll horizontal forcé */
+  .tbl { font-size: 12px; }
+  .tbl th, .tbl td { padding: 8px 10px; }
+  table.tbl { display: block; overflow-x: auto; white-space: nowrap; }
+
+  /* Cap les énormes typos display */
+  h1.disp-a, .disp-a-hero {
+    font-size: clamp(40px, 12vw, 84px) !important;
+    line-height: 0.92 !important;
+  }
+  h2.disp-a { font-size: clamp(28px, 8vw, 56px) !important; }
+  h3.disp-a { font-size: clamp(22px, 6vw, 36px) !important; }
+
+  /* TV page : reste plein écran mais on lisse */
+  [style*="font-size: 240px"] { font-size: clamp(80px, 24vw, 160px) !important; }
+  [style*="font-size: 168px"] { font-size: clamp(48px, 14vw, 96px) !important; }
+  [style*="font-size: 132px"] { font-size: clamp(40px, 12vw, 88px) !important; }
+  [style*="font-size: 130px"] { font-size: clamp(40px, 12vw, 88px) !important; }
+  [style*="font-size: 96px"] { font-size: clamp(36px, 10vw, 64px) !important; }
+  [style*="font-size: 88px"] { font-size: clamp(32px, 9vw, 64px) !important; }
+  [style*="font-size: 84px"] { font-size: clamp(32px, 9vw, 64px) !important; }
+  [style*="font-size: 80px"] { font-size: clamp(28px, 8vw, 56px) !important; }
+  [style*="font-size: 72px"] { font-size: clamp(28px, 7vw, 56px) !important; }
+  [style*="font-size: 64px"] { font-size: clamp(24px, 6vw, 48px) !important; }
+  [style*="font-size: 56px"] { font-size: clamp(22px, 5.5vw, 44px) !important; }
+
+  /* Hide sidebar borders/decorations that don't make sense in stacked mode */
+  aside[style*="border-right"], aside[style*="border-left"] {
+    border-right: none !important;
+    border-left: none !important;
+    border-top: 1px solid var(--line) !important;
+  }
+
+  /* Boutons CTA pleine largeur sur mobile */
+  .btn { min-height: 44px; }
+
+  /* Cards et tuiles - moins de padding */
+  [style*="padding: 32px"] { padding: 16px !important; }
+  [style*="padding: 24px"] { padding: 14px !important; }
+
+  /* Espacement vertical réduit */
+  [style*="gap: 48px"] { gap: 20px !important; }
+  [style*="gap: 32px"] { gap: 16px !important; }
+  [style*="gap: 28px"] { gap: 14px !important; }
+}
+
+/* Tablet (640-1024px) : garde 2 colonnes pour les grilles 3/4/5 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  [style*="grid-template-columns: repeat(4, 1fr)"]:not(.keep-cols),
+  [style*="grid-template-columns: repeat(5, 1fr)"]:not(.keep-cols) {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  [style*="grid-template-columns: repeat(3, 1fr)"]:not(.keep-cols) {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Mobile nav drawer */
+.mobile-drawer-open { overflow: hidden; }
+.mobile-drawer {
+  position: fixed;
+  inset: 0;
+  background: var(--ink);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: slideIn .2s ease;
+}
+@keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.mobile-hamburger {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--chalk);
+}
+@media (max-width: 768px) { .mobile-hamburger { display: inline-flex; } }
+
