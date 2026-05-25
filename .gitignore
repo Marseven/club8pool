@@ -23,4 +23,6 @@ yarn-error.log
 /.zed
 /database/database.sqlite
 /.claude
+# .htaccess géré directement sur chaque serveur (Hostinger)
+/.htaccess
 
