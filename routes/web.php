@@ -50,6 +50,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/poules/matchs/{match}', [\App\Http\Controllers\Admin\PoolController::class, 'updateMatch'])->name('pools.matches.update');
     Route::post('/poules/matchs/{match}/lancer', [\App\Http\Controllers\Admin\PoolController::class, 'startMatch'])->name('pools.matches.start');
 
+    Route::get('/import', [\App\Http\Controllers\Admin\ImportController::class, 'show'])->name('import.show');
+    Route::post('/import', [\App\Http\Controllers\Admin\ImportController::class, 'preview'])->name('import.preview');
+    Route::post('/import/confirm', [\App\Http\Controllers\Admin\ImportController::class, 'commit'])->name('import.commit');
+    Route::post('/import/annuler', [\App\Http\Controllers\Admin\ImportController::class, 'cancel'])->name('import.cancel');
+
     Route::patch('/matchs/{match}', [MatchController::class, 'update'])->name('matches.update');
 
     Route::get('/joueurs', [AdminPlayerController::class, 'index'])->name('players.index');

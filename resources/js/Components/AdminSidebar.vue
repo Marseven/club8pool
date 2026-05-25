@@ -13,6 +13,7 @@ const items = [
   ['dashboard', 'Tableau de bord', '◰', '/admin'],
   ['comps', 'Compétitions', '◇', '/admin/competitions'],
   ['pools', 'Poules', '▤', '/admin/poules'],
+  ['import', 'Import Excel', '↓', '/admin/import'],
   ['players', 'Joueurs', '○', '/admin/joueurs'],
   ['referees', 'Arbitres', '△', '/admin/arbitres'],
   ['draw', 'Tirage final', '◉', '/admin/tirage'],
