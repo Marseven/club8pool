@@ -12,7 +12,7 @@ class LiveController extends Controller
 {
     public function __invoke(): Response
     {
-        $competition = Competition::with('pools')->firstOrFail();
+        $competition = Competition::firstOrFail();
 
         $liveMatches = GameMatch::with(['playerA.club', 'playerB.club', 'table', 'referee'])
             ->where('competition_id', $competition->id)
@@ -28,49 +28,34 @@ class LiveController extends Controller
             ->limit(4)
             ->get();
 
-        // Tous les matchs terminés, plus récents en premier
-        $allDone = GameMatch::with(['playerA', 'playerB'])
+        // Bracket phase finale — tous les matchs (pending inclus pour la structure)
+        $koMatches = GameMatch::with(['playerA', 'playerB'])
             ->where('competition_id', $competition->id)
-            ->where('status', 'done')
-            ->whereNotNull('player_a_id')
-            ->whereNotNull('player_b_id')
-            ->orderByDesc('ended_at')
+            ->where('phase', 'knockout')
+            ->orderBy('round_position')
             ->get();
 
-        $roundOrder = ['F' => 0, 'SF' => 1, 'QF' => 2, 'R16' => 3];
-
-        $knockoutDone = $allDone
-            ->where('phase', 'knockout')
-            ->sortBy(fn ($m) => $roundOrder[$m->round] ?? 9)
-            ->map(fn ($m) => [
-                'id'       => $m->id,
-                'round'    => $m->round,
-                'score_a'  => $m->score_a,
-                'score_b'  => $m->score_b,
-                'ended_at' => $m->ended_at?->toIso8601String(),
-                'player_a' => $m->playerA ? ['first_name' => $m->playerA->first_name, 'last_name' => $m->playerA->last_name] : null,
-                'player_b' => $m->playerB ? ['first_name' => $m->playerB->first_name, 'last_name' => $m->playerB->last_name] : null,
-            ])->values();
-
-        $poolsDone = $competition->pools->map(fn ($pool) => [
-            'id'      => $pool->id,
-            'name'    => $pool->name,
-            'matches' => $allDone->where('pool_id', $pool->id)->map(fn ($m) => [
-                'id'       => $m->id,
-                'score_a'  => $m->score_a,
-                'score_b'  => $m->score_b,
-                'ended_at' => $m->ended_at?->toIso8601String(),
-                'player_a' => $m->playerA ? ['first_name' => $m->playerA->first_name, 'last_name' => $m->playerA->last_name] : null,
-                'player_b' => $m->playerB ? ['first_name' => $m->playerB->first_name, 'last_name' => $m->playerB->last_name] : null,
-            ])->values(),
-        ]);
+        $knockoutBracket = [];
+        foreach (['R16', 'QF', 'SF', 'F'] as $r) {
+            $rounds = $koMatches->where('round', $r)->values();
+            if ($rounds->isNotEmpty()) {
+                $knockoutBracket[$r] = $rounds->map(fn ($m) => [
+                    'id'       => $m->id,
+                    'status'   => $m->status,
+                    'score_a'  => $m->score_a ?? 0,
+                    'score_b'  => $m->score_b ?? 0,
+                    'ended_at' => $m->ended_at?->toIso8601String(),
+                    'player_a' => $m->playerA ? ['first_name' => $m->playerA->first_name, 'last_name' => $m->playerA->last_name] : null,
+                    'player_b' => $m->playerB ? ['first_name' => $m->playerB->first_name, 'last_name' => $m->playerB->last_name] : null,
+                ])->values();
+            }
+        }
 
         return Inertia::render('Public/Live', [
-            'competition'  => $competition,
-            'liveMatches'  => $liveMatches,
-            'nextMatches'  => $nextMatches,
-            'knockoutDone' => $knockoutDone,
-            'poolsDone'    => $poolsDone,
+            'competition'     => $competition,
+            'liveMatches'     => $liveMatches,
+            'nextMatches'     => $nextMatches,
+            'knockoutBracket' => $knockoutBracket,
         ]);
     }
 }
