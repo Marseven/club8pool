@@ -88,6 +88,25 @@ class PoolController extends Controller
         return back()->with('success', 'Score enregistré.');
     }
 
+    public function resetMatch(GameMatch $match): RedirectResponse
+    {
+        $match->update([
+            'status'           => 'scheduled',
+            'score_a'          => 0,
+            'score_b'          => 0,
+            'started_at'       => null,
+            'ended_at'         => null,
+            'duration_seconds' => null,
+            'warning_a'        => false,
+            'warning_b'        => false,
+            'referee_note'     => null,
+            'pool_table_id'    => null,
+            'referee_id'       => null,
+        ]);
+
+        return back()->with('success', 'Match remis à zéro.');
+    }
+
     public function startMatch(Request $request, GameMatch $match): RedirectResponse
     {
         if ($match->status === 'done') {

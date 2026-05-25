@@ -54,6 +54,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('/poules', [\App\Http\Controllers\Admin\PoolController::class, 'index'])->name('pools.index');
     Route::patch('/poules/matchs/{match}', [\App\Http\Controllers\Admin\PoolController::class, 'updateMatch'])->name('pools.matches.update');
+    Route::post('/poules/matchs/{match}/reset', [\App\Http\Controllers\Admin\PoolController::class, 'resetMatch'])->name('pools.matches.reset');
     Route::post('/poules/matchs/{match}/lancer', [\App\Http\Controllers\Admin\PoolController::class, 'startMatch'])->name('pools.matches.start');
 
     Route::get('/import', [\App\Http\Controllers\Admin\ImportController::class, 'show'])->name('import.show');

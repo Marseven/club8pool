@@ -4,7 +4,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import PoolStandings from '@/Components/PoolStandings.vue';
 import Chip from '@/Components/Chip.vue';
-import { Play, Square } from 'lucide-vue-next';
+import { Play, Square, RotateCcw } from 'lucide-vue-next';
 
 const props = defineProps({
   competition: Object,
@@ -59,6 +59,17 @@ const launch = () => {
 };
 
 const cancelStart = () => { startingMatch.value = null; };
+
+const confirmingReset = ref(null);
+const resetMatch = (m) => {
+  if (confirmingReset.value === m.id) {
+    router.post(`/admin/poules/matchs/${m.id}/reset`, {}, { preserveScroll: true });
+    confirmingReset.value = null;
+  } else {
+    confirmingReset.value = m.id;
+    setTimeout(() => { if (confirmingReset.value === m.id) confirmingReset.value = null; }, 3000);
+  }
+};
 
 let pollInterval;
 onMounted(() => {
@@ -147,10 +158,15 @@ const playerLabel = (pool, playerId) => {
                   <span v-else style="color: var(--mute-2);">·</span>
                   <span v-if="m.warning_a || m.warning_b" style="color: var(--live); margin-left: 8px;">!</span>
                 </td>
-                <td style="text-align: right; white-space: nowrap;">
+                <td style="text-align: right; white-space: nowrap; display: flex; gap: 4px; justify-content: flex-end; align-items: center;">
                   <button v-if="m.status === 'scheduled'" class="btn btn-felt"
                           style="padding: 4px 10px; font-size: 11px; display:inline-flex; align-items:center; gap:4px;" @click="startStart(m)">
                     <Play :size="12" /> Démarrer
+                  </button>
+                  <button v-if="m.status === 'scheduled'" class="btn"
+                          style="padding: 4px 10px; font-size: 11px;"
+                          @click="startEdit(m)" title="Saisir directement sans live">
+                    Saisir
                   </button>
                   <button v-if="m.status === 'live'" class="btn"
                           style="padding: 4px 10px; font-size: 11px; border-color: var(--live); color: var(--live); display:inline-flex; align-items:center; gap:4px;"
@@ -161,10 +177,17 @@ const playerLabel = (pool, playerId) => {
                           style="padding: 4px 10px; font-size: 11px;" @click="startEdit(m)">
                     Modifier
                   </button>
-                  <button v-if="m.status === 'scheduled'" class="btn"
-                          style="padding: 4px 10px; font-size: 11px; margin-left: 4px;"
-                          @click="startEdit(m)" title="Saisir directement sans live">
-                    Saisir
+                  <button v-if="m.status !== 'scheduled'" class="btn"
+                          @click="resetMatch(m)"
+                          :style="{
+                            padding: '4px 10px', fontSize: '11px',
+                            display: 'inline-flex', alignItems: 'center', gap: '4px',
+                            borderColor: confirmingReset === m.id ? 'var(--live)' : undefined,
+                            color: confirmingReset === m.id ? 'var(--live)' : undefined,
+                          }"
+                          :title="confirmingReset === m.id ? 'Cliquer encore pour confirmer' : 'Remettre à zéro'">
+                    <RotateCcw :size="11" />
+                    {{ confirmingReset === m.id ? 'Confirmer ?' : 'Reset' }}
                   </button>
                 </td>
               </tr>
