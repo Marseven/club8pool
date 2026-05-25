@@ -36,6 +36,37 @@ const submit = () => form.post('/inscription', {
 });
 
 const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
+
+const structureLabel = {
+  knockout: 'Élimination directe',
+  pools_knockout: 'Poules + phase finale',
+  pools_only: 'Phase de poules',
+  round_robin: 'Round-robin',
+};
+
+const fmtDate = (d) => {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long' });
+};
+const fmtDateTime = (d) => {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
+    + ' à ' + new Date(d).getUTCHours().toString().padStart(2, '0') + 'h';
+};
+
+const yearLabel = computed(() => props.competition?.starts_on?.slice(0, 4) ?? new Date().getFullYear());
+const venueLabel = computed(() => props.competition?.venue ?? '');
+const datesLabel = computed(() => {
+  const start = props.competition?.starts_on;
+  const end = props.competition?.ends_on;
+  if (!start) return '';
+  if (!end || start === end) return `Le ${fmtDate(start)}`;
+  return `Du ${fmtDate(start)} au ${fmtDate(end)}`;
+});
+const closesLabel = computed(() => {
+  const at = props.competition?.registration_closes_at;
+  return at ? `Inscriptions closes le ${fmtDateTime(at)}.` : '';
+});
 </script>
 
 <template>
@@ -51,11 +82,12 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
         <Chip v-else style="width: fit-content;" variant="live">INSCRIPTIONS FERMÉES</Chip>
         <h1 class="disp-a" style="font-size: 80px; line-height: 0.92; margin-top: 24px;">
           {{ competition?.name?.split(' — ')[0] }}<br />
-          <span style="color: var(--felt-2);">2026</span>
+          <span style="color: var(--felt-2);">{{ yearLabel }}</span>
         </h1>
         <p style="font-size: 15px; color: var(--chalk-2); max-width: 460px; line-height: 1.6; margin-top: 28px;">
-          {{ slots }} places. Élimination directe. Race to {{ competition?.race_to }}. Du 05 au 07 juin au Cadre, Libreville.
-          Inscriptions closes le 04/06 à 18h.
+          {{ slots }} places. {{ structureLabel[competition?.structure] ?? '' }}. Race to {{ competition?.race_to }}.
+          {{ datesLabel }}<template v-if="venueLabel"> à {{ venueLabel }}</template>.
+          {{ closesLabel }}
         </p>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 36px;">
           <div v-for="(item, i) in [
