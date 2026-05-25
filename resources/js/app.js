@@ -6,7 +6,9 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from 'ziggy-js';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Club 8 Pool';
+// Forçé en dur : VITE_APP_NAME suit APP_NAME (qui peut être 'Laravel' selon
+// l'environnement de build). On garde le branding propre quoi qu'il arrive.
+const appName = 'Club 8 Pool';
 
 createInertiaApp({
     title: (title) => (title ? `${title} · ${appName}` : appName),
