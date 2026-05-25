@@ -51,18 +51,18 @@ class LoginController extends Controller
     private function loginReferee(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'fgb_card' => ['required', 'string'],
+            'name' => ['required', 'string'],
             'pin' => ['required', 'string'],
         ]);
 
-        $user = User::where('fgb_card', $data['fgb_card'])
+        $user = User::whereRaw('LOWER(name) = ?', [strtolower(trim($data['name']))])
             ->where('role', 'referee')
             ->first();
 
         if (! $user || ! $user->pin || ! Hash::check($data['pin'], $user->pin)) {
             return back()->withErrors([
-                'fgb_card' => 'Carte ou PIN invalide.',
-            ])->onlyInput('fgb_card');
+                'name' => 'Prénom ou PIN invalide.',
+            ])->onlyInput('name');
         }
 
         Auth::login($user, $request->boolean('remember'));

@@ -7,7 +7,7 @@ import GabonFlag from '@/Components/GabonFlag.vue';
 const mode = ref('admin'); // 'admin' | 'referee'
 
 const adminForm = useForm({ mode: 'admin', email: '', password: '', remember: false });
-const refForm = useForm({ mode: 'referee', fgb_card: '', pin: '', remember: false });
+const refForm = useForm({ mode: 'referee', name: '', pin: '', remember: false });
 
 watch(mode, () => {
   adminForm.clearErrors();
@@ -39,7 +39,7 @@ const submitRef = () => refForm.post('/login');
             Configurez la compétition, pilotez les poules et démarrez les matchs depuis votre interface organisateur.
           </template>
           <template v-else>
-            Rejoignez les matchs qui vous sont assignés. Identifiez-vous avec votre carte FGB et votre code PIN.
+            Rejoignez les matchs qui vous sont assignés. Identifiez-vous avec votre prénom et votre code PIN.
           </template>
         </p>
       </div>
@@ -96,28 +96,20 @@ const submitRef = () => refForm.post('/login');
         <button type="submit" class="btn btn-felt" :disabled="adminForm.processing" style="margin-top: 12px;">
           {{ adminForm.processing ? 'Connexion…' : 'Se connecter →' }}
         </button>
-
-        <div style="margin-top: 14px; padding: 14px; border: 1px solid var(--line); background: var(--ink-2);">
-          <div class="mono" style="font-size: 10px; letter-spacing: 0.2em; color: var(--mute);">DÉMO</div>
-          <div style="font-size: 12px; color: var(--chalk-2); margin-top: 6px;" class="mono">
-            admin@club8pool.ga · password
-          </div>
-        </div>
       </form>
 
       <!-- Referee form -->
       <form v-else @submit.prevent="submitRef" style="max-width: 420px; display: flex; flex-direction: column; gap: 18px;">
-        <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--felt-2);">ARBITRE · CARTE FGB + PIN</div>
+        <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--felt-2);">ARBITRE · PRÉNOM + PIN</div>
         <h2 class="disp-a" style="font-size: 48px;">Connexion arbitre</h2>
 
         <label>
           <div class="mono" style="font-size: 10px; letter-spacing: 0.18em; color: var(--mute); margin-bottom: 8px; text-transform: uppercase;">
-            Carte FGB
+            Prénom
           </div>
-          <input v-model="refForm.fgb_card" type="text" required autocomplete="username"
-                 placeholder="ICN-ARB-XXX"
-                 style="font-family: var(--font-mono); letter-spacing: 0.06em;" />
-          <div v-if="refForm.errors.fgb_card" style="color: var(--live); font-size: 11px; margin-top: 6px;" class="mono">{{ refForm.errors.fgb_card }}</div>
+          <input v-model="refForm.name" type="text" required autocomplete="username"
+                 placeholder="Votre prénom" />
+          <div v-if="refForm.errors.name" style="color: var(--live); font-size: 11px; margin-top: 6px;" class="mono">{{ refForm.errors.name }}</div>
         </label>
         <label>
           <div class="mono" style="font-size: 10px; letter-spacing: 0.18em; color: var(--mute); margin-bottom: 8px; text-transform: uppercase;">
@@ -134,14 +126,6 @@ const submitRef = () => refForm.post('/login');
         <button type="submit" class="btn btn-felt" :disabled="refForm.processing" style="margin-top: 12px;">
           {{ refForm.processing ? 'Connexion…' : 'Se connecter →' }}
         </button>
-
-        <div style="margin-top: 14px; padding: 14px; border: 1px solid var(--line); background: var(--ink-2);">
-          <div class="mono" style="font-size: 10px; letter-spacing: 0.2em; color: var(--mute);">DÉMO</div>
-          <div style="font-size: 12px; color: var(--chalk-2); margin-top: 6px; line-height: 1.7;" class="mono">
-            Eric · ICN-ARB-001 · PIN 12345<br/>
-            T-One · ICN-ARB-002 · PIN 12345
-          </div>
-        </div>
       </form>
     </div>
   </div>
