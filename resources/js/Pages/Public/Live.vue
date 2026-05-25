@@ -112,12 +112,11 @@ const raceFor = (m) => m.phase === 'knockout'
     <meta name="description" content="Suivi en direct des matchs du Icone Pool Championship — scores live, classements de poules en temps réel." head-key="description" />
   </Head>
 
-  <div style="min-height: 100vh; background: var(--ink); display: flex; flex-direction: column;">
+  <div style="height: 100dvh; background: var(--ink); display: flex; flex-direction: column; overflow: hidden;">
     <!-- Header -->
-    <header style="display: flex; justify-content: space-between; align-items: center;
-                   padding: 18px 32px; border-bottom: 1px solid var(--line);
-                   background: rgba(10,10,11,0.85); backdrop-filter: blur(8px);
-                   position: sticky; top: 0; z-index: 10;">
+    <header style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+                   padding: clamp(8px,1.4vh,18px) clamp(12px,2.5vw,32px); border-bottom: 1px solid var(--line);
+                   background: rgba(10,10,11,0.92);">
       <div style="display: flex; align-items: center; gap: 16px;">
         <img v-if="competition?.logo_url" :src="competition.logo_url" :alt="competition.name + ' logo'"
              style="height: 44px; width: 44px; object-fit: contain;" />
@@ -144,7 +143,7 @@ const raceFor = (m) => m.phase === 'knockout'
     </header>
 
     <!-- Section : matchs en direct (toujours visible, haut de page) -->
-    <section style="padding: 24px 32px;">
+    <section class="section-live" style="flex-shrink: 0; padding: clamp(8px,1.4vh,20px) clamp(12px,2.5vw,32px);">
       <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
         <h2 class="disp-a" style="font-size: 28px;">▸ MATCHS EN DIRECT</h2>
         <div v-if="competition?.structure === 'pools_knockout'" class="mono" style="font-size: 11px; color: var(--mute);">
@@ -194,9 +193,12 @@ const raceFor = (m) => m.phase === 'knockout'
     </section>
 
     <!-- Section : carousel de poules (1 à la fois, rotation 10s) -->
-    <section v-if="currentPool" style="flex: 1; padding: 16px 32px 24px; border-top: 1px solid var(--line); background: var(--ink-2);">
+    <section v-if="currentPool" style="flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+                                        padding: clamp(8px,1.2vh,16px) clamp(12px,2.5vw,32px) clamp(6px,1vh,12px);
+                                        border-top: 1px solid var(--line); background: var(--ink-2);">
       <!-- Toolbar -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; gap: 14px; flex-wrap: wrap;">
+      <div style="flex-shrink: 0; display: flex; justify-content: space-between; align-items: center;
+                  margin-bottom: clamp(6px,1vh,14px); gap: 10px; flex-wrap: wrap;">
         <div style="display: flex; align-items: baseline; gap: 18px;">
           <h2 class="disp-a pool-title" style="font-size: 64px; line-height: 0.92;">POULE {{ currentPool.name }}</h2>
           <span class="mono" style="font-size: 12px; color: var(--mute); letter-spacing: 0.18em;">
@@ -223,7 +225,7 @@ const raceFor = (m) => m.phase === 'knockout'
       </div>
 
       <!-- Progress bar -->
-      <div style="height: 3px; background: var(--ink-3); margin-bottom: 18px;">
+      <div style="flex-shrink: 0; height: 3px; background: var(--ink-3); margin-bottom: clamp(6px,1vh,14px);">
         <div :style="{
           height: '100%',
           background: 'var(--felt-2)',
@@ -233,7 +235,8 @@ const raceFor = (m) => m.phase === 'knockout'
       </div>
 
       <!-- Standings table — pleine largeur, gros texte -->
-      <div class="standings-wrap" style="border: 1px solid var(--line); background: var(--ink); overflow: hidden;">
+      <div class="standings-wrap" style="flex: 1; min-height: 0; display: flex; flex-direction: column;
+                                          border: 1px solid var(--line); background: var(--ink); overflow: hidden;">
         <div class="standings-head"
              style="background: var(--ink-2); border-bottom: 1px solid var(--line);">
           <div class="mono col-rank" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em;">RANG</div>
@@ -269,13 +272,10 @@ const raceFor = (m) => m.phase === 'knockout'
         </div>
       </div>
 
-      <div class="mono" style="font-size: 11px; color: var(--mute); letter-spacing: 0.18em; margin-top: 14px; text-align: center;">
-        TOP {{ competition?.qualifiers_per_pool ?? 2 }} QUALIFIÉS POUR LA PHASE FINALE · V VICTOIRES · W MANCHES GAGNÉES · L MANCHES PERDUES · DIFF = W − L
-      </div>
     </section>
 
     <!-- Prochains matchs (optionnel, petit) -->
-    <section v-if="nextMatches?.length && !isFullscreen" style="padding: 16px 32px; border-top: 1px solid var(--line);">
+    <section v-if="nextMatches?.length && !isFullscreen" style="flex-shrink: 0; padding: clamp(8px,1.2vh,16px) clamp(12px,2.5vw,32px); border-top: 1px solid var(--line);">
       <h3 class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute); margin-bottom: 10px;">PROCHAINEMENT</h3>
       <div class="next-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
         <div v-for="m in nextMatches" :key="m.id"
@@ -290,8 +290,8 @@ const raceFor = (m) => m.phase === 'knockout'
     </section>
 
     <!-- Footer (caché en plein écran) -->
-    <footer v-if="!isFullscreen" style="padding: 16px 32px; border-top: 1px solid var(--line);
-                   display: flex; justify-content: space-between; align-items: center;">
+    <footer v-if="!isFullscreen" style="flex-shrink: 0; padding: clamp(8px,1.2vh,16px) clamp(12px,2.5vw,32px);
+                   border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center;">
       <div style="display: flex; align-items: center; gap: 14px;">
         <GabonFlag :width="22" :height="15" />
         <span class="mono" style="font-size: 11px; letter-spacing: 0.18em; color: var(--mute);">
@@ -306,115 +306,79 @@ const raceFor = (m) => m.phase === 'knockout'
 </template>
 
 <style scoped>
-.standings-head,
-.standings-row {
+/* ── Standings : flex rows fill available height evenly ── */
+.standings-head {
+  flex-shrink: 0;
   display: grid;
-  grid-template-columns: 70px 1fr 80px 80px 80px 100px;
-  gap: 0;
-  padding: 14px 24px;
+  grid-template-columns: clamp(32px,5vw,70px) 1fr clamp(36px,6vw,80px) clamp(36px,6vw,80px) clamp(36px,6vw,80px) clamp(48px,7vw,100px);
+  align-items: center;
+  padding: clamp(6px,1vh,12px) clamp(10px,2vw,24px);
+  background: var(--ink-2);
+  border-bottom: 1px solid var(--line);
 }
 .standings-row {
-  padding: 20px 24px;
-}
-.rank-num { font-size: 38px; }
-.row-name { font-size: 22px; font-weight: 700; }
-.row-v { font-size: 30px; }
-.row-w, .row-l { font-size: 26px; }
-.row-diff { font-size: 28px; }
-
-.live-score { font-size: 80px; }
-.live-dash { font-size: 48px; }
-@media (max-width: 900px) {
-  .live-score { font-size: 56px; gap: 10px; }
-  .live-dash { font-size: 32px; }
-}
-@media (max-width: 560px) {
-  .live-score { font-size: 44px; gap: 8px; }
-  .live-dash { font-size: 24px; }
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: clamp(32px,5vw,70px) 1fr clamp(36px,6vw,80px) clamp(36px,6vw,80px) clamp(36px,6vw,80px) clamp(48px,7vw,100px);
+  align-items: center;
+  padding: 0 clamp(10px,2vw,24px);
 }
 
-@media (max-width: 900px) {
+/* Font sizes scale with viewport height */
+.rank-num  { font-size: clamp(14px, 3.2vh, 38px); }
+.row-name  { font-size: clamp(11px, 2vh, 22px); font-weight: 700; }
+.row-v     { font-size: clamp(13px, 2.6vh, 30px); text-align: right; }
+.row-w     { font-size: clamp(12px, 2.2vh, 26px); text-align: right; color: var(--felt-2); }
+.row-l     { font-size: clamp(12px, 2.2vh, 26px); text-align: right; color: var(--mute); }
+.row-diff  { font-size: clamp(12px, 2.4vh, 28px); text-align: right; }
+
+/* Pool subtitle slot hint */
+.standings-row .mono { font-size: clamp(9px, 1.1vh, 11px); }
+
+/* ── Live score ── */
+.live-score { font-size: clamp(28px, 6vh, 80px); }
+.live-dash  { font-size: clamp(18px, 3.8vh, 48px); }
+
+/* ── Pool title ── */
+.pool-title { font-size: clamp(20px, 5vh, 64px) !important; line-height: 0.92; }
+
+/* ── Pool A/B/C/D selector buttons ── */
+.pool-btn {
+  width:  clamp(24px, 3.2vw, 36px) !important;
+  height: clamp(24px, 3.2vw, 36px) !important;
+  font-size: clamp(11px, 1.4vw, 16px) !important;
+}
+
+/* ── Live match section: header title ── */
+.section-live h2 { font-size: clamp(14px, 2.2vh, 28px); }
+
+/* ── Live grid: 1 col on narrow screens ── */
+@media (max-width: 860px) {
+  .live-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Hide W and L on narrow widths ── */
+@media (max-width: 860px) {
   .standings-head,
   .standings-row {
-    grid-template-columns: 44px 1fr 56px 56px 76px;
-    padding: 10px 14px;
+    grid-template-columns: clamp(28px,4vw,44px) 1fr clamp(32px,5vw,56px) clamp(44px,7vw,76px);
   }
-  .standings-row { padding: 14px 14px; }
-  .col-w { display: none; }
-  .rank-num { font-size: 26px; }
-  .row-name { font-size: 16px; }
-  .row-v { font-size: 22px; }
-  .row-l { font-size: 18px; }
-  .row-diff { font-size: 20px; }
-}
-
-@media (max-width: 560px) {
-  .standings-head,
-  .standings-row {
-    grid-template-columns: 36px 1fr 44px 60px;
-    padding: 8px 10px;
-  }
-  .standings-row { padding: 12px 10px; }
   .col-w, .col-l { display: none; }
-  .rank-num { font-size: 22px; }
-  .row-name { font-size: 14px; }
-  .row-v { font-size: 20px; }
-  .row-diff { font-size: 18px; }
 }
-
-/* Header responsive */
-@media (max-width: 768px) {
-  header {
-    padding: 12px 16px !important;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  header :deep(.disp-a) {
-    font-size: 16px !important;
-  }
-}
-@media (max-width: 560px) {
-  header :deep(.disp-a) {
-    font-size: 14px !important;
+@media (max-width: 480px) {
+  .standings-head,
+  .standings-row {
+    grid-template-columns: clamp(24px,4vw,36px) 1fr clamp(30px,5vw,44px) clamp(40px,7vw,60px);
   }
 }
 
-/* Section paddings shrink on mobile */
-@media (max-width: 768px) {
-  section {
-    padding: 16px !important;
-  }
-}
+/* ── Next matches grid ── */
+@media (max-width: 860px)  { .next-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+@media (max-width: 480px)  { .next-grid { grid-template-columns: 1fr !important; } }
 
-/* Carousel toolbar wraps */
-@media (max-width: 768px) {
-  .pool-title {
-    font-size: 36px !important;
-  }
-  .pool-btn {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 13px !important;
-  }
-}
-@media (max-width: 560px) {
-  .pool-title {
-    font-size: 28px !important;
-  }
-}
-
-/* Live match cards: 1 column on small */
-@media (max-width: 900px) {
-  .live-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* Next matches: 2 col on tablet, 1 col on phone */
-@media (max-width: 900px) {
-  .next-grid { grid-template-columns: repeat(2, 1fr) !important; }
-}
-@media (max-width: 560px) {
-  .next-grid { grid-template-columns: 1fr !important; }
+/* ── Header on small screens ── */
+@media (max-width: 640px) {
+  header { flex-wrap: wrap; gap: 8px; }
 }
 </style>
