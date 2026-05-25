@@ -150,7 +150,7 @@ const raceFor = (m) => m.phase === 'knockout'
         </div>
       </div>
 
-      <div v-if="liveMatches?.length" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+      <div v-if="liveMatches?.length" class="live-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
         <div v-for="m in liveMatches" :key="m.id"
              style="border: 1px solid rgba(229,72,77,0.45); background: rgba(229,72,77,0.04); padding: 24px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
@@ -171,9 +171,9 @@ const raceFor = (m) => m.phase === 'knockout'
               </div>
               <div style="font-size: 12px; color: var(--mute); margin-top: 4px;">{{ m.player_a?.club?.name }}</div>
             </div>
-            <div class="disp-a tnum" style="font-size: 80px; line-height: 0.9; display: flex; gap: 14px; align-items: baseline;">
+            <div class="disp-a tnum live-score" style="line-height: 0.9; display: flex; gap: 14px; align-items: baseline;">
               <span :style="{ color: m.score_a > m.score_b ? 'var(--felt-2)' : 'var(--chalk-2)' }">{{ m.score_a }}</span>
-              <span style="color: var(--mute-2); font-size: 48px;">—</span>
+              <span class="live-dash" style="color: var(--mute-2);">—</span>
               <span :style="{ color: m.score_b > m.score_a ? 'var(--felt-2)' : 'var(--chalk-2)' }">{{ m.score_b }}</span>
             </div>
             <div style="text-align: right; min-width: 0;">
@@ -196,7 +196,7 @@ const raceFor = (m) => m.phase === 'knockout'
       <!-- Toolbar -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; gap: 14px; flex-wrap: wrap;">
         <div style="display: flex; align-items: baseline; gap: 18px;">
-          <h2 class="disp-a" style="font-size: 64px; line-height: 0.92;">POULE {{ currentPool.name }}</h2>
+          <h2 class="disp-a pool-title" style="font-size: 64px; line-height: 0.92;">POULE {{ currentPool.name }}</h2>
           <span class="mono" style="font-size: 12px; color: var(--mute); letter-spacing: 0.18em;">
             {{ currentPoolIdx + 1 }}/{{ pools.length }} · SUIVANT DANS {{ Math.max(0, carouselCountdown) }}s
           </span>
@@ -209,7 +209,7 @@ const raceFor = (m) => m.phase === 'knockout'
           </button>
           <button @click="nextPool" class="btn" style="padding: 8px 12px;" title="Poule suivante">▶</button>
           <span style="width: 16px;"></span>
-          <button v-for="(p, i) in pools" :key="p.id" @click="selectPool(i)"
+          <button v-for="(p, i) in pools" :key="p.id" @click="selectPool(i)" class="pool-btn"
                   :style="{
                     width: '36px', height: '36px', cursor: 'pointer',
                     background: i === currentPoolIdx ? 'var(--felt-2)' : 'transparent',
@@ -231,37 +231,36 @@ const raceFor = (m) => m.phase === 'knockout'
       </div>
 
       <!-- Standings table — pleine largeur, gros texte -->
-      <div style="border: 1px solid var(--line); background: var(--ink); overflow: hidden;">
-        <div style="display: grid; grid-template-columns: 70px 1fr 80px 80px 80px 100px; gap: 0;
-                    background: var(--ink-2); border-bottom: 1px solid var(--line); padding: 14px 24px;">
-          <div class="mono" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em;">RANG</div>
-          <div class="mono" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em;">JOUEUR</div>
-          <div class="mono" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em; text-align: right;">V</div>
-          <div class="mono" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em; text-align: right;">W</div>
-          <div class="mono" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em; text-align: right;">L</div>
-          <div class="mono" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em; text-align: right;">DIFF</div>
+      <div class="standings-wrap" style="border: 1px solid var(--line); background: var(--ink); overflow: hidden;">
+        <div class="standings-head"
+             style="background: var(--ink-2); border-bottom: 1px solid var(--line);">
+          <div class="mono col-rank" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em;">RANG</div>
+          <div class="mono col-name" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em;">JOUEUR</div>
+          <div class="mono col-v" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em; text-align: right;">V</div>
+          <div class="mono col-w" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em; text-align: right;">W</div>
+          <div class="mono col-l" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em; text-align: right;">L</div>
+          <div class="mono col-diff" style="font-size: 11px; color: var(--mute); letter-spacing: 0.22em; text-align: right;">DIFF</div>
         </div>
 
-        <div v-for="(s, i) in currentPool.standings" :key="s.player_id" :style="{
-          display: 'grid', gridTemplateColumns: '70px 1fr 80px 80px 80px 100px',
-          padding: '20px 24px', alignItems: 'center',
+        <div v-for="(s, i) in currentPool.standings" :key="s.player_id" class="standings-row" :style="{
+          alignItems: 'center',
           borderTop: i ? '1px solid var(--line)' : 'none',
           background: s.rank <= (competition?.qualifiers_per_pool ?? 2) ? 'rgba(45,168,118,0.06)' : 'transparent',
           borderLeft: s.rank <= (competition?.qualifiers_per_pool ?? 2) ? '4px solid var(--felt-2)' : '4px solid transparent',
         }">
-          <div class="disp-a tnum" :style="{ fontSize: '38px', color: s.rank <= (competition?.qualifiers_per_pool ?? 2) ? 'var(--felt-2)' : 'var(--chalk)' }">
+          <div class="disp-a tnum col-rank rank-num" :style="{ color: s.rank <= (competition?.qualifiers_per_pool ?? 2) ? 'var(--felt-2)' : 'var(--chalk)' }">
             {{ s.rank }}
           </div>
-          <div>
-            <div style="font-size: 22px; font-weight: 700;">{{ s.name }}</div>
+          <div class="col-name">
+            <div class="row-name">{{ s.name }}</div>
             <div class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.18em; margin-top: 4px;">
               {{ currentPool.name }}{{ s.pool_slot }}
             </div>
           </div>
-          <div class="disp-a tnum" style="font-size: 30px; text-align: right;">{{ s.v }}</div>
-          <div class="disp-a tnum" style="font-size: 26px; color: var(--felt-2); text-align: right;">{{ s.w }}</div>
-          <div class="disp-a tnum" style="font-size: 26px; color: var(--mute); text-align: right;">{{ s.l }}</div>
-          <div class="disp-a tnum" :style="{ fontSize: '28px', textAlign: 'right',
+          <div class="disp-a tnum col-v row-v" style="text-align: right;">{{ s.v }}</div>
+          <div class="disp-a tnum col-w row-w" style="color: var(--felt-2); text-align: right;">{{ s.w }}</div>
+          <div class="disp-a tnum col-l row-l" style="color: var(--mute); text-align: right;">{{ s.l }}</div>
+          <div class="disp-a tnum col-diff row-diff" :style="{ textAlign: 'right',
                 color: s.diff > 0 ? 'var(--felt-2)' : s.diff < 0 ? 'var(--live)' : 'var(--chalk-2)' }">
             {{ s.diff > 0 ? '+' : '' }}{{ s.diff }}
           </div>
@@ -276,7 +275,7 @@ const raceFor = (m) => m.phase === 'knockout'
     <!-- Prochains matchs (optionnel, petit) -->
     <section v-if="nextMatches?.length && !isFullscreen" style="padding: 16px 32px; border-top: 1px solid var(--line);">
       <h3 class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute); margin-bottom: 10px;">PROCHAINEMENT</h3>
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+      <div class="next-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
         <div v-for="m in nextMatches" :key="m.id"
              style="border: 1px solid var(--line); padding: 10px 14px; background: var(--ink-2);">
           <div class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.18em;">
@@ -303,3 +302,117 @@ const raceFor = (m) => m.phase === 'knockout'
     </footer>
   </div>
 </template>
+
+<style scoped>
+.standings-head,
+.standings-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 80px 80px 80px 100px;
+  gap: 0;
+  padding: 14px 24px;
+}
+.standings-row {
+  padding: 20px 24px;
+}
+.rank-num { font-size: 38px; }
+.row-name { font-size: 22px; font-weight: 700; }
+.row-v { font-size: 30px; }
+.row-w, .row-l { font-size: 26px; }
+.row-diff { font-size: 28px; }
+
+.live-score { font-size: 80px; }
+.live-dash { font-size: 48px; }
+@media (max-width: 900px) {
+  .live-score { font-size: 56px; gap: 10px; }
+  .live-dash { font-size: 32px; }
+}
+@media (max-width: 560px) {
+  .live-score { font-size: 44px; gap: 8px; }
+  .live-dash { font-size: 24px; }
+}
+
+@media (max-width: 900px) {
+  .standings-head,
+  .standings-row {
+    grid-template-columns: 44px 1fr 56px 56px 76px;
+    padding: 10px 14px;
+  }
+  .standings-row { padding: 14px 14px; }
+  .col-w { display: none; }
+  .rank-num { font-size: 26px; }
+  .row-name { font-size: 16px; }
+  .row-v { font-size: 22px; }
+  .row-l { font-size: 18px; }
+  .row-diff { font-size: 20px; }
+}
+
+@media (max-width: 560px) {
+  .standings-head,
+  .standings-row {
+    grid-template-columns: 36px 1fr 44px 60px;
+    padding: 8px 10px;
+  }
+  .standings-row { padding: 12px 10px; }
+  .col-w, .col-l { display: none; }
+  .rank-num { font-size: 22px; }
+  .row-name { font-size: 14px; }
+  .row-v { font-size: 20px; }
+  .row-diff { font-size: 18px; }
+}
+
+/* Header responsive */
+@media (max-width: 768px) {
+  header {
+    padding: 12px 16px !important;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  header :deep(.disp-a) {
+    font-size: 16px !important;
+  }
+}
+@media (max-width: 560px) {
+  header :deep(.disp-a) {
+    font-size: 14px !important;
+  }
+}
+
+/* Section paddings shrink on mobile */
+@media (max-width: 768px) {
+  section {
+    padding: 16px !important;
+  }
+}
+
+/* Carousel toolbar wraps */
+@media (max-width: 768px) {
+  .pool-title {
+    font-size: 36px !important;
+  }
+  .pool-btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 13px !important;
+  }
+}
+@media (max-width: 560px) {
+  .pool-title {
+    font-size: 28px !important;
+  }
+}
+
+/* Live match cards: 1 column on small */
+@media (max-width: 900px) {
+  .live-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Next matches: 2 col on tablet, 1 col on phone */
+@media (max-width: 900px) {
+  .next-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 560px) {
+  .next-grid { grid-template-columns: 1fr !important; }
+}
+</style>
