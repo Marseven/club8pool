@@ -3,6 +3,7 @@ import { Head, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import PublicNav from '@/Components/PublicNav.vue';
 import Chip from '@/Components/Chip.vue';
+import { Check } from 'lucide-vue-next';
 
 const props = defineProps({
   competition: Object,
@@ -242,7 +243,7 @@ const closesLabel = computed(() => {
         </form>
 
         <div v-if="isOpen && step === 3" style="padding: 60px 0; text-align: center;">
-          <div class="disp-a" style="font-size: 64px; color: var(--felt-2);">✓</div>
+          <div style="color: var(--felt-2);"><Check :size="48" /></div>
           <h2 class="disp-a" style="font-size: 40px; margin-top: 18px;">Inscription envoyée</h2>
           <p style="font-size: 14px; color: var(--mute); margin-top: 12px;">
             Vous serez contacté par la FGB sous 48h pour la validation.

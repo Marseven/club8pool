@@ -1,6 +1,7 @@
 <script setup>
 import { Head, router, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { Check, Clock } from 'lucide-vue-next';
 
 const props = defineProps({ match: Object });
 
@@ -23,7 +24,7 @@ const allSigned = computed(() => signed.value.has(props.match.player_a?.id) && s
                    display: flex; justify-content: space-between; align-items: center;">
       <Link href="/arbitre" style="color: var(--mute); font-size: 16px;">←</Link>
       <div style="text-align: center;">
-        <div class="mono" style="font-size: 9px; letter-spacing: 0.22em; color: var(--felt-2);">✓ MATCH TERMINÉ</div>
+        <div class="mono" style="font-size: 9px; letter-spacing: 0.22em; color: var(--felt-2); display:flex; align-items:center; gap:4px;"><Check :size="10" style="vertical-align:middle;" /> MATCH TERMINÉ</div>
         <div style="font-size: 13px; font-weight: 700;">Validation</div>
       </div>
       <span style="color: var(--mute); font-size: 16px;">⋮</span>
@@ -64,7 +65,8 @@ const allSigned = computed(() => signed.value.has(props.match.player_a?.id) && s
             <span style="font-size: 12px; font-weight: 700;">{{ p?.first_name }} {{ p?.last_name }}</span>
             <span class="mono" :style="{ fontSize: '9px', letterSpacing: '0.14em',
                   color: signed.has(p?.id) ? 'var(--felt-2)' : 'var(--live)' }">
-              {{ signed.has(p?.id) ? '✓ SIGNÉ' : '! EN ATTENTE' }}
+              <template v-if="signed.has(p?.id)"><Check :size="9" style="vertical-align:middle;margin-right:2px;" /> SIGNÉ</template>
+              <template v-else><Clock :size="9" style="vertical-align:middle;margin-right:2px;" /> EN ATTENTE</template>
             </span>
           </div>
           <button @click="sign(p.id)" :disabled="signed.has(p?.id)" :style="{
@@ -74,7 +76,8 @@ const allSigned = computed(() => signed.value.has(props.match.player_a?.id) && s
             fontSize: '24px', color: signed.has(p?.id) ? 'var(--felt-2)' : 'var(--mute-2)',
             fontFamily: 'cursive', cursor: signed.has(p?.id) ? 'default' : 'pointer',
           }">
-            {{ signed.has(p?.id) ? '✓' : 'Toucher pour signer' }}
+            <Check v-if="signed.has(p?.id)" :size="32" style="color: var(--felt-2);" />
+            <template v-else>Toucher pour signer</template>
           </button>
         </div>
       </div>

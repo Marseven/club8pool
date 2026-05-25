@@ -4,6 +4,7 @@ import { ref, computed } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import PoolStandings from '@/Components/PoolStandings.vue';
 import Chip from '@/Components/Chip.vue';
+import { Play, Square } from 'lucide-vue-next';
 
 const props = defineProps({
   competition: Object,
@@ -139,13 +140,13 @@ const playerLabel = (pool, playerId) => {
                 </td>
                 <td style="text-align: right; white-space: nowrap;">
                   <button v-if="m.status === 'scheduled'" class="btn btn-felt"
-                          style="padding: 4px 10px; font-size: 11px;" @click="startStart(m)">
-                    ▸ Démarrer
+                          style="padding: 4px 10px; font-size: 11px; display:inline-flex; align-items:center; gap:4px;" @click="startStart(m)">
+                    <Play :size="12" /> Démarrer
                   </button>
                   <button v-if="m.status === 'live'" class="btn"
-                          style="padding: 4px 10px; font-size: 11px; border-color: var(--live); color: var(--live);"
+                          style="padding: 4px 10px; font-size: 11px; border-color: var(--live); color: var(--live); display:inline-flex; align-items:center; gap:4px;"
                           @click="startEdit(m)">
-                    ■ Clore
+                    <Square :size="12" /> Clore
                   </button>
                   <button v-if="m.status === 'done'" class="btn"
                           style="padding: 4px 10px; font-size: 11px;" @click="startEdit(m)">
@@ -219,7 +220,7 @@ const playerLabel = (pool, playerId) => {
                   justify-content: center; z-index: 50;">
         <div style="background: var(--ink-2); border: 1px solid var(--felt-2); padding: 32px;
                     width: 520px; max-width: 90vw;">
-          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--felt-2);">▸ DÉMARRER LE MATCH</div>
+          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--felt-2); display:flex; align-items:center; gap:4px;"><Play :size="12" /> DÉMARRER LE MATCH</div>
           <div class="disp-a" style="font-size: 26px; margin-top: 8px;">
             {{ startingMatch.player_a?.first_name }} {{ startingMatch.player_a?.last_name }}
             <span style="color: var(--mute);">vs</span>
@@ -257,8 +258,8 @@ const playerLabel = (pool, playerId) => {
 
           <div style="display: flex; gap: 10px; margin-top: 28px;">
             <button class="btn" @click="cancelStart">Annuler</button>
-            <button class="btn btn-felt" style="margin-left: auto;" @click="launch" :disabled="!starter.pool_table_id">
-              ▸ Lancer le match
+            <button class="btn btn-felt" style="margin-left: auto; display:inline-flex; align-items:center; gap:6px;" @click="launch" :disabled="!starter.pool_table_id">
+              <Play :size="14" /> Lancer le match
             </button>
           </div>
         </div>

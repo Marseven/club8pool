@@ -3,6 +3,7 @@ import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import Ball8 from '@/Components/Ball8.vue';
 import RefereeNav from '@/Components/RefereeNav.vue';
+import { Check } from 'lucide-vue-next';
 
 const props = defineProps({ matches: Array });
 const page = usePage();
@@ -67,7 +68,13 @@ const initials = (s) => (s || '').split(' ').map(w => w[0]).slice(0, 2).join('')
             background: m.status === 'live' ? 'rgba(229,72,77,0.15)' : m.status === 'done' ? 'rgba(45,168,118,0.12)' : 'rgba(255,255,255,0.08)',
             color: m.status === 'live' ? 'var(--live)' : m.status === 'done' ? 'var(--felt-2)' : 'var(--chalk-2)',
           }">
-            {{ m.status === 'live' ? '● LIVE' : m.status === 'done' ? '✓ TERMINÉ' : m.status === 'scheduled' ? 'PROCHAIN' : 'EN ATTENTE' }}
+            <template v-if="m.status === 'live'">
+              <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;vertical-align:middle;margin-right:4px;"></span>LIVE
+            </template>
+            <template v-else-if="m.status === 'done'">
+              <Check :size="10" style="vertical-align:middle;margin-right:2px;" /> TERMINÉ
+            </template>
+            <template v-else>{{ m.status === 'scheduled' ? 'PROCHAIN' : 'EN ATTENTE' }}</template>
           </span>
         </div>
         <div class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.18em; margin-bottom: 8px;">

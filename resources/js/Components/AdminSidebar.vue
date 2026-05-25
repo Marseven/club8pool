@@ -2,6 +2,7 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed, ref, watch, onMounted } from 'vue';
 import Logo from './Logo.vue';
+import { X, Menu } from 'lucide-vue-next';
 
 defineProps({ active: { type: String, default: 'dashboard' } });
 
@@ -16,7 +17,7 @@ const items = [
   ['import', 'Import Excel', '↓', '/admin/import'],
   ['players', 'Joueurs', '○', '/admin/joueurs'],
   ['referees', 'Arbitres', '△', '/admin/arbitres'],
-  ['knockout', 'Phase finale', '◉', '/admin/phase-finale'],
+  ['knockout', 'Phase finale', '⊙', '/admin/phase-finale'],
 ];
 
 const initials = (s) => (s || '??').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
@@ -38,7 +39,8 @@ onMounted(() => {
                  background: var(--ink-2); position: sticky; top: 0; z-index: 40;">
     <Link href="/admin"><Logo :size="28" /></Link>
     <button class="mobile-hamburger" @click="open = !open" aria-label="Menu">
-      <span style="font-family: var(--font-mono); font-weight: 700; font-size: 18px;">{{ open ? '✕' : '≡' }}</span>
+      <X v-if="open" :size="18" />
+      <Menu v-else :size="18" />
     </button>
   </header>
 
@@ -84,7 +86,7 @@ onMounted(() => {
                    padding: 14px 24px; border-bottom: 1px solid var(--line);">
       <Logo :size="28" />
       <button class="mobile-hamburger" @click="open = false" aria-label="Fermer">
-        <span style="font-family: var(--font-mono); font-weight: 700; font-size: 18px;">✕</span>
+        <X :size="18" />
       </button>
     </header>
 

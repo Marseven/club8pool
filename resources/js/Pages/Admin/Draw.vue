@@ -4,6 +4,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import Ball8 from '@/Components/Ball8.vue';
 import Chip from '@/Components/Chip.vue';
+import { Play, Pause, Check } from 'lucide-vue-next';
 
 const props = defineProps({
   competition: Object,
@@ -56,7 +57,10 @@ const reset = () => { drawn.value = 0; };
         </div>
         <div style="display: flex; gap: 10px; align-items: center;">
           <Chip variant="live">EN COURS · {{ drawn }}/{{ players.length }}</Chip>
-          <button class="btn" @click="paused = !paused">{{ paused ? '▸ Reprendre' : '‖ Pause' }}</button>
+          <button class="btn" @click="paused = !paused" style="display:inline-flex; align-items:center; gap:4px;">
+            <template v-if="paused"><Play :size="12" /> Reprendre</template>
+            <template v-else><Pause :size="12" /> Pause</template>
+          </button>
           <button class="btn" @click="reset">⟲ Re-tirer</button>
         </div>
       </header>
@@ -79,7 +83,7 @@ const reset = () => { drawn.value = 0; };
               <span style="font-size: 12px; font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 {{ p.name }}
               </span>
-              <span v-if="i < drawn" class="mono" style="font-size: 9px; color: var(--felt-2);">✓</span>
+              <Check v-if="i < drawn" :size="9" style="color: var(--felt-2);" />
               <span v-else class="mono tnum" style="font-size: 10px; color: var(--mute);">{{ p.rating }}</span>
             </div>
           </div>

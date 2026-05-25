@@ -1,1 +1,0 @@
-import{e as s,q as t,n as r,m as n}from"./app-Csalc94v.js";const p={__name:"Chip",props:{variant:{type:String,default:""}},setup(a){return(e,o)=>(n(),s("span",{class:r(["chip",a.variant])},[t(e.$slots,"default")],2))}};export{p as _};

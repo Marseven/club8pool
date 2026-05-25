@@ -1,6 +1,7 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3';
 import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { Pause } from 'lucide-vue-next';
 
 const props = defineProps({ match: Object });
 
@@ -45,7 +46,10 @@ const winFrame = (side) => {
       </div>
       <span class="mono" style="padding: 3px 7px; border: 1px solid rgba(45,168,118,0.4);
                                 background: rgba(45,168,118,0.08); border-radius: 2px;
-                                font-size: 9px; color: var(--felt-2); letter-spacing: 0.14em;">● EN LIGNE</span>
+                                font-size: 9px; color: var(--felt-2); letter-spacing: 0.14em;
+                                display:inline-flex; align-items:center; gap:4px;">
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;"></span>EN LIGNE
+      </span>
     </header>
 
     <div :style="{
@@ -109,7 +113,10 @@ const winFrame = (side) => {
     <div style="margin-top: auto; padding: 12px 16px; border-top: 1px solid var(--line);
                 display: flex; justify-content: space-between; align-items: center; background: var(--ink-2);">
       <button class="mono" style="background: transparent; border: none; color: var(--mute);
-                                   font-size: 11px; letter-spacing: 0.14em; cursor: pointer;">‖ PAUSE</button>
+                                   font-size: 11px; letter-spacing: 0.14em; cursor: pointer;
+                                   display:inline-flex; align-items:center; gap:4px;">
+        <Pause :size="14" /> PAUSE
+      </button>
       <a :href="`/arbitre/match/${match.id}/fin`" class="btn" style="border-color: var(--felt-2); color: var(--felt-2);">
         FIN DE MATCH
       </a>

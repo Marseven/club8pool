@@ -4,6 +4,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import Ball8 from '@/Components/Ball8.vue';
 import Chip from '@/Components/Chip.vue';
+import { Check } from 'lucide-vue-next';
 
 const props = defineProps({
   competition: Object,
@@ -51,7 +52,7 @@ const adjust = (match, side, delta) => {
       <section style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
                       background: var(--line); border-bottom: 1px solid var(--line);">
         <div v-for="(kpi, i) in [
-          [`${kpis.players}/${kpis.slots}`, 'JOUEURS INSCRITS', `${competition?.pool_count ?? 0} poules de ${competition?.pool_size ?? 7}`, '✓'],
+          [`${kpis.players}/${kpis.slots}`, 'JOUEURS INSCRITS', `${competition?.pool_count ?? 0} poules de ${competition?.pool_size ?? 7}`, 'check'],
           [`${kpis.matches_done}/${kpis.matches_total}`, 'MATCHS JOUÉS', `${kpis.matches_live} en cours`, ''],
           [`${kpis.tables_active}/${kpis.tables_total}`, 'TABLES ACTIVES', '1 réservée · 1 maintenance', ''],
           ['00:42', 'MATCH LE PLUS LONG', kpis.longest_live ? `${kpis.longest_live.player_a?.last_name} vs ${kpis.longest_live.player_b?.last_name}` : '—', 'LIVE'],
@@ -59,7 +60,8 @@ const adjust = (match, side, delta) => {
           <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">{{ kpi[1] }}</div>
           <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 12px;">
             <span class="disp-a tnum" style="font-size: 42px;">{{ kpi[0] }}</span>
-            <span v-if="kpi[3]" class="mono tnum" style="font-size: 11px; color: var(--felt-2);">{{ kpi[3] }}</span>
+            <Check v-if="kpi[3] === 'check'" :size="10" style="color: var(--felt-2);" />
+            <span v-else-if="kpi[3]" class="mono tnum" style="font-size: 11px; color: var(--felt-2);">{{ kpi[3] }}</span>
           </div>
           <div style="font-size: 12px; color: var(--mute); margin-top: 6px;">{{ kpi[2] }}</div>
         </div>
@@ -190,7 +192,8 @@ const adjust = (match, side, delta) => {
                 {{ s.kind === 'rest' ? 'Journée de repos' : 'Journée de compétition' }}
               </span>
               <Chip :variant="s.status === 'live' ? 'live' : s.status === 'done' ? 'felt' : ''" style="padding: 1px 6px; font-size: 9px;">
-                {{ s.status === 'done' ? '✓' : s.status === 'live' ? 'EN COURS' : s.status === 'rest' ? 'REPOS' : 'À VENIR' }}
+                <Check v-if="s.status === 'done'" :size="10" style="vertical-align:middle;" />
+                <template v-else>{{ s.status === 'live' ? 'EN COURS' : s.status === 'rest' ? 'REPOS' : 'À VENIR' }}</template>
               </Chip>
             </div>
           </div>

@@ -3,6 +3,7 @@ import { Link, usePage } from '@inertiajs/vue3';
 import { computed, ref, watch, onMounted } from 'vue';
 import Logo from './Logo.vue';
 import GabonFlag from './GabonFlag.vue';
+import { X, Menu } from 'lucide-vue-next';
 
 const page = usePage();
 const auth = computed(() => page.props.auth?.user);
@@ -55,7 +56,8 @@ onMounted(() => {
     </div>
 
     <button class="mobile-hamburger" @click="open = !open" aria-label="Menu">
-      <span style="font-family: var(--font-mono); font-weight: 700; font-size: 18px;">{{ open ? '✕' : '≡' }}</span>
+      <X v-if="open" :size="18" />
+      <Menu v-else :size="18" />
     </button>
   </nav>
 
@@ -64,7 +66,7 @@ onMounted(() => {
                    padding: 14px 24px; border-bottom: 1px solid var(--line);">
       <Logo :size="32" />
       <button class="mobile-hamburger" @click="open = false" aria-label="Fermer">
-        <span style="font-family: var(--font-mono); font-weight: 700; font-size: 18px;">✕</span>
+        <X :size="18" />
       </button>
     </header>
 

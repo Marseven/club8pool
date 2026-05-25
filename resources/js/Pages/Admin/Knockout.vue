@@ -3,6 +3,7 @@ import { Head, router } from '@inertiajs/vue3';
 import { ref, computed, watch } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import Chip from '@/Components/Chip.vue';
+import { AlertTriangle, RotateCcw, Check } from 'lucide-vue-next';
 
 const props = defineProps({
   competition: Object,
@@ -116,8 +117,8 @@ const roundLabel = (r) => ({ R16: '8e de finale', QF: 'Quart de finale', SF: 'De
         <h3 class="disp-a" style="font-size: 24px; margin-bottom: 14px;">Qualifiés par poule</h3>
         <div v-if="ties.length" style="margin-bottom: 18px; padding: 12px 16px;
              border: 1px solid var(--line-strong); background: var(--ink-2);">
-          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--live);">
-            ⚠ {{ ties.length }} EX-AEQUO À TRANCHER
+          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--live); display:flex; align-items:center; gap:6px;">
+            <AlertTriangle :size="12" /> {{ ties.length }} EX-AEQUO À TRANCHER
           </div>
           <ul style="margin: 8px 0 0; padding-left: 18px; font-size: 12px; color: var(--chalk-2); line-height: 1.6;">
             <li v-for="(t, i) in ties" :key="i">
@@ -204,7 +205,9 @@ const roundLabel = (r) => ({ R16: '8e de finale', QF: 'Quart de finale', SF: 'De
         </p>
         <button class="btn btn-felt" @click="generate" :disabled="submitting"
                 style="padding: 14px 22px;">
-          {{ submitting ? 'Création…' : (hasExisting ? '↻ Régénérer le bracket' : '✓ Générer le bracket') }}
+          <template v-if="submitting">Création…</template>
+          <template v-else-if="hasExisting"><RotateCcw :size="12" style="vertical-align:middle;margin-right:4px;" /> Régénérer le bracket</template>
+          <template v-else><Check :size="12" style="vertical-align:middle;margin-right:4px;" /> Générer le bracket</template>
         </button>
       </section>
     </main>

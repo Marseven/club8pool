@@ -4,6 +4,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue';
 import Ball8 from '@/Components/Ball8.vue';
 import GabonFlag from '@/Components/GabonFlag.vue';
 import Chip from '@/Components/Chip.vue';
+import { Play, Pause, ChevronRight, ChevronLeft } from 'lucide-vue-next';
 
 const props = defineProps({
   competition: Object,
@@ -145,7 +146,7 @@ const raceFor = (m) => m.phase === 'knockout'
     <!-- Section : matchs en direct (toujours visible, haut de page) -->
     <section class="section-live" style="flex-shrink: 0; padding: clamp(8px,1.4vh,20px) clamp(12px,2.5vw,32px);">
       <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
-        <h2 class="disp-a" style="font-size: 28px;">▸ MATCHS EN DIRECT</h2>
+        <h2 class="disp-a" style="font-size: 28px;">MATCHS EN DIRECT</h2>
         <div v-if="competition?.structure === 'pools_knockout'" class="mono" style="font-size: 11px; color: var(--mute);">
           POULES RACE TO {{ competition?.pool_race_to ?? competition?.race_to }} · FINALE RACE TO {{ competition?.knockout_race_to ?? competition?.race_to }}
         </div>
@@ -206,12 +207,13 @@ const raceFor = (m) => m.phase === 'knockout'
           </span>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
-          <button @click="prevPool" class="btn" style="padding: 8px 12px;" title="Poule précédente">◀</button>
+          <button @click="prevPool" class="btn" style="padding: 8px 12px;" title="Poule précédente"><ChevronLeft :size="14" /></button>
           <button @click="carouselPaused = ! carouselPaused" class="btn" style="padding: 8px 12px;"
                   :title="carouselPaused ? 'Reprendre' : 'Mettre en pause'">
-            {{ carouselPaused ? '▸' : '‖' }}
+            <Play v-if="carouselPaused" :size="14" />
+            <Pause v-else :size="14" />
           </button>
-          <button @click="nextPool" class="btn" style="padding: 8px 12px;" title="Poule suivante">▶</button>
+          <button @click="nextPool" class="btn" style="padding: 8px 12px;" title="Poule suivante"><ChevronRight :size="14" /></button>
           <span style="width: 16px;"></span>
           <button v-for="(p, i) in pools" :key="p.id" @click="selectPool(i)" class="pool-btn"
                   :style="{

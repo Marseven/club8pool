@@ -3,6 +3,7 @@ import { Head, useForm } from '@inertiajs/vue3';
 import { ref, computed, watch } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import Ball8 from '@/Components/Ball8.vue';
+import { Check } from 'lucide-vue-next';
 
 const step = ref(0);
 const steps = ['Informations', 'Format', 'Règles & race', 'Frais & dotation', 'Publication'];
@@ -170,7 +171,7 @@ const formatFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
               }">
                 <div style="display: flex; justify-content: space-between;">
                   <Ball8 :size="24" />
-                  <span v-if="form.discipline === d.v" class="mono" style="font-size: 9px; color: var(--felt-2);">✓</span>
+                  <Check v-if="form.discipline === d.v" :size="9" style="color: var(--felt-2);" />
                 </div>
                 <div class="disp-a" style="font-size: 22px; margin-top: 14px;">{{ d.l }}</div>
                 <div style="font-size: 11px; color: var(--mute); margin-top: 6px;">{{ d.sub }}</div>
@@ -186,7 +187,7 @@ const formatFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
               }">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <span class="disp-a" style="font-size: 18px;">{{ s.l }}</span>
-                  <span v-if="form.structure === s.v" class="mono" style="font-size: 9px; color: var(--felt-2); letter-spacing: 0.14em;">✓ SÉLECTIONNÉ</span>
+                  <span v-if="form.structure === s.v" class="mono" style="font-size: 9px; color: var(--felt-2); letter-spacing: 0.14em; display:inline-flex; align-items:center; gap:4px;"><Check :size="9" /> SÉLECTIONNÉ</span>
                 </div>
                 <div style="font-size: 12px; color: var(--mute); margin-top: 10px; line-height: 1.5;">{{ s.sub }}</div>
                 <div v-if="s.hint" class="mono" style="font-size: 10px; color: var(--felt-2); letter-spacing: 0.14em; margin-top: 10px;">{{ s.hint }}</div>
@@ -446,15 +447,17 @@ const formatFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
                 color: i < step ? 'var(--ink)' : 'var(--felt-2)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontFamily: 'var(--font-mono)', fontSize: '10px',
-              }">{{ i < step ? '✓' : i === step ? '·' : '' }}</span>
+              }"><Check v-if="i < step" :size="10" /><template v-else-if="i === step">·</template></span>
               <span :style="{ fontSize: '13px', color: i > step ? 'var(--mute)' : 'var(--chalk)' }">{{ s }}</span>
             </div>
           </div>
 
           <div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px;">
             <button v-if="step < steps.length - 1" class="btn btn-felt" @click="step++">Étape suivante →</button>
-            <button v-else class="btn btn-felt" @click="submit" :disabled="form.processing">
-              {{ form.processing ? 'Création…' : '✓ Publier la compétition' }}
+            <button v-else class="btn btn-felt" @click="submit" :disabled="form.processing"
+                    style="display:inline-flex; align-items:center; gap:6px;">
+              <template v-if="form.processing">Création…</template>
+              <template v-else><Check :size="12" /> Publier la compétition</template>
             </button>
             <button v-if="step > 0" class="btn" @click="step--">← Étape précédente</button>
           </div>

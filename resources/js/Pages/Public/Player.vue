@@ -4,6 +4,7 @@ import { computed } from 'vue';
 import PublicNav from '@/Components/PublicNav.vue';
 import GabonFlag from '@/Components/GabonFlag.vue';
 import Chip from '@/Components/Chip.vue';
+import { Check } from 'lucide-vue-next';
 
 const props = defineProps({
   player: Object,
@@ -73,7 +74,7 @@ const fmtTime = (iso) => {
       <div style="padding: 36px 40px; border-right: 1px solid var(--line);">
         <div style="display: flex; gap: 10px; margin-bottom: 18px;">
           <Chip v-if="registration" variant="felt">POULE {{ registration.pool_name }} · {{ registration.pool_slot ? registration.pool_name + registration.pool_slot : '—' }}</Chip>
-          <Chip v-if="qualified" variant="felt">✓ QUALIFIÉ</Chip>
+          <Chip v-if="qualified" variant="felt" style="display:inline-flex;align-items:center;gap:4px;"><Check :size="10" /> QUALIFIÉ</Chip>
           <Chip><GabonFlag :width="14" :height="10" /> {{ player.club?.city?.toUpperCase() ?? 'GABON' }}</Chip>
         </div>
         <h1 class="disp-a" style="font-size: 84px; line-height: 0.88;">
@@ -166,7 +167,7 @@ const fmtTime = (iso) => {
              }"
              :title="`${phaseLabel(m)} vs ${m.opponent?.name ?? '—'}`">
           <span v-if="m.status === 'done'">{{ m.my_score }}–{{ m.opp_score }}</span>
-          <span v-else-if="m.status === 'live'">●</span>
+          <span v-else-if="m.status === 'live'" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;vertical-align:middle;"></span>
           <span v-else>·</span>
         </div>
       </div>

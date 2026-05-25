@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import { Check, Play } from 'lucide-vue-next';
 defineProps({ match: Object });
 </script>
 
@@ -51,7 +52,7 @@ defineProps({ match: Object });
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
           <button style="padding: 14px; background: rgba(45,168,118,0.08); border: 1px solid var(--felt-2);
                          color: var(--chalk); border-radius: 3px; text-align: left; cursor: pointer;">
-            <div class="mono" style="font-size: 9px; color: var(--felt-2); letter-spacing: 0.14em;">✓ CHOIX ARBITRE</div>
+            <div class="mono" style="font-size: 9px; color: var(--felt-2); letter-spacing: 0.14em; display:flex; align-items:center; gap:4px;"><Check :size="9" style="vertical-align:middle;" /> CHOIX ARBITRE</div>
             <div style="font-size: 13px; font-weight: 700; margin-top: 6px;">{{ match.player_a?.last_name }}</div>
             <div class="mono" style="font-size: 9px; color: var(--mute); margin-top: 2px;">SEED HAUT</div>
           </button>
@@ -86,7 +87,7 @@ defineProps({ match: Object });
 
     <div style="padding: 14px 22px; border-top: 1px solid var(--line); background: var(--ink-2);">
       <Link :href="`/arbitre/match/${match.id}/live`" class="btn btn-felt"
-            style="width: 100%; padding: 16px; justify-content: center;">▸ Démarrer le match</Link>
+            style="width: 100%; padding: 16px; justify-content: center; display:flex; align-items:center; gap:6px;"><Play :size="14" /> Démarrer le match</Link>
     </div>
   </div>
 </template>

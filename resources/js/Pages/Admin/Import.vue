@@ -3,6 +3,7 @@ import { Head, useForm, router, Link } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import Chip from '@/Components/Chip.vue';
+import { Check } from 'lucide-vue-next';
 
 const props = defineProps({
   competition: Object,
@@ -188,8 +189,8 @@ const totalCounts = computed(() => {
 
         <div style="display: flex; gap: 10px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); flex-wrap: wrap;">
           <button class="btn" @click="cancelImport">Annuler</button>
-          <button class="btn btn-felt" style="margin-left: auto;" @click="confirmImport" :disabled="totalCounts.matches === 0">
-            ✓ Valider l'import · {{ totalCounts.matches }} matchs
+          <button class="btn btn-felt" style="margin-left: auto; display:inline-flex; align-items:center; gap:6px;" @click="confirmImport" :disabled="totalCounts.matches === 0">
+            <Check :size="12" /> Valider l'import · {{ totalCounts.matches }} matchs
           </button>
         </div>
       </section>
