@@ -2,6 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import Chip from '@/Components/Chip.vue';
+import { competitionStatus, competitionStatusChip, competitionFormat, label } from '@/utils/labels.js';
 
 defineProps({ competitions: Array });
 </script>
@@ -37,12 +38,12 @@ defineProps({ competitions: Array });
             <tr v-for="c in competitions" :key="c.id">
               <td style="font-weight: 600;">{{ c.name }}</td>
               <td>{{ c.discipline }}</td>
-              <td style="color: var(--mute);">{{ c.format }}</td>
+              <td style="color: var(--mute);">{{ label(competitionFormat, c.format) }}</td>
               <td class="mono tnum">{{ c.registrations_count }} / {{ c.player_slots }}</td>
               <td class="mono tnum">{{ c.matches_count }}</td>
               <td>
-                <Chip :variant="c.status === 'in_progress' ? 'live' : c.status === 'finished' ? 'felt' : ''">
-                  {{ c.status }}
+                <Chip :variant="label(competitionStatusChip, c.status)">
+                  {{ label(competitionStatus, c.status) }}
                 </Chip>
               </td>
               <td style="text-align: right;">

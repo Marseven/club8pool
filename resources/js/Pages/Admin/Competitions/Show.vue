@@ -2,14 +2,15 @@
 import { Head, Link } from '@inertiajs/vue3';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import Chip from '@/Components/Chip.vue';
+import { competitionStatus, competitionStatusChip, registrationStatus, registrationStatusChip, label } from '@/utils/labels.js';
 
 defineProps({ competition: Object });
 
 const structureLabel = {
-  knockout: 'Élimination directe',
+  knockout:       'Élimination directe',
   pools_knockout: 'Poules + phase finale',
-  pools_only: 'Poules uniquement',
-  round_robin: 'Round-robin général',
+  pools_only:     'Poules uniquement',
+  round_robin:    'Round-robin général',
 };
 
 const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
@@ -101,7 +102,7 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
             <tr><th>Inscriptions</th><td>Closes le {{ competition.registration_closes_at?.slice(0, 16)?.replace('T', ' à ') }}</td></tr>
             <tr><th>Inscription</th><td>{{ fmtFcfa(competition.entry_fee ?? 0) }}</td></tr>
             <tr><th>Dotation</th><td><strong style="color: var(--felt-2);">{{ fmtFcfa(competition.prize_pool ?? 0) }}</strong></td></tr>
-            <tr><th>Statut</th><td><Chip>{{ competition.status }}</Chip></td></tr>
+            <tr><th>Statut</th><td><Chip :variant="label(competitionStatusChip, competition.status)">{{ label(competitionStatus, competition.status) }}</Chip></td></tr>
           </table>
         </div>
 
@@ -127,7 +128,7 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
               <div style="font-size: 13px; font-weight: 600;">{{ r.player.first_name }} {{ r.player.last_name }}</div>
               <div style="font-size: 11px; color: var(--mute);">{{ r.player.club?.name }}</div>
             </div>
-            <Chip :variant="r.status === 'paid' ? 'felt' : ''">{{ r.status }}</Chip>
+            <Chip :variant="label(registrationStatusChip, r.status)">{{ label(registrationStatus, r.status) }}</Chip>
           </div>
         </div>
       </section>

@@ -2,6 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3';
 import PublicNav from '@/Components/PublicNav.vue';
 import Chip from '@/Components/Chip.vue';
+import { competitionStatus, competitionStatusChip, label } from '@/utils/labels.js';
 
 defineProps({
   open: Array,
@@ -13,18 +14,11 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n ?? 0) + ' FCFA';
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long' }) : '';
 
 const structureLabel = {
-  knockout: 'Élimination directe',
+  knockout:       'Élimination directe',
   pools_knockout: 'Poules + phase finale',
-  pools_only: 'Phase de poules',
-  round_robin: 'Round-robin',
+  pools_only:     'Phase de poules',
+  round_robin:    'Round-robin',
 };
-
-const statusLabel = (s) => ({
-  draft: 'BROUILLON',
-  registration: 'INSCRIPTIONS OUVERTES',
-  in_progress: 'EN COURS',
-  finished: 'TERMINÉE',
-})[s] ?? s;
 </script>
 
 <template>
@@ -97,7 +91,7 @@ const statusLabel = (s) => ({
         <Link v-for="c in others" :key="c.id" :href="`/inscription/${c.slug}`"
               style="border: 1px solid var(--line); background: var(--ink-2); padding: 20px; display: block; opacity: 0.85;">
           <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px;">
-            <Chip :variant="c.status === 'in_progress' ? 'live' : ''">{{ statusLabel(c.status) }}</Chip>
+            <Chip :variant="label(competitionStatusChip, c.status)">{{ label(competitionStatus, c.status) }}</Chip>
             <span class="mono" style="font-size: 10px; color: var(--mute);">{{ c.registered }}/{{ c.player_slots }}</span>
           </div>
           <div style="font-size: 18px; font-weight: 600; margin-top: 10px;">{{ c.name }}</div>
