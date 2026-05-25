@@ -8,6 +8,7 @@ import Chip from '@/Components/Chip.vue';
 const props = defineProps({
   competition: Object,
   tables: Array,
+  pools: Array,
   kpis: Object,
   recentRegistrations: Array,
   schedule: Array,
@@ -50,7 +51,7 @@ const adjust = (match, side, delta) => {
       <section style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
                       background: var(--line); border-bottom: 1px solid var(--line);">
         <div v-for="(kpi, i) in [
-          [`${kpis.players}/${kpis.slots}`, 'JOUEURS INSCRITS', `${4} clubs représentés`, '✓'],
+          [`${kpis.players}/${kpis.slots}`, 'JOUEURS INSCRITS', `${competition?.pool_count ?? 0} poules de ${competition?.pool_size ?? 7}`, '✓'],
           [`${kpis.matches_done}/${kpis.matches_total}`, 'MATCHS JOUÉS', `${kpis.matches_live} en cours`, ''],
           [`${kpis.tables_active}/${kpis.tables_total}`, 'TABLES ACTIVES', '1 réservée · 1 maintenance', ''],
           ['00:42', 'MATCH LE PLUS LONG', kpis.longest_live ? `${kpis.longest_live.player_a?.last_name} vs ${kpis.longest_live.player_b?.last_name}` : '—', 'LIVE'],
@@ -61,6 +62,35 @@ const adjust = (match, side, delta) => {
             <span v-if="kpi[3]" class="mono tnum" style="font-size: 11px; color: var(--felt-2);">{{ kpi[3] }}</span>
           </div>
           <div style="font-size: 12px; color: var(--mute); margin-top: 6px;">{{ kpi[2] }}</div>
+        </div>
+      </section>
+
+      <section v-if="pools?.length" style="padding: 24px 32px; border-bottom: 1px solid var(--line);">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
+          <h3 class="disp-a" style="font-size: 22px;">Avancement des poules</h3>
+          <Link href="/competitions" class="mono" style="font-size: 11px; color: var(--mute); letter-spacing: 0.14em;">
+            VUE PUBLIQUE →
+          </Link>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+          <div v-for="p in pools" :key="p.id" style="border: 1px solid var(--line); padding: 14px; background: var(--ink-2);">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span class="disp-a" style="font-size: 20px;">POULE {{ p.name }}</span>
+              <span class="mono" style="font-size: 10px; color: var(--mute);">{{ p.matches_done }}/{{ p.matches_total }}</span>
+            </div>
+            <div style="margin-top: 10px; height: 4px; background: var(--ink-4);">
+              <div :style="{ height: '100%', width: p.progress + '%', background: 'var(--felt-2)' }" />
+            </div>
+            <div style="margin-top: 12px;">
+              <div class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.18em;">LEADER</div>
+              <div style="font-size: 13px; font-weight: 600; margin-top: 4px;">
+                {{ p.leader ? (p.leader.player.first_name + ' ' + (p.leader.player.last_name ?? '')).trim() : '—' }}
+              </div>
+              <div class="mono" style="font-size: 10px; color: var(--mute); margin-top: 4px;">
+                V {{ p.leader?.v ?? 0 }} · Diff {{ (p.leader?.diff ?? 0) > 0 ? '+' : '' }}{{ p.leader?.diff ?? 0 }}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

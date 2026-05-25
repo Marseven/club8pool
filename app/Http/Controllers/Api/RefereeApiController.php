@@ -61,15 +61,25 @@ class RefereeApiController extends Controller
     public function frame(Request $request, GameMatch $match): JsonResponse
     {
         $data = $request->validate([
-            'winner' => ['required', 'in:A,B'],
+            'winner' => ['required', 'in:A,B,draw'],
+            'warning_a' => ['boolean'],
+            'warning_b' => ['boolean'],
         ]);
 
         if ($data['winner'] === 'A') {
             $match->increment('score_a');
+        } elseif ($data['winner'] === 'B') {
+            $match->increment('score_b');
         } else {
+            $match->increment('score_a');
             $match->increment('score_b');
         }
-        $match->update(['status' => 'live']);
+        $match->update([
+            'status' => 'live',
+            'is_draw' => $data['winner'] === 'draw' ? true : $match->is_draw,
+            'warning_a' => $data['warning_a'] ?? $match->warning_a,
+            'warning_b' => $data['warning_b'] ?? $match->warning_b,
+        ]);
 
         return response()->json(['match' => $match->fresh()]);
     }

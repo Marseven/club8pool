@@ -11,9 +11,10 @@ const user = computed(() => page.props.auth?.user);
 const items = [
   ['dashboard', 'Tableau de bord', '◰', '/admin'],
   ['comps', 'Compétitions', '◇', '/admin/competitions'],
+  ['pools', 'Poules', '▤', '/admin/poules'],
   ['players', 'Joueurs', '○', '/admin/joueurs'],
   ['referees', 'Arbitres', '△', '/admin/arbitres'],
-  ['draw', 'Tirage au sort', '◉', '/admin/tirage'],
+  ['draw', 'Tirage final', '◉', '/admin/tirage'],
 ];
 
 const initials = (s) => (s || '??').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();

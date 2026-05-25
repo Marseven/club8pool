@@ -24,7 +24,7 @@ const submit = () => form.post('/login');
         </h1>
         <p style="margin-top: 24px; max-width: 460px; color: var(--chalk-2); font-size: 15px; line-height: 1.5;">
           Configurez les compétitions, suivez les tables en temps réel, et orchestrez les tirages au sort
-          de la Coupe du Gabon depuis votre interface.
+          depuis votre interface.
         </p>
       </div>
       <div style="display: flex; align-items: center; gap: 12px; color: var(--mute);" class="mono">

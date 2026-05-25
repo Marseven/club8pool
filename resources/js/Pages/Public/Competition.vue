@@ -2,35 +2,28 @@
 import { Head } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import PublicNav from '@/Components/PublicNav.vue';
+import PoolStandings from '@/Components/PoolStandings.vue';
+import PoolMatches from '@/Components/PoolMatches.vue';
 import Bracket from '@/Components/Bracket.vue';
-import RankingTable from '@/Components/RankingTable.vue';
 import Chip from '@/Components/Chip.vue';
 
 const props = defineProps({
   competition: Object,
-  matches: Object,
-  ranking: Array,
+  pools: Array,
+  knockoutMatches: Object,
   liveMatches: Array,
-  schedule: Array,
 });
 
-const tab = ref('bracket');
+const tab = ref('standings');
 const tabs = [
-  ['bracket', 'Bracket'],
-  ['ranking', 'Classement'],
-  ['players', 'Joueurs'],
-  ['schedule', 'Calendrier'],
+  ['standings', 'Classements'],
+  ['matches', 'Matchs'],
+  ['knockout', 'Phase finale'],
   ['live', 'Live'],
 ];
 
-const fmtTime = (iso) => {
-  if (!iso) return '';
-  const d = new Date(iso);
-  return `${d.getUTCHours().toString().padStart(2, '0')}:${d.getUTCMinutes().toString().padStart(2, '0')}`;
-};
-
-const matchesTotal = computed(() => (props.schedule || []).length);
 const matchesLive = computed(() => (props.liveMatches || []).length);
+const hasKnockout = computed(() => Object.keys(props.knockoutMatches || {}).length > 0);
 </script>
 
 <template>
@@ -39,24 +32,35 @@ const matchesLive = computed(() => (props.liveMatches || []).length);
     <PublicNav />
     <section style="padding: 32px 48px 0; border-bottom: 1px solid var(--line);">
       <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
-        <Chip variant="live">EN DIRECT</Chip>
+        <Chip v-if="matchesLive" variant="live">EN DIRECT · {{ matchesLive }} TABLES</Chip>
         <span class="mono" style="font-size: 11px; letter-spacing: 0.2em; color: var(--mute);">
-          SAM. 06 JUIN 2026 · {{ competition?.venue?.toUpperCase() }}
+          {{ competition?.starts_on?.slice(0, 10) }} → {{ competition?.ends_on?.slice(0, 10) }} · {{ competition?.venue?.toUpperCase() }}
         </span>
       </div>
       <div style="display: flex; justify-content: space-between; align-items: end;">
-        <h1 class="disp-a" style="font-size: 88px;">
-          {{ competition?.name?.split(' — ')[0] }} <span style="color: var(--felt-2);">{{ competition?.discipline }}</span>
+        <h1 class="disp-a" style="font-size: 72px;">
+          {{ competition?.name }}
         </h1>
         <div style="display: flex; gap: 28px; padding-bottom: 14px;">
-          <div v-for="(item, i) in [
-            ['16', 'JOUEURS'],
-            [`${matchesTotal}`, 'MATCHS'],
-            [`T-${matchesLive}`, 'TABLES'],
-            ['EN COURS', 'PHASE'],
-          ]" :key="i">
-            <div class="disp-a tnum" style="font-size: 26px;">{{ item[0] }}</div>
-            <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">{{ item[1] }}</div>
+          <div>
+            <div class="disp-a tnum" style="font-size: 26px;">{{ String(competition?.pool_count ?? 0).padStart(2, '0') }}</div>
+            <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">POULES</div>
+          </div>
+          <div>
+            <div class="disp-a tnum" style="font-size: 26px;">{{ String(competition?.player_slots ?? 0).padStart(2, '0') }}</div>
+            <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">JOUEURS</div>
+          </div>
+          <div v-if="competition?.structure === 'pools_knockout'">
+            <div class="disp-a tnum" style="font-size: 26px;">{{ competition?.pool_race_to ?? competition?.race_to }} / {{ competition?.knockout_race_to ?? competition?.race_to }}</div>
+            <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">RACE POULES / FINALE</div>
+          </div>
+          <div v-else>
+            <div class="disp-a tnum" style="font-size: 26px;">RACE TO {{ competition?.race_to ?? 3 }}</div>
+            <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">FORMAT</div>
+          </div>
+          <div>
+            <div class="disp-a tnum" style="font-size: 26px;">{{ competition?.qualifiers_per_pool ?? 2 }}</div>
+            <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">QUALIFIÉS / POULE</div>
           </div>
         </div>
       </div>
@@ -72,57 +76,59 @@ const matchesLive = computed(() => (props.liveMatches || []).length);
       </div>
     </section>
 
-    <section style="display: grid; grid-template-columns: 1fr 360px; border-bottom: 1px solid var(--line);">
-      <div style="padding: 32px 48px; border-right: 1px solid var(--line); overflow: hidden;">
-        <Bracket v-if="tab === 'bracket'" :matches="matches" />
-        <RankingTable v-else-if="tab === 'ranking'" :players="ranking" />
-        <div v-else-if="tab === 'schedule'" style="display: flex; flex-direction: column;">
-          <div v-for="(m, i) in schedule" :key="m.id" :style="{
-            display: 'grid', gridTemplateColumns: '100px 1fr auto', alignItems: 'center',
-            padding: '14px 0', borderTop: i ? '1px solid var(--line)' : '1px solid var(--line-strong)'
-          }">
-            <span class="disp-a tnum" style="font-size: 22px;">{{ fmtTime(m.scheduled_at) }}</span>
-            <span style="font-size: 14px;">
-              {{ m.player_a?.last_name ?? 'À déterminer' }}
-              <span style="color: var(--mute);">vs</span>
-              {{ m.player_b?.last_name ?? 'À déterminer' }}
-            </span>
-            <span class="mono" style="font-size: 10px; color: var(--mute);">{{ m.table?.name ?? '—' }} · {{ m.round }}</span>
-          </div>
-        </div>
-        <div v-else style="padding: 80px; text-align: center; color: var(--mute);" class="mono">
-          VUE « {{ tab.toUpperCase() }} » À VENIR
-        </div>
+    <section v-if="tab === 'standings'" style="padding: 32px 48px;
+                                                display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;">
+      <PoolStandings v-for="pool in pools" :key="pool.id" :pool="pool" :qualifiers-per-pool="competition?.qualifiers_per_pool ?? 2" />
+    </section>
+
+    <section v-else-if="tab === 'matches'" style="padding: 32px 48px;">
+      <div v-for="pool in pools" :key="pool.id" style="margin-bottom: 40px;">
+        <h3 class="disp-a" style="font-size: 28px; margin-bottom: 16px;">POULE {{ pool.name }}</h3>
+        <PoolMatches :pool="pool" />
       </div>
-      <aside style="padding: 24px; display: flex; flex-direction: column; gap: 18px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span class="disp-a" style="font-size: 22px;">En direct</span>
-          <Chip variant="live">{{ matchesLive }} TABLES</Chip>
-        </div>
+    </section>
+
+    <section v-else-if="tab === 'knockout'" style="padding: 32px 48px;">
+      <div v-if="hasKnockout" style="overflow-x: auto;">
+        <Bracket :matches="knockoutMatches" />
+      </div>
+      <div v-else style="padding: 80px; text-align: center;">
+        <div class="disp-a" style="font-size: 40px; color: var(--mute);">EN ATTENTE</div>
+        <p style="margin-top: 14px; color: var(--mute); font-size: 14px;">
+          Le tableau de la phase finale sera tiré dès que les poules seront terminées.
+        </p>
+      </div>
+    </section>
+
+    <section v-else-if="tab === 'live'" style="padding: 32px 48px;">
+      <div v-if="liveMatches.length === 0" style="padding: 80px; text-align: center;">
+        <div class="disp-a" style="font-size: 36px; color: var(--mute);">AUCUN MATCH EN DIRECT</div>
+      </div>
+      <div v-else style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
         <div v-for="m in liveMatches" :key="m.id"
-             style="border: 1px solid var(--line); padding: 16px; background: var(--ink-2);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+             style="border: 1px solid rgba(229,72,77,0.45); background: rgba(229,72,77,0.04); padding: 20px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 14px;">
             <span class="mono" style="font-size: 10px; letter-spacing: 0.2em; color: var(--mute);">
               {{ m.table?.name?.toUpperCase() }}
             </span>
+            <Chip variant="live">LIVE</Chip>
           </div>
-          <div v-for="(p, j) in [m.player_a, m.player_b]" :key="j"
-               style="display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 6px 0;">
-            <span :style="{ fontSize: '13px', fontWeight: 600,
-                            color: (j === 0 ? m.score_a : m.score_b) > (j === 0 ? m.score_b : m.score_a) ? 'var(--chalk)' : 'var(--mute)' }">
-              {{ p.first_name }} {{ p.last_name }}
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px;">
+            <span style="font-size: 18px; font-weight: 600;">{{ m.player_a?.first_name }} {{ m.player_a?.last_name }}</span>
+            <span class="disp-a tnum" style="font-size: 48px;">
+              <span :style="{ color: m.score_a > m.score_b ? 'var(--felt-2)' : 'var(--chalk-2)' }">{{ m.score_a }}</span>
+              <span style="color: var(--mute-2);"> — </span>
+              <span :style="{ color: m.score_b > m.score_a ? 'var(--felt-2)' : 'var(--chalk-2)' }">{{ m.score_b }}</span>
             </span>
-            <span class="disp-a tnum" :style="{ fontSize: '28px',
-                  color: (j === 0 ? m.score_a : m.score_b) > (j === 0 ? m.score_b : m.score_a) ? 'var(--felt-2)' : 'var(--chalk-2)' }">
-              {{ j === 0 ? m.score_a : m.score_b }}
-            </span>
+            <span style="font-size: 18px; font-weight: 600; text-align: right;">{{ m.player_b?.first_name }} {{ m.player_b?.last_name }}</span>
           </div>
-          <div class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.14em;
-                                    margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line);">
-            RACE TO {{ competition?.race_to }}
+          <div class="mono" style="font-size: 10px; color: var(--mute); margin-top: 12px;">
+            RACE TO {{ m.phase === 'knockout'
+              ? (competition?.knockout_race_to ?? competition?.race_to)
+              : (competition?.pool_race_to ?? competition?.race_to) }}
           </div>
         </div>
-      </aside>
+      </div>
     </section>
   </div>
 </template>
