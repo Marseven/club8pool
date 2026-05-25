@@ -1,1 +1,0 @@
-import{e as s,s as t,n as r,p as n}from"./app-DaxM4l8z.js";const l={__name:"Chip",props:{variant:{type:String,default:""}},setup(a){return(e,o)=>(n(),s("span",{class:r(["chip",a.variant])},[t(e.$slots,"default")],2))}};export{l as _};

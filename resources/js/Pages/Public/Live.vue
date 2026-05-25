@@ -107,7 +107,10 @@ const raceFor = (m) => m.phase === 'knockout'
   ? (props.competition?.knockout_race_to ?? props.competition?.race_to)
   : (props.competition?.pool_race_to ?? props.competition?.race_to);
 
+// Nom complet
 const playerName = (p) => p ? `${p.first_name} ${p.last_name}` : '—';
+// Abréviation 3 lettres du nom de famille (style tableau foot)
+const abbrev = (p) => p ? p.last_name.slice(0, 3).toUpperCase() : '—';
 </script>
 
 <template>
@@ -326,20 +329,52 @@ const playerName = (p) => p ? `${p.first_name} ${p.last_name}` : '—';
         <div class="bracket-grid" :style="{ '--cols': bracketRounds.length }">
           <div v-for="round in bracketRounds" :key="round" class="bracket-col">
             <div class="mono bracket-round-label">{{ roundLabel(round) }}</div>
-            <div v-for="m in knockoutBracket[round]" :key="m.id"
-                 class="bracket-card"
-                 :class="{ 'bc-live': m.status==='live', 'bc-done': m.status==='done', 'bc-pending': m.status==='pending' }">
-              <div class="bc-player" :class="{ 'bc-winner': m.status==='done' && m.score_a > m.score_b }">
-                <span class="bc-name">{{ m.player_a ? m.player_a.first_name+' '+m.player_a.last_name : '—' }}</span>
-                <span v-if="m.status!=='pending'" class="disp-a tnum bc-score">{{ m.score_a }}</span>
+
+            <!-- ── R16 : une seule ligne par match, style tableau foot ── -->
+            <template v-if="round === 'R16'">
+              <div v-for="m in knockoutBracket[round]" :key="m.id"
+                   class="bracket-card bc-row"
+                   :class="{ 'bc-live': m.status==='live', 'bc-done': m.status==='done', 'bc-pending': m.status==='pending' }">
+                <!-- Nom A (3 lettres, aligné à droite) -->
+                <span class="bc-abbrev bc-abbrev-a"
+                      :class="{ 'bc-winner-abbrev': m.status==='done' && m.score_a > m.score_b }">
+                  {{ abbrev(m.player_a) }}
+                </span>
+                <!-- Score ou VS -->
+                <span class="disp-a tnum bc-row-score">
+                  <template v-if="m.status !== 'pending'">{{ m.score_a }}<span class="bc-sep">—</span>{{ m.score_b }}</template>
+                  <template v-else><span class="bc-vs mono">VS</span></template>
+                </span>
+                <!-- Nom B (3 lettres, aligné à gauche) -->
+                <span class="bc-abbrev bc-abbrev-b"
+                      :class="{ 'bc-winner-abbrev': m.status==='done' && m.score_b > m.score_a }">
+                  {{ abbrev(m.player_b) }}
+                </span>
+                <!-- Badge heure / live -->
+                <span v-if="m.status==='live'" class="mono bc-row-tag bc-row-live">●</span>
+                <span v-else-if="m.status==='done'" class="mono bc-row-tag">{{ fmtTime(m.ended_at) }}</span>
+                <span v-else class="bc-row-tag"></span>
               </div>
-              <div class="bc-player" :class="{ 'bc-winner': m.status==='done' && m.score_b > m.score_a }">
-                <span class="bc-name">{{ m.player_b ? m.player_b.first_name+' '+m.player_b.last_name : '—' }}</span>
-                <span v-if="m.status!=='pending'" class="disp-a tnum bc-score">{{ m.score_b }}</span>
+            </template>
+
+            <!-- ── QF / SF / F : cartes empilées (peu de matchs, plus de place) ── -->
+            <template v-else>
+              <div v-for="m in knockoutBracket[round]" :key="m.id"
+                   class="bracket-card"
+                   :class="{ 'bc-live': m.status==='live', 'bc-done': m.status==='done', 'bc-pending': m.status==='pending' }">
+                <div class="bc-player" :class="{ 'bc-winner': m.status==='done' && m.score_a > m.score_b }">
+                  <span class="bc-name">{{ m.player_a ? m.player_a.first_name+' '+m.player_a.last_name : '—' }}</span>
+                  <span v-if="m.status!=='pending'" class="disp-a tnum bc-score">{{ m.score_a }}</span>
+                </div>
+                <div class="bc-player" :class="{ 'bc-winner': m.status==='done' && m.score_b > m.score_a }">
+                  <span class="bc-name">{{ m.player_b ? m.player_b.first_name+' '+m.player_b.last_name : '—' }}</span>
+                  <span v-if="m.status!=='pending'" class="disp-a tnum bc-score">{{ m.score_b }}</span>
+                </div>
+                <div v-if="m.status==='live'" class="bc-badge bc-badge-live mono">● LIVE</div>
+                <div v-else-if="m.status==='done'" class="bc-badge bc-badge-done mono">{{ fmtTime(m.ended_at) }}</div>
               </div>
-              <div v-if="m.status==='live'" class="bc-badge bc-badge-live mono">● LIVE</div>
-              <div v-else-if="m.status==='done'" class="bc-badge bc-badge-done mono">{{ fmtTime(m.ended_at) }}</div>
-            </div>
+            </template>
+
           </div>
         </div>
       </template>
@@ -536,4 +571,52 @@ const playerName = (p) => p ? `${p.first_name} ${p.last_name}` : '—';
 @media (max-width: 480px) {
   .bracket-grid { grid-template-columns: 1fr; overflow-y: auto; }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   R16 : cartes en ligne unique, style tableau foot
+   ───────────────────────────────────────────────────────────── */
+
+/* Override flex-column → grid sur une ligne */
+.bc-row {
+  display: grid !important;
+  grid-template-columns: 1fr auto 1fr auto;
+  align-items: center;
+  gap: clamp(4px, 0.8vw, 12px);
+  padding: clamp(3px, 0.5vh, 6px) clamp(6px, 0.8vw, 12px) !important;
+  flex-direction: unset !important;
+  justify-content: unset !important;
+}
+
+/* Nom abrégé 3 lettres */
+.bc-abbrev {
+  font-size: clamp(10px, 1.8vh, 22px);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--chalk-2);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.bc-abbrev-a { text-align: right; }
+.bc-abbrev-b { text-align: left; }
+.bc-winner-abbrev { color: var(--felt-2); font-weight: 700; }
+
+/* Score central */
+.bc-row-score {
+  font-size: clamp(11px, 2vh, 26px);
+  color: var(--chalk);
+  text-align: center;
+  white-space: nowrap;
+}
+.bc-sep   { color: var(--mute-2); margin: 0 clamp(2px, 0.4vw, 6px); }
+.bc-vs    { font-size: clamp(9px, 1.2vh, 13px); color: var(--mute); letter-spacing: 0.14em; }
+
+/* Tag heure / point live (4e colonne) */
+.bc-row-tag {
+  font-size: clamp(7px, 0.9vh, 10px);
+  color: var(--mute);
+  letter-spacing: 0.1em;
+  text-align: right;
+  white-space: nowrap;
+}
+.bc-row-live { color: var(--live); }
 </style>
