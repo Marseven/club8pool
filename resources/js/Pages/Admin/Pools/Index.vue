@@ -8,12 +8,16 @@ import Chip from '@/Components/Chip.vue';
 const props = defineProps({
   competition: Object,
   pools: Array,
+  tables: Array,
+  referees: Array,
 });
 
 const selectedPool = ref(props.pools[0]?.id);
 const editingMatch = ref(null);
+const startingMatch = ref(null);
 
 const editor = ref({ score_a: 0, score_b: 0, is_draw: false, warning_a: false, warning_b: false, note: '' });
+const starter = ref({ pool_table_id: null, referee_id: null });
 
 const currentPool = computed(() => props.pools.find(p => p.id === selectedPool.value));
 
@@ -37,6 +41,23 @@ const saveScore = () => {
 };
 
 const cancel = () => { editingMatch.value = null; };
+
+const startStart = (m) => {
+  startingMatch.value = m;
+  starter.value = {
+    pool_table_id: props.tables.find(t => t.status !== 'maint')?.id ?? null,
+    referee_id: props.referees[0]?.id ?? null,
+  };
+};
+
+const launch = () => {
+  router.post(`/admin/poules/matchs/${startingMatch.value.id}/lancer`, starter.value, {
+    preserveScroll: true,
+    onSuccess: () => { startingMatch.value = null; },
+  });
+};
+
+const cancelStart = () => { startingMatch.value = null; };
 
 const playerLabel = (pool, playerId) => {
   const idx = pool.players.findIndex(p => p.id === playerId);
@@ -116,9 +137,24 @@ const playerLabel = (pool, playerId) => {
                   <span v-else style="color: var(--mute-2);">·</span>
                   <span v-if="m.warning_a || m.warning_b" style="color: var(--live); margin-left: 8px;">⚠</span>
                 </td>
-                <td style="text-align: right;">
-                  <button class="btn" style="padding: 4px 10px; font-size: 11px;" @click="startEdit(m)">
-                    {{ m.status === 'done' ? 'Modifier' : 'Saisir' }}
+                <td style="text-align: right; white-space: nowrap;">
+                  <button v-if="m.status === 'scheduled'" class="btn btn-felt"
+                          style="padding: 4px 10px; font-size: 11px;" @click="startStart(m)">
+                    ▶ Démarrer
+                  </button>
+                  <button v-if="m.status === 'live'" class="btn"
+                          style="padding: 4px 10px; font-size: 11px; border-color: var(--live); color: var(--live);"
+                          @click="startEdit(m)">
+                    ⏹ Clore
+                  </button>
+                  <button v-if="m.status === 'done'" class="btn"
+                          style="padding: 4px 10px; font-size: 11px;" @click="startEdit(m)">
+                    Modifier
+                  </button>
+                  <button v-if="m.status === 'scheduled'" class="btn"
+                          style="padding: 4px 10px; font-size: 11px; margin-left: 4px;"
+                          @click="startEdit(m)" title="Saisir directement sans live">
+                    Saisir
                   </button>
                 </td>
               </tr>
@@ -173,6 +209,57 @@ const playerLabel = (pool, playerId) => {
           <div style="display: flex; gap: 10px; margin-top: 24px;">
             <button class="btn" @click="cancel">Annuler</button>
             <button class="btn btn-felt" style="margin-left: auto;" @click="saveScore">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modale : démarrer un match -->
+      <div v-if="startingMatch" @click.self="cancelStart"
+           style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center;
+                  justify-content: center; z-index: 50;">
+        <div style="background: var(--ink-2); border: 1px solid var(--felt-2); padding: 32px;
+                    width: 520px; max-width: 90vw;">
+          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--felt-2);">▶ DÉMARRER LE MATCH</div>
+          <div class="disp-a" style="font-size: 26px; margin-top: 8px;">
+            {{ startingMatch.player_a?.first_name }} {{ startingMatch.player_a?.last_name }}
+            <span style="color: var(--mute);">vs</span>
+            {{ startingMatch.player_b?.first_name }} {{ startingMatch.player_b?.last_name }}
+          </div>
+          <div class="mono" style="font-size: 11px; color: var(--mute); margin-top: 8px; letter-spacing: 0.14em;">
+            POULE {{ currentPool.name }} · RACE TO {{ competition.pool_race_to ?? competition.race_to }}
+          </div>
+
+          <div style="margin-top: 24px;">
+            <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute); margin-bottom: 10px;">TABLE</div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+              <button v-for="t in tables" :key="t.id" type="button" @click="starter.pool_table_id = t.id" :disabled="t.status === 'maint'"
+                :style="{
+                  padding: '14px', cursor: t.status === 'maint' ? 'not-allowed' : 'pointer',
+                  border: '1px solid ' + (starter.pool_table_id === t.id ? 'var(--felt-2)' : 'var(--line-strong)'),
+                  background: starter.pool_table_id === t.id ? 'rgba(45,168,118,0.08)' : 'var(--ink)',
+                  textAlign: 'left', opacity: t.status === 'maint' ? 0.4 : 1,
+                }">
+                <div class="disp-a" style="font-size: 18px;">{{ t.name }}</div>
+                <div class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.14em; margin-top: 4px;">
+                  {{ t.location?.toUpperCase() }} · {{ t.status === 'maint' ? 'MAINTENANCE' : t.status === 'live' ? '⚠ OCCUPÉE' : 'LIBRE' }}
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-top: 22px;">
+            <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute); margin-bottom: 10px;">ARBITRE</div>
+            <select v-model="starter.referee_id">
+              <option :value="null">— sans arbitre —</option>
+              <option v-for="r in referees" :key="r.id" :value="r.id">{{ r.name }}{{ r.title ? ' · ' + r.title : '' }}</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 28px;">
+            <button class="btn" @click="cancelStart">Annuler</button>
+            <button class="btn btn-felt" style="margin-left: auto;" @click="launch" :disabled="!starter.pool_table_id">
+              ▶ Lancer le match
+            </button>
           </div>
         </div>
       </div>

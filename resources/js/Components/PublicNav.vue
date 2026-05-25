@@ -8,11 +8,11 @@ const page = usePage();
 const auth = computed(() => page.props.auth?.user);
 
 const links = [
-  { label: 'Compétitions', href: '/competitions' },
-  { label: 'Classement', href: '/competitions#ranking' },
-  { label: 'Joueurs', href: '/joueurs/1' },
-  { label: 'Inscription', href: '/inscription' },
-  { label: 'Live', href: '/tv' },
+  { label: 'Compétitions', href: '/competitions', external: false },
+  { label: 'Classement', href: '/competitions#ranking', external: false },
+  { label: 'Joueurs', href: '/joueurs/1', external: false },
+  { label: 'Inscription', href: '/inscription', external: false },
+  { label: 'Live ↗', href: '/live', external: true },
 ];
 </script>
 
@@ -24,9 +24,12 @@ const links = [
     <Link href="/"><Logo :size="36" /></Link>
     <div style="display: flex; gap: 28px; font-size: 13px; font-weight: 600;
                 letter-spacing: 0.04em; text-transform: uppercase;">
-      <Link v-for="l in links" :key="l.href" :href="l.href" style="color: var(--mute);">
-        {{ l.label }}
-      </Link>
+      <template v-for="l in links" :key="l.href">
+        <a v-if="l.external" :href="l.href" target="_blank" rel="noopener" :style="{ color: l.label.includes('Live') ? 'var(--live)' : 'var(--mute)' }">
+          {{ l.label }}
+        </a>
+        <Link v-else :href="l.href" style="color: var(--mute);">{{ l.label }}</Link>
+      </template>
     </div>
     <div style="display: flex; gap: 10px; align-items: center;">
       <GabonFlag :width="22" :height="15" />

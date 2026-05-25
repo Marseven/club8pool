@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Competition;
 use App\Models\GameMatch;
 use App\Models\Pool;
+use App\Models\PoolTable;
+use App\Models\User;
 use App\Services\PoolStanding;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,7 +21,7 @@ class PoolController extends Controller
         $competition = Competition::with('pools.players.club')->firstOrFail();
 
         $pools = $competition->pools->map(function ($pool) {
-            $matches = GameMatch::with(['playerA', 'playerB', 'table'])
+            $matches = GameMatch::with(['playerA', 'playerB', 'table', 'referee'])
                 ->where('pool_id', $pool->id)
                 ->where('phase', 'pool')
                 ->orderBy('round_position')
@@ -57,6 +59,12 @@ class PoolController extends Controller
         return Inertia::render('Admin/Pools/Index', [
             'competition' => $competition,
             'pools' => $pools,
+            'tables' => PoolTable::where('competition_id', $competition->id)
+                ->orderBy('id')
+                ->get(['id', 'name', 'location', 'status']),
+            'referees' => User::where('role', 'referee')
+                ->orderBy('name')
+                ->get(['id', 'name', 'title']),
         ]);
     }
 
@@ -77,5 +85,33 @@ class PoolController extends Controller
         $match->update($data);
 
         return back()->with('success', 'Score enregistré.');
+    }
+
+    public function startMatch(Request $request, GameMatch $match): RedirectResponse
+    {
+        $data = $request->validate([
+            'pool_table_id' => ['required', 'exists:pool_tables,id'],
+            'referee_id' => ['nullable', 'exists:users,id'],
+        ]);
+
+        // Libérer toute autre table actuellement live et l'arbitre s'il était assigné ailleurs
+        GameMatch::where('competition_id', $match->competition_id)
+            ->where('pool_table_id', $data['pool_table_id'])
+            ->where('status', 'live')
+            ->where('id', '!=', $match->id)
+            ->update(['status' => 'scheduled']);
+
+        $match->update([
+            'pool_table_id' => $data['pool_table_id'],
+            'referee_id' => $data['referee_id'] ?? null,
+            'status' => 'live',
+            'started_at' => now(),
+            'score_a' => 0,
+            'score_b' => 0,
+        ]);
+
+        PoolTable::where('id', $data['pool_table_id'])->update(['status' => 'live']);
+
+        return back()->with('success', 'Match lancé.');
     }
 }

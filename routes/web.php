@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\RefereeController as AdminRefereeController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Public\CompetitionController;
 use App\Http\Controllers\Public\LandingController;
+use App\Http\Controllers\Public\LiveController;
 use App\Http\Controllers\Public\PlayerController;
 use App\Http\Controllers\Public\RegisterController;
 use App\Http\Controllers\Public\TvController;
@@ -22,6 +23,7 @@ Route::get('/competitions/{slug}', [CompetitionController::class, 'show'])->name
 Route::get('/joueurs/{player}', [PlayerController::class, 'show'])->name('player.show');
 Route::get('/inscription', [RegisterController::class, 'show'])->name('register.show');
 Route::post('/inscription', [RegisterController::class, 'store'])->name('register.store');
+Route::get('/live', LiveController::class)->name('live');
 Route::get('/tv', [TvController::class, 'show'])->name('tv');
 Route::get('/tv/table/{tableId}', [TvController::class, 'show'])->name('tv.table');
 
@@ -45,6 +47,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('/poules', [\App\Http\Controllers\Admin\PoolController::class, 'index'])->name('pools.index');
     Route::patch('/poules/matchs/{match}', [\App\Http\Controllers\Admin\PoolController::class, 'updateMatch'])->name('pools.matches.update');
+    Route::post('/poules/matchs/{match}/lancer', [\App\Http\Controllers\Admin\PoolController::class, 'startMatch'])->name('pools.matches.start');
 
     Route::patch('/matchs/{match}', [MatchController::class, 'update'])->name('matches.update');
 
