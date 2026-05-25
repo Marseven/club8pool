@@ -15,14 +15,16 @@ class RefereeApiController extends Controller
     public function login(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'fgb_card' => ['required', 'string'],
-            'pin' => ['required', 'string'],
+            'name' => ['required', 'string'],
+            'pin'  => ['required', 'string'],
         ]);
 
-        $user = User::where('fgb_card', $data['fgb_card'])->where('role', 'referee')->first();
+        $user = User::whereRaw('LOWER(name) = ?', [strtolower(trim($data['name']))])
+            ->where('role', 'referee')
+            ->first();
 
-        if (! $user || ! Hash::check($data['pin'], $user->pin)) {
-            return response()->json(['message' => 'Identifiants invalides.'], 401);
+        if (! $user || ! $user->pin || ! Hash::check($data['pin'], $user->pin)) {
+            return response()->json(['message' => 'Prénom ou PIN invalide.'], 401);
         }
 
         $token = $user->createToken('referee-mobile')->plainTextToken;
@@ -30,10 +32,9 @@ class RefereeApiController extends Controller
         return response()->json([
             'token' => $token,
             'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
+                'id'    => $user->id,
+                'name'  => $user->name,
                 'title' => $user->title,
-                'fgb_card' => $user->fgb_card,
             ],
         ]);
     }
