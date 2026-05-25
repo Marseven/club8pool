@@ -32,8 +32,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- Mobile topbar with hamburger -->
-  <header class="mobile-only" style="display: flex; align-items: center; justify-content: space-between;
+  <!-- Mobile topbar with hamburger (mobile only — display géré 100% en CSS) -->
+  <header class="admin-mobile-topbar" style="align-items: center; justify-content: space-between;
                  padding: 12px 16px; border-bottom: 1px solid var(--line);
                  background: var(--ink-2); position: sticky; top: 0; z-index: 40;">
     <Link href="/admin"><Logo :size="28" /></Link>

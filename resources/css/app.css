@@ -175,7 +175,12 @@ label .label {
  * ─────────────────────────────────────────────────────────────────────── */
 
 .mobile-only { display: none; }
-@media (max-width: 768px) { .mobile-only { display: block; } .mobile-hidden { display: none !important; } }
+.admin-mobile-topbar { display: none; }
+@media (max-width: 768px) {
+  .mobile-only { display: block; }
+  .mobile-hidden { display: none !important; }
+  .admin-mobile-topbar { display: flex; }
+}
 
 /* Inputs touch-friendly */
 input, textarea, select, button {
