@@ -177,7 +177,7 @@ const playerLabel = (pool, playerId) => {
                           style="padding: 4px 10px; font-size: 11px;" @click="startEdit(m)">
                     Modifier
                   </button>
-                  <button v-if="m.status !== 'scheduled'" class="btn"
+                  <button class="btn"
                           @click="resetMatch(m)"
                           :style="{
                             padding: '4px 10px', fontSize: '11px',
