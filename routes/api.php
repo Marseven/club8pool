@@ -8,6 +8,7 @@ Route::post('/referee/login', [RefereeApiController::class, 'login']);
 Route::middleware('auth:sanctum')->prefix('referee')->group(function () {
     Route::get('/me', [RefereeApiController::class, 'me']);
     Route::get('/queue', [RefereeApiController::class, 'queue']);
+    Route::get('/tables', [RefereeApiController::class, 'tables']);
     Route::get('/matches/{match}', [RefereeApiController::class, 'show']);
     Route::post('/matches/{match}/start', [RefereeApiController::class, 'start']);
     Route::post('/matches/{match}/frame', [RefereeApiController::class, 'frame']);

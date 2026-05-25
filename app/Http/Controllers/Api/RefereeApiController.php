@@ -53,6 +53,15 @@ class RefereeApiController extends Controller
         return response()->json($matches);
     }
 
+    public function tables(): JsonResponse
+    {
+        $tables = \App\Models\PoolTable::with([
+            'liveMatch.playerA', 'liveMatch.playerB', 'liveMatch.referee', 'liveMatch.pool',
+        ])->orderBy('id')->get();
+
+        return response()->json($tables);
+    }
+
     public function show(GameMatch $match): JsonResponse
     {
         return response()->json($match->load(['playerA.club', 'playerB.club', 'table', 'competition', 'signatures']));
