@@ -34,7 +34,7 @@ const submit = () => form.post('/admin/joueurs', { onSuccess: () => { showForm.v
       </header>
 
       <div v-if="showForm" style="padding: 24px 32px; border-bottom: 1px solid var(--line); background: var(--ink-2);">
-        <form @submit.prevent="submit" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: end;">
+        <form @submit.prevent="submit" class="player-form" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: end;">
           <label>
             <div class="mono" style="font-size: 10px; color: var(--mute); margin-bottom: 4px;">PRÉNOM</div>
             <input v-model="form.first_name" required />
@@ -82,3 +82,23 @@ const submit = () => form.post('/admin/joueurs', { onSuccess: () => { showForm.v
     </main>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  /* Header: stack */
+  header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Add player form: 1 col on mobile */
+  .player-form {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>

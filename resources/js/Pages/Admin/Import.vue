@@ -210,3 +210,28 @@ const totalCounts = computed(() => {
     </main>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Preview stats grid: 1 col on mobile */
+  div[style*="grid-template-columns: repeat(3, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* CTA row: stack */
+  div[style*="justify-content: flex-end"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+}
+</style>

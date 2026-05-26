@@ -164,3 +164,49 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
     </footer>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  /* Hero section padding */
+  section:first-of-type {
+    padding: 28px 16px 24px !important;
+  }
+
+  /* CTA buttons: stack on small screens */
+  div[style*="gap: 12px"][style*="margin-top: 28px"] {
+    flex-direction: column;
+  }
+  div[style*="gap: 12px"][style*="margin-top: 28px"] > a,
+  div[style*="gap: 12px"][style*="margin-top: 28px"] > a + a {
+    margin-left: 0 !important;
+  }
+
+  /* Schedule section: reduce time font size */
+  span[style*="font-size: 32px"][style*="min-width"] {
+    font-size: 22px !important;
+    min-width: 60px !important;
+  }
+
+  /* Reduce section paddings */
+  section[style*="padding: 56px 48px"] {
+    padding: 28px 16px !important;
+  }
+
+  /* Pool leader cards: reduce name size */
+  div.disp-a[style*="font-size: 32px"] {
+    font-size: 22px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Stats bar: 2x2 + last centered */
+  section[style*="grid-template-columns: repeat(5, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Stats bar big number */
+  div.disp-a[style*="font-size: 44px"] {
+    font-size: 30px !important;
+  }
+}
+</style>

@@ -56,3 +56,17 @@ defineProps({ competitions: Array });
     </main>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+</style>

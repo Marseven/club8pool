@@ -75,8 +75,8 @@ const closesLabel = computed(() => {
   </Head>
   <div style="background: var(--ink); min-height: 100vh;">
     <PublicNav />
-    <section style="display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 73px);">
-      <div style="padding: 48px 56px; border-right: 1px solid var(--line);
+    <section class="register-layout" style="display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 73px);">
+      <div class="register-sidebar" style="padding: 48px 56px; border-right: 1px solid var(--line);
                   background: var(--ink-2); display: flex; flex-direction: column;">
         <Chip v-if="isOpen" style="width: fit-content;" variant="felt">INSCRIPTIONS OUVERTES</Chip>
         <Chip v-else style="width: fit-content;" variant="live">INSCRIPTIONS FERMÉES</Chip>
@@ -116,7 +116,7 @@ const closesLabel = computed(() => {
         </div>
       </div>
 
-      <div style="padding: 48px 56px;">
+      <div class="register-form-panel" style="padding: 48px 56px;">
         <!-- État : inscriptions fermées -->
         <div v-if="!isOpen" style="display: flex; flex-direction: column; align-items: flex-start; gap: 22px; padding: 40px 0;">
           <div style="display: flex; align-items: center; gap: 12px;">
@@ -144,7 +144,7 @@ const closesLabel = computed(() => {
         </div>
 
         <!-- Formulaire d'inscription -->
-        <div v-if="isOpen" style="display: flex; gap: 0; margin-bottom: 36px;">
+        <div v-if="isOpen" class="steps-bar" style="display: flex; gap: 0; margin-bottom: 36px;">
           <div v-for="(s, i) in steps" :key="i" style="flex: 1; display: flex; align-items: center; gap: 10px;">
             <span :style="{
               width: '28px', height: '28px', borderRadius: '50%',
@@ -253,3 +253,39 @@ const closesLabel = computed(() => {
     </section>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  /* Stack sidebar above form panel */
+  .register-layout {
+    grid-template-columns: 1fr !important;
+    min-height: unset !important;
+  }
+
+  /* Sidebar: remove border-right, add bottom border */
+  .register-sidebar {
+    border-right: none !important;
+    border-bottom: 1px solid var(--line);
+    padding: 28px 18px !important;
+  }
+
+  /* Form panel: full padding reduction */
+  .register-form-panel {
+    padding: 28px 18px !important;
+  }
+
+  /* H1 in sidebar: reduce size */
+  .register-sidebar h1 {
+    font-size: clamp(36px, 10vw, 64px) !important;
+  }
+
+  /* Step indicators: let them overflow-scroll if too wide */
+  .steps-bar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .steps-bar::-webkit-scrollbar { display: none; }
+}
+</style>

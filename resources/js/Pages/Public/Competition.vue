@@ -33,22 +33,22 @@ const hasKnockout = computed(() => Object.keys(props.knockoutMatches || {}).leng
   </Head>
   <div style="background: var(--ink); min-height: 100vh;">
     <PublicNav />
-    <section style="padding: 32px 48px 0; border-bottom: 1px solid var(--line);">
-      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
+    <section class="comp-header-section" style="padding: 32px 48px 0; border-bottom: 1px solid var(--line);">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap;">
         <Chip v-if="matchesLive" variant="live">EN DIRECT · {{ matchesLive }} TABLES</Chip>
         <span class="mono" style="font-size: 11px; letter-spacing: 0.2em; color: var(--mute);">
           {{ competition?.starts_on?.slice(0, 10) }} → {{ competition?.ends_on?.slice(0, 10) }} · {{ competition?.venue?.toUpperCase() }}
         </span>
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: end;">
+      <div class="comp-title-row" style="display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 14px;">
         <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
           <img v-if="competition?.logo_url" :src="competition.logo_url" :alt="competition.name + ' logo'"
-               style="height: 80px; width: auto; max-width: 160px; object-fit: contain;" />
+               style="height: 60px; width: auto; max-width: 120px; object-fit: contain;" />
           <h1 class="disp-a" style="font-size: 72px;">
             {{ competition?.name }}
           </h1>
         </div>
-        <div style="display: flex; gap: 28px; padding-bottom: 14px;">
+        <div class="comp-stats-row" style="display: flex; gap: 28px; padding-bottom: 14px; flex-wrap: wrap;">
           <div>
             <div class="disp-a tnum" style="font-size: 26px;">{{ String(competition?.pool_count ?? 0).padStart(2, '0') }}</div>
             <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute); margin-top: 2px;">POULES</div>
@@ -71,13 +71,14 @@ const hasKnockout = computed(() => Object.keys(props.knockoutMatches || {}).leng
           </div>
         </div>
       </div>
-      <div style="display: flex; gap: 0; margin-top: 32px;">
+      <div class="tabs-row" style="display: flex; gap: 0; margin-top: 32px;">
         <button v-for="[k, l] in tabs" :key="k" @click="tab = k"
           :style="{ background: 'transparent', border: 'none', cursor: 'pointer',
                     padding: '14px 22px',
                     borderBottom: tab === k ? '2px solid var(--chalk)' : '2px solid transparent',
                     color: tab === k ? 'var(--chalk)' : 'var(--mute)',
-                    fontSize: '12px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }">
+                    fontSize: '12px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+                    whiteSpace: 'nowrap' }">
           {{ l }}
         </button>
       </div>
@@ -139,3 +140,45 @@ const hasKnockout = computed(() => Object.keys(props.knockoutMatches || {}).leng
     </section>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  /* Header section: reduce padding */
+  .comp-header-section {
+    padding: 20px 16px 0 !important;
+  }
+
+  /* Title row: stack on mobile */
+  .comp-title-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  /* Stats row: reduce gap and font */
+  .comp-stats-row {
+    gap: 14px !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Tabs: horizontal scroll instead of overflow */
+  .tabs-row {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-top: 16px !important;
+  }
+  .tabs-row::-webkit-scrollbar { display: none; }
+
+  /* Standings/Matches sections: reduce padding */
+  section[style*="padding: 32px 48px"] {
+    padding: 20px 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* knockout waiting state: reduce padding */
+  div[style*="padding: 80px"] {
+    padding: 40px 16px !important;
+  }
+}
+</style>

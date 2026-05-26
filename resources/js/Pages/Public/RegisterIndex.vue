@@ -47,7 +47,7 @@ const structureLabel = {
     </section>
 
     <section v-else style="padding: 32px 24px;">
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 1280px; margin: 0 auto;">
+      <div class="comps-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 1280px; margin: 0 auto;">
         <Link v-for="c in open" :key="c.id" :href="`/inscription/${c.slug}`"
               style="border: 1px solid var(--felt-2); background: rgba(45,168,118,0.05); padding: 24px; display: block;">
           <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px;">
@@ -87,7 +87,7 @@ const structureLabel = {
 
     <section v-if="others.length" style="padding: 32px 24px; border-top: 1px solid var(--line);">
       <h2 class="disp-a" style="font-size: clamp(24px, 6vw, 40px); margin-bottom: 18px;">Autres éditions</h2>
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; max-width: 1280px; margin: 0 auto;">
+      <div class="comps-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; max-width: 1280px; margin: 0 auto;">
         <Link v-for="c in others" :key="c.id" :href="`/inscription/${c.slug}`"
               style="border: 1px solid var(--line); background: var(--ink-2); padding: 20px; display: block; opacity: 0.85;">
           <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px;">
@@ -103,3 +103,12 @@ const structureLabel = {
     </section>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  /* Competition cards: 1 col on mobile */
+  .comps-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>

@@ -96,7 +96,7 @@ const adjust = (match, side, delta) => {
         </div>
       </section>
 
-      <section style="display: grid; grid-template-columns: 1.4fr 1fr; flex: 1; border-bottom: 1px solid var(--line);">
+      <section class="dashboard-main-grid" style="display: grid; grid-template-columns: 1.4fr 1fr; flex: 1; border-bottom: 1px solid var(--line);">
         <div style="padding: 24px 32px; border-right: 1px solid var(--line);">
           <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 18px;">
             <h3 class="disp-a" style="font-size: 28px;">Tables en temps réel</h3>
@@ -151,7 +151,7 @@ const adjust = (match, side, delta) => {
               <h4 class="disp-a" style="font-size: 22px;">Contrôleur match · {{ kpis.longest_live.table?.name }}</h4>
               <span class="mono" style="font-size: 11px; color: var(--mute);">QUART DE FINALE</span>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center;">
+            <div class="match-controller-grid" style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center;">
               <div style="text-align: left;">
                 <div style="font-size: 12px; color: var(--mute); margin-bottom: 6px;">SEED #{{ kpis.longest_live.player_a?.id }}</div>
                 <div style="font-size: 18px; font-weight: 600;">{{ kpis.longest_live.player_a?.first_name }} {{ kpis.longest_live.player_a?.last_name }}</div>
@@ -223,3 +223,39 @@ const adjust = (match, side, delta) => {
     </main>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  /* Header: stack title and action buttons */
+  header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  header > div:last-child {
+    width: 100%;
+  }
+  header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Match controller: stack players vertically */
+  .match-controller-grid {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+  }
+
+  /* Tables grid: 1 col on small phones */
+  .tables-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .match-controller-grid > div:first-child,
+  .match-controller-grid > div:last-child {
+    text-align: center;
+  }
+}
+</style>

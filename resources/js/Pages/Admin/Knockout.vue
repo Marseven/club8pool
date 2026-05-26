@@ -268,7 +268,7 @@ const closeMatchToEdit = (m) => { scoringMatchId.value = null; openSaisir(m); };
           </p>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px;">
+        <div class="qualifiers-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px;">
           <div v-for="(players, poolName) in localQualifiers" :key="poolName"
                style="border: 1px solid var(--line); background: var(--ink-2);">
             <div style="padding: 12px 16px; border-bottom: 1px solid var(--line);
@@ -309,7 +309,7 @@ const closeMatchToEdit = (m) => { scoringMatchId.value = null; openSaisir(m); };
         <p style="font-size: 12px; color: var(--mute); margin-bottom: 18px;">
           Seeding cross-poules standard : les têtes de poule se rencontrent au plus tôt en demi-finale.
         </p>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+        <div class="bracket-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
           <div v-for="(pair, i) in localPairs" :key="i"
                style="border: 1px solid var(--line); background: var(--ink-2); padding: 14px;">
             <div class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.18em;">
@@ -553,3 +553,42 @@ const closeMatchToEdit = (m) => { scoringMatchId.value = null; openSaisir(m); };
     </div>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  /* Header: stack title + chip */
+  header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  /* Bracket preview: 2 cols on mobile, 1 col on small phones */
+  .bracket-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Qualifiers: 1 col on mobile */
+  .qualifiers-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Existing bracket table: all widths fluid */
+  section table {
+    width: 100%;
+  }
+  section table td:first-child,
+  section table td:nth-child(3) {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .bracket-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>

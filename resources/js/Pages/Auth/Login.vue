@@ -20,9 +20,9 @@ const submitRef = () => refForm.post('/login');
 
 <template>
   <Head title="Connexion" />
-  <div style="min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; background: var(--ink);">
+  <div class="login-layout" style="min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; background: var(--ink);">
     <!-- Left visual panel -->
-    <div style="padding: 56px 64px; border-right: 1px solid var(--line); background: var(--ink-2);
+    <div class="login-panel-left" style="padding: 56px 64px; border-right: 1px solid var(--line); background: var(--ink-2);
                 display: flex; flex-direction: column; justify-content: space-between;">
       <Link href="/" style="display: flex; align-items: center; gap: 12px;">
         <Ball8 :size="42" />
@@ -52,7 +52,7 @@ const submitRef = () => refForm.post('/login');
     </div>
 
     <!-- Right form panel -->
-    <div style="padding: 64px; display: flex; flex-direction: column; justify-content: center;">
+    <div class="login-panel-right" style="padding: 64px; display: flex; flex-direction: column; justify-content: center;">
       <!-- Mode toggle -->
       <div style="display: flex; gap: 0; margin-bottom: 36px; max-width: 420px; border: 1px solid var(--line-strong);">
         <button type="button" @click="mode = 'admin'" :style="{
@@ -130,3 +130,23 @@ const submitRef = () => refForm.post('/login');
     </div>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  /* Full width single column on mobile */
+  .login-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Hide the decorative left panel on mobile — forms take full page */
+  .login-panel-left {
+    display: none !important;
+  }
+
+  /* Form panel: full width, reduced padding */
+  .login-panel-right {
+    padding: 40px 20px !important;
+    justify-content: flex-start !important;
+  }
+}
+</style>

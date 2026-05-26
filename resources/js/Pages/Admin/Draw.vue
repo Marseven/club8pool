@@ -143,3 +143,44 @@ const reset = () => { drawn.value = 0; };
     </main>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  /* Header: stack */
+  header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  header > div:last-child {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+
+  /* 3-col draw layout: stack vertically */
+  section[style*="grid-template-columns: 300px 1fr 380px"] {
+    grid-template-columns: 1fr !important;
+    min-height: unset !important;
+  }
+
+  /* Center draw card */
+  .draw-center {
+    order: -1; /* Current player card first on mobile */
+  }
+
+  /* Matchup circles: smaller */
+  .draw-circles > div {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 10px !important;
+  }
+
+  /* Draw center card: reduce min-width */
+  .draw-card {
+    min-width: 0 !important;
+    width: 100%;
+  }
+}
+</style>

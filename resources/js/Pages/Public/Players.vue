@@ -44,12 +44,12 @@ const initials = (name) => name.split(' ').map(w => w[0]).slice(0, 2).join('').t
         {{ String(totalPlayers ?? 0).padStart(2, '0') }} <span style="color: var(--felt-2);">JOUEURS</span> EN LICE
       </h1>
 
-      <div style="display: flex; gap: 14px; margin-top: 28px; flex-wrap: wrap;">
-        <input v-model="search" placeholder="Rechercher un joueur, un club…" style="max-width: 360px;" />
-        <div style="display: flex; gap: 6px;">
+      <div class="filter-bar" style="display: flex; gap: 14px; margin-top: 28px; flex-wrap: wrap;">
+        <input v-model="search" placeholder="Rechercher un joueur, un club…" class="search-input" style="max-width: 360px;" />
+        <div class="pool-filter-btns" style="display: flex; gap: 6px;">
           <button :class="filterPool === 'all' ? 'btn btn-primary' : 'btn'" style="padding: 8px 14px;" @click="filterPool = 'all'">Toutes</button>
           <button v-for="p in pools" :key="p.id" :class="filterPool === p.name ? 'btn btn-primary' : 'btn'"
-                  style="padding: 8px 14px;" @click="filterPool = p.name">
+                  style="padding: 8px 14px; white-space: nowrap;" @click="filterPool = p.name">
             Poule {{ p.name }}
           </button>
         </div>
@@ -130,5 +130,43 @@ const initials = (name) => name.split(' ').map(w => w[0]).slice(0, 2).join('').t
 <style scoped>
 .hover-row:hover {
   background: var(--ink-3) !important;
+}
+
+@media (max-width: 768px) {
+  /* Filter bar: search full width, pool buttons scroll */
+  .filter-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .search-input {
+    max-width: 100% !important;
+    width: 100%;
+  }
+  .pool-filter-btns {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .pool-filter-btns::-webkit-scrollbar { display: none; }
+
+  /* Player row: tighter grid on mobile */
+  .player-row {
+    grid-template-columns: 22px 30px 1fr auto !important;
+    gap: 8px !important;
+    padding: 12px 14px !important;
+  }
+
+  /* Stats on right: reduce gap */
+  .player-stats {
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Hide club text in player row to save space */
+  .player-club {
+    display: none;
+  }
 }
 </style>

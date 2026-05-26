@@ -173,69 +173,115 @@ const fmtTime = (iso) => {
       </div>
 
       <!-- Détail des matchs -->
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>Phase</th>
-            <th>Adversaire</th>
-            <th style="text-align: right;">Score</th>
-            <th>Résultat</th>
-            <th>Quand</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="m in journey" :key="m.id">
-            <td>{{ phaseLabel(m) }}</td>
-            <td style="font-weight: 600;">
-              <Link v-if="m.opponent" :href="`/joueurs/${m.opponent.id}`">{{ m.opponent.name }}</Link>
-              <span v-else style="color: var(--mute);">À déterminer</span>
-            </td>
-            <td class="mono tnum" style="text-align: right; font-weight: 700;">
-              <template v-if="m.status === 'done' || m.status === 'live'">{{ m.my_score }} — {{ m.opp_score }}</template>
-              <template v-else>—</template>
-            </td>
-            <td>
-              <Chip v-if="m.status === 'live'" variant="live">EN COURS</Chip>
-              <Chip v-else-if="m.win" variant="felt">VICTOIRE</Chip>
-              <Chip v-else-if="m.loss">DÉFAITE</Chip>
-              <span v-else-if="m.is_draw" class="mono" style="color: var(--mute);">NUL</span>
-              <span v-else class="mono" style="color: var(--mute);">À VENIR</span>
-            </td>
-            <td class="mono" style="font-size: 11px; color: var(--mute);">
-              <template v-if="m.scheduled_at">{{ fmtTime(m.scheduled_at) }}</template>
-              <template v-else>—</template>
-              <template v-if="m.table"> · {{ m.table }}</template>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="tbl-scroll">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Phase</th>
+              <th>Adversaire</th>
+              <th style="text-align: right;">Score</th>
+              <th>Résultat</th>
+              <th>Quand</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="m in journey" :key="m.id">
+              <td>{{ phaseLabel(m) }}</td>
+              <td style="font-weight: 600;">
+                <Link v-if="m.opponent" :href="`/joueurs/${m.opponent.id}`">{{ m.opponent.name }}</Link>
+                <span v-else style="color: var(--mute);">À déterminer</span>
+              </td>
+              <td class="mono tnum" style="text-align: right; font-weight: 700;">
+                <template v-if="m.status === 'done' || m.status === 'live'">{{ m.my_score }} — {{ m.opp_score }}</template>
+                <template v-else>—</template>
+              </td>
+              <td>
+                <Chip v-if="m.status === 'live'" variant="live">EN COURS</Chip>
+                <Chip v-else-if="m.win" variant="felt">VICTOIRE</Chip>
+                <Chip v-else-if="m.loss">DÉFAITE</Chip>
+                <span v-else-if="m.is_draw" class="mono" style="color: var(--mute);">NUL</span>
+                <span v-else class="mono" style="color: var(--mute);">À VENIR</span>
+              </td>
+              <td class="mono" style="font-size: 11px; color: var(--mute);">
+                <template v-if="m.scheduled_at">{{ fmtTime(m.scheduled_at) }}</template>
+                <template v-else>—</template>
+                <template v-if="m.table"> · {{ m.table }}</template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <!-- Historique hors compétition courante -->
     <section v-if="history?.length" style="padding: 32px 48px;">
       <h3 class="disp-a" style="font-size: 24px; margin-bottom: 16px;">Historique précédent</h3>
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Compétition</th>
-            <th>Tour</th>
-            <th>Adversaire</th>
-            <th style="text-align: right;">Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="m in history" :key="m.id">
-            <td class="mono" style="color: var(--mute);">{{ fmtDate(m.ended_at) }}</td>
-            <td>{{ m.competition?.name }}</td>
-            <td style="color: var(--mute);">{{ m.round }}</td>
-            <td style="font-weight: 600;">
-              {{ (m.player_a_id === player.id ? m.player_b : m.player_a)?.last_name }}
-            </td>
-            <td class="mono tnum" style="text-align: right;">{{ m.score_a }}–{{ m.score_b }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="tbl-scroll">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Compétition</th>
+              <th>Tour</th>
+              <th>Adversaire</th>
+              <th style="text-align: right;">Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="m in history" :key="m.id">
+              <td class="mono" style="color: var(--mute);">{{ fmtDate(m.ended_at) }}</td>
+              <td>{{ m.competition?.name }}</td>
+              <td style="color: var(--mute);">{{ m.round }}</td>
+              <td style="font-weight: 600;">
+                {{ (m.player_a_id === player.id ? m.player_b : m.player_a)?.last_name }}
+              </td>
+              <td class="mono tnum" style="text-align: right;">{{ m.score_a }}–{{ m.score_b }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   </div>
 </template>
+
+<style scoped>
+.tbl-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  /* Hero: stack avatar + name + KPI vertically */
+  /* Global CSS handles 280px 1fr 320px → 1fr collapse */
+
+  /* Avatar panel: compact height when stacked */
+  section[style*="grid-template-columns: 280px 1fr 320px"] > div:first-child {
+    height: 180px !important;
+  }
+
+  /* Avatar circle: smaller */
+  section[style*="grid-template-columns: 280px 1fr 320px"] > div:first-child > div {
+    width: 100px !important;
+    height: 100px !important;
+    font-size: 36px !important;
+  }
+
+  /* Name column: reduce padding */
+  section[style*="grid-template-columns: 280px 1fr 320px"] > div:nth-child(2) {
+    padding: 20px 16px !important;
+  }
+
+  /* KPI section: horizontal scrollable on mobile */
+  section[style*="grid-template-columns: 280px 1fr 320px"] > div:last-child {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Journey section: reduce padding */
+  section[style*="padding: 32px 48px"] {
+    padding: 20px 16px !important;
+  }
+}
+</style>

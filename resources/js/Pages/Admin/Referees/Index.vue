@@ -32,7 +32,7 @@ const submit = () => form.post('/admin/arbitres', { onSuccess: () => { showForm.
       </header>
 
       <div v-if="showForm" style="padding: 24px 32px; border-bottom: 1px solid var(--line); background: var(--ink-2);">
-        <form @submit.prevent="submit" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: end;">
+        <form @submit.prevent="submit" class="referee-form" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: end;">
           <label>
             <div class="mono" style="font-size: 10px; color: var(--mute); margin-bottom: 4px;">NOM COMPLET</div>
             <input v-model="form.name" required />
@@ -75,3 +75,20 @@ const submit = () => form.post('/admin/arbitres', { onSuccess: () => { showForm.
     </main>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .referee-form {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>

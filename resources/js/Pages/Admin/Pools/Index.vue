@@ -110,7 +110,7 @@ const playerLabel = (pool, playerId) => {
   <div style="display: flex; min-height: 100vh; background: var(--ink);">
     <AdminSidebar active="pools" />
     <main style="flex: 1;">
-      <header style="display: flex; justify-content: space-between; align-items: center;
+      <header class="pools-header" style="display: flex; justify-content: space-between; align-items: center;
                      padding: 20px 32px; border-bottom: 1px solid var(--line);">
         <div>
           <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">
@@ -118,7 +118,7 @@ const playerLabel = (pool, playerId) => {
           </div>
           <div class="disp-a" style="font-size: 28px; margin-top: 6px;">{{ competition.name }}</div>
         </div>
-        <div style="display: flex; gap: 8px;">
+        <div class="pool-selector" style="display: flex; gap: 8px;">
           <button v-for="p in pools" :key="p.id" @click="selectedPool = p.id" :style="{
             padding: '8px 16px',
             border: '1px solid ' + (selectedPool === p.id ? 'var(--felt-2)' : 'var(--line-strong)'),
@@ -129,7 +129,7 @@ const playerLabel = (pool, playerId) => {
         </div>
       </header>
 
-      <section v-if="currentPool" style="display: grid; grid-template-columns: 420px 1fr; min-height: calc(100vh - 76px);">
+      <section v-if="currentPool" class="pools-content" style="display: grid; grid-template-columns: 420px 1fr; min-height: calc(100vh - 76px);">
         <aside style="border-right: 1px solid var(--line); padding: 24px;">
           <PoolStandings :pool="currentPool" :qualifiers-per-pool="competition.qualifiers_per_pool" />
           <div style="margin-top: 24px; padding: 14px; background: var(--ink-2); border: 1px solid var(--line);">
@@ -423,3 +423,42 @@ const playerLabel = (pool, playerId) => {
     </main>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  /* Header: stack title + pool selector */
+  .pools-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  /* Pool selector: scrollable horizontal row */
+  .pool-selector {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    width: 100%;
+    padding-bottom: 2px;
+  }
+  .pool-selector::-webkit-scrollbar { display: none; }
+  .pool-selector button {
+    white-space: nowrap;
+    min-height: 44px;
+  }
+
+  /* Content grid: sidebar above table */
+  .pools-content {
+    grid-template-columns: 1fr !important;
+    min-height: unset !important;
+  }
+
+  /* Actions in table: wrap buttons */
+  td:last-child {
+    white-space: normal !important;
+  }
+  td:last-child > button {
+    margin-bottom: 4px;
+  }
+}
+</style>
