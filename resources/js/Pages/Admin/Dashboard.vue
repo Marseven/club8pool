@@ -40,7 +40,10 @@ const adjust = (match, side, delta) => {
           <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">COMPÉTITION ACTIVE</div>
           <div style="display: flex; align-items: center; gap: 14px; margin-top: 8px;">
             <span class="disp-a" style="font-size: 22px;">{{ competition?.name }}</span>
-            <Chip variant="live">PHASE QUARTS</Chip>
+            <Chip v-if="competition?.status === 'in_progress'" variant="live">{{ kpis.current_phase }}</Chip>
+            <Chip v-else-if="competition?.status === 'registration'" variant="felt">INSCRIPTIONS OUVERTES</Chip>
+            <Chip v-else-if="competition?.status === 'draft'" variant="">BROUILLON</Chip>
+            <Chip v-else-if="competition?.status === 'finished'" variant="">TERMINÉE</Chip>
           </div>
         </div>
         <div style="display: flex; gap: 10px;">
@@ -54,8 +57,9 @@ const adjust = (match, side, delta) => {
         <div v-for="(kpi, i) in [
           [`${kpis.players}/${kpis.slots}`, 'JOUEURS INSCRITS', `${competition?.pool_count ?? 0} poules de ${competition?.pool_size ?? 7}`, 'check'],
           [`${kpis.matches_done}/${kpis.matches_total}`, 'MATCHS JOUÉS', `${kpis.matches_live} en cours`, ''],
-          [`${kpis.tables_active}/${kpis.tables_total}`, 'TABLES ACTIVES', '1 réservée · 1 maintenance', ''],
-          ['00:42', 'MATCH LE PLUS LONG', kpis.longest_live ? `${kpis.longest_live.player_a?.last_name} vs ${kpis.longest_live.player_b?.last_name}` : '—', 'LIVE'],
+          [`${kpis.tables_active}/${kpis.tables_total}`, 'TABLES ACTIVES',
+            [kpis.tables_reserved > 0 ? `${kpis.tables_reserved} réservée` : null, kpis.tables_maintenance > 0 ? `${kpis.tables_maintenance} maintenance` : null].filter(Boolean).join(' · ') || 'Toutes libres', ''],
+          [kpis.longest_duration ?? '—', 'MATCH LE PLUS LONG', kpis.longest_live ? `${kpis.longest_live.player_a?.last_name} vs ${kpis.longest_live.player_b?.last_name}` : '—', kpis.longest_duration ? 'LIVE' : ''],
         ]" :key="i" style="padding: 24px; background: var(--ink-2);">
           <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">{{ kpi[1] }}</div>
           <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 12px;">
