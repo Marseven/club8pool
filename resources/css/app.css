@@ -167,6 +167,27 @@ label .label {
 }
 
 /* ───────────────────────────────────────────────────────────────────────
+ * CONTAINER & LAYOUT UTILITIES
+ * ─────────────────────────────────────────────────────────────────────── */
+
+.container {
+  max-width: 1280px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(16px, 4vw, 48px);
+  padding-right: clamp(16px, 4vw, 48px);
+}
+
+/* Section full-width (background/border) + contenu centré via .container */
+.page-section {
+  padding-top: clamp(20px, 3vw, 40px);
+  padding-bottom: clamp(20px, 3vw, 40px);
+  border-bottom: 1px solid var(--line);
+}
+.page-section:last-of-type { border-bottom: none; }
+
+/* ───────────────────────────────────────────────────────────────────────
  * RESPONSIVE LAYER
  * Beaucoup d'inline styles sont utilisés dans le code Vue ; cette section
  * surcharge en !important les patterns de layout les plus courants sur
@@ -276,6 +297,24 @@ input, textarea, select, button {
   [style*="border-right: 1px solid var(--line)"][style*="grid"] > * {
     border-right: none !important;
   }
+
+  /* Container padding réduit */
+  .container { padding-left: 16px !important; padding-right: 16px !important; }
+
+  /* Register two-panel layout → empilé */
+  .register-layout {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+  .register-sidebar {
+    border-right: none !important;
+    border-bottom: 1px solid var(--line);
+    padding: 28px 20px !important;
+  }
+  .register-form-panel { padding: 28px 20px !important; }
+
+  /* Places restantes bar : masquer sur mobile si trop petit */
+  .register-slots-bar { display: none; }
 
   /* Bracket horizontal scroll au lieu de déborder */
   .bracket-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }

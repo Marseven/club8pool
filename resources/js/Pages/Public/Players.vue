@@ -38,25 +38,28 @@ const initials = (name) => name.split(' ').map(w => w[0]).slice(0, 2).join('').t
   <div style="background: var(--ink); min-height: 100vh;">
     <PublicNav />
 
-    <section style="padding: 32px 48px; border-bottom: 1px solid var(--line);">
-      <div class="mono" style="font-size: 11px; letter-spacing: 0.2em; color: var(--mute);">JOUEURS · {{ competition?.name?.toUpperCase() }}</div>
-      <h1 class="disp-a" style="font-size: 72px; margin-top: 14px;">
-        {{ String(totalPlayers ?? 0).padStart(2, '0') }} <span style="color: var(--felt-2);">JOUEURS</span> EN LICE
-      </h1>
+    <section style="padding: 32px 0; border-bottom: 1px solid var(--line);">
+      <div class="container">
+        <div class="mono" style="font-size: 11px; letter-spacing: 0.2em; color: var(--mute);">JOUEURS · {{ competition?.name?.toUpperCase() }}</div>
+        <h1 class="disp-a" style="font-size: 72px; margin-top: 14px;">
+          {{ String(totalPlayers ?? 0).padStart(2, '0') }} <span style="color: var(--felt-2);">JOUEURS</span> EN LICE
+        </h1>
 
-      <div class="filter-bar" style="display: flex; gap: 14px; margin-top: 28px; flex-wrap: wrap;">
-        <input v-model="search" placeholder="Rechercher un joueur, un club…" class="search-input" style="max-width: 360px;" />
-        <div class="pool-filter-btns" style="display: flex; gap: 6px;">
-          <button :class="filterPool === 'all' ? 'btn btn-primary' : 'btn'" style="padding: 8px 14px;" @click="filterPool = 'all'">Toutes</button>
-          <button v-for="p in pools" :key="p.id" :class="filterPool === p.name ? 'btn btn-primary' : 'btn'"
-                  style="padding: 8px 14px; white-space: nowrap;" @click="filterPool = p.name">
-            Poule {{ p.name }}
-          </button>
+        <div class="filter-bar" style="display: flex; gap: 14px; margin-top: 28px; flex-wrap: wrap;">
+          <input v-model="search" placeholder="Rechercher un joueur, un club…" class="search-input" style="max-width: 360px;" />
+          <div class="pool-filter-btns" style="display: flex; gap: 6px;">
+            <button :class="filterPool === 'all' ? 'btn btn-primary' : 'btn'" style="padding: 8px 14px;" @click="filterPool = 'all'">Toutes</button>
+            <button v-for="p in pools" :key="p.id" :class="filterPool === p.name ? 'btn btn-primary' : 'btn'"
+                    style="padding: 8px 14px; white-space: nowrap;" @click="filterPool = p.name">
+              Poule {{ p.name }}
+            </button>
+          </div>
         </div>
       </div>
     </section>
 
-    <section style="padding: 32px 48px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;">
+    <section style="padding: 32px 0;">
+      <div class="container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;">
       <div v-for="pool in filteredPools" :key="pool.id"
            style="border: 1px solid var(--line); background: var(--ink-2); overflow: hidden;">
         <div style="padding: 16px 20px; border-bottom: 1px solid var(--line);
@@ -112,16 +115,19 @@ const initials = (name) => name.split(' ').map(w => w[0]).slice(0, 2).join('').t
           </div>
         </div>
       </div>
+      </div>
     </section>
 
-    <section v-if="unassigned?.length" style="padding: 0 48px 48px;">
-      <h3 class="disp-a" style="font-size: 22px; margin-bottom: 14px;">En attente d'affectation</h3>
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
-        <Link v-for="pl in unassigned" :key="pl.id" :href="`/joueurs/${pl.id}`"
-              style="border: 1px solid var(--line); background: var(--ink-2); padding: 14px;">
-          <div style="font-size: 13px; font-weight: 600;">{{ pl.name }}</div>
-          <div class="mono" style="font-size: 10px; color: var(--mute); margin-top: 4px;">{{ pl.club }} · ELO {{ pl.rating }}</div>
-        </Link>
+    <section v-if="unassigned?.length" style="padding: 0 0 48px;">
+      <div class="container">
+        <h3 class="disp-a" style="font-size: 22px; margin-bottom: 14px;">En attente d'affectation</h3>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+          <Link v-for="pl in unassigned" :key="pl.id" :href="`/joueurs/${pl.id}`"
+                style="border: 1px solid var(--line); background: var(--ink-2); padding: 14px;">
+            <div style="font-size: 13px; font-weight: 600;">{{ pl.name }}</div>
+            <div class="mono" style="font-size: 10px; color: var(--mute); margin-top: 4px;">{{ pl.club }} · ELO {{ pl.rating }}</div>
+          </Link>
+        </div>
       </div>
     </section>
   </div>

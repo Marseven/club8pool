@@ -54,17 +54,19 @@ const sections = [
   <div style="background: var(--ink); min-height: 100vh; display: flex; flex-direction: column;">
     <PublicNav />
 
-    <section style="padding: 32px 24px; border-bottom: 1px solid var(--line);">
-      <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute);">JURIDIQUE</div>
-      <h1 class="disp-a" style="font-size: clamp(30px, 7vw, 60px); margin-top: 14px; line-height: 0.95;">
-        Conditions Générales<br /><span style="color: var(--mute);">d'Utilisation</span>
-      </h1>
-      <div class="mono" style="font-size: 11px; color: var(--mute); margin-top: 16px; letter-spacing: 0.12em;">
-        Version en vigueur : juin 2026 · Droit applicable : République Gabonaise
+    <section style="padding: 32px 0; border-bottom: 1px solid var(--line);">
+      <div class="container">
+        <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute);">JURIDIQUE</div>
+        <h1 class="disp-a" style="font-size: clamp(30px, 7vw, 60px); margin-top: 14px; line-height: 0.95;">
+          Conditions Générales<br /><span style="color: var(--mute);">d'Utilisation</span>
+        </h1>
+        <div class="mono" style="font-size: 11px; color: var(--mute); margin-top: 16px; letter-spacing: 0.12em;">
+          Version en vigueur : juin 2026 · Droit applicable : République Gabonaise
+        </div>
       </div>
     </section>
 
-    <div style="flex: 1; padding: 32px 24px; max-width: 800px;">
+    <div class="container" style="flex: 1; max-width: 800px;">
       <div style="display: flex; flex-direction: column; gap: 36px;">
         <section v-for="s in sections" :key="s.title">
           <h2 style="font-size: 16px; font-weight: 700; color: var(--chalk); margin-bottom: 12px; border-left: 2px solid var(--felt-2); padding-left: 12px;">

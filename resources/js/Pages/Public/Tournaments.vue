@@ -30,24 +30,29 @@ const structureLabel = {
   <div style="background: var(--ink); min-height: 100vh;">
     <PublicNav />
 
-    <section style="padding: 32px 24px; border-bottom: 1px solid var(--line);">
-      <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute);">ARCHIVES</div>
-      <h1 class="disp-a" style="font-size: clamp(40px, 9vw, 80px); margin-top: 14px; line-height: 0.92;">
-        Tournois<br /><span style="color: var(--mute);">terminés</span>
-      </h1>
-    </section>
-
-    <section v-if="competitions.length === 0" style="padding: 48px 24px;">
-      <div style="padding: 40px; border: 1px dashed var(--line-strong); text-align: center; max-width: 560px; margin: 0 auto;">
-        <div class="disp-a" style="font-size: clamp(20px, 5vw, 28px); color: var(--mute);">Aucun tournoi archivé</div>
-        <p style="font-size: 13px; color: var(--mute); margin-top: 14px; line-height: 1.6;">
-          Les compétitions terminées apparaîtront ici une fois archivées.
-        </p>
+    <section style="padding: 32px 0; border-bottom: 1px solid var(--line);">
+      <div class="container">
+        <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute);">ARCHIVES</div>
+        <h1 class="disp-a" style="font-size: clamp(40px, 9vw, 80px); margin-top: 14px; line-height: 0.92;">
+          Tournois<br /><span style="color: var(--mute);">terminés</span>
+        </h1>
       </div>
     </section>
 
-    <section v-else style="padding: 32px 24px;">
-      <div class="t-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 1280px; margin: 0 auto;">
+    <section v-if="competitions.length === 0" style="padding: 48px 0;">
+      <div class="container">
+        <div style="padding: 40px; border: 1px dashed var(--line-strong); text-align: center; max-width: 560px; margin: 0 auto;">
+          <div class="disp-a" style="font-size: clamp(20px, 5vw, 28px); color: var(--mute);">Aucun tournoi archivé</div>
+          <p style="font-size: 13px; color: var(--mute); margin-top: 14px; line-height: 1.6;">
+            Les compétitions terminées apparaîtront ici une fois archivées.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section v-else style="padding: 32px 0;">
+      <div class="container">
+      <div class="t-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px;">
         <Link
           v-for="c in competitions"
           :key="c.id"
@@ -109,6 +114,7 @@ const structureLabel = {
             <div style="margin-left: auto; color: var(--mute); align-self: center;">→</div>
           </div>
         </Link>
+      </div>
       </div>
     </section>
 

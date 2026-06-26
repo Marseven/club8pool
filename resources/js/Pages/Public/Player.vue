@@ -55,12 +55,14 @@ const disciplineLabel = (d) => ({ '8ball': '8-Ball', '9ball': '9-Ball', '10ball'
   <div style="background: var(--ink); min-height: 100vh;">
     <PublicNav />
 
-    <div style="padding: 20px 48px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: center;">
-      <Link href="/joueurs" class="mono" style="font-size: 11px; letter-spacing: 0.2em; color: var(--mute);">JOUEURS</Link>
-      <span style="color: var(--mute-2);">/</span>
-      <span class="mono" style="font-size: 11px; letter-spacing: 0.2em; color: var(--chalk-2);">
-        {{ player.first_name?.toUpperCase() }} {{ player.last_name }}
-      </span>
+    <div style="padding: 20px 0; border-bottom: 1px solid var(--line);">
+      <div class="container" style="display: flex; gap: 12px; align-items: center;">
+        <Link href="/joueurs" class="mono" style="font-size: 11px; letter-spacing: 0.2em; color: var(--mute);">JOUEURS</Link>
+        <span style="color: var(--mute-2);">/</span>
+        <span class="mono" style="font-size: 11px; letter-spacing: 0.2em; color: var(--chalk-2);">
+          {{ player.first_name?.toUpperCase() }} {{ player.last_name }}
+        </span>
+      </div>
     </div>
 
     <!-- Hero identité -->
@@ -149,127 +151,133 @@ const disciplineLabel = (d) => ({ '8ball': '8-Ball', '9ball': '9-Ball', '10ball'
     </section>
 
     <!-- Parcours dans la compétition -->
-    <section v-if="journey?.length" style="padding: 32px 48px; border-bottom: 1px solid var(--line);">
-      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px;">
-        <h2 class="disp-a" style="font-size: 32px;">Parcours · {{ competition?.name }}</h2>
-        <span class="mono" style="font-size: 11px; color: var(--mute); letter-spacing: 0.14em;">
-          {{ journey.filter(j => j.status === 'done').length }}/{{ journey.length }} MATCHS JOUÉS
-        </span>
-      </div>
-
-      <!-- Frise -->
-      <div style="display: flex; gap: 6px; margin-bottom: 28px; flex-wrap: wrap;">
-        <div v-for="m in journey" :key="m.id"
-             :style="{
-               width: '44px', height: '44px',
-               background: m.win ? 'rgba(45,168,118,0.18)' : m.loss ? 'rgba(229,72,77,0.12)' : m.status === 'live' ? 'rgba(229,72,77,0.04)' : m.is_draw ? 'var(--ink-3)' : 'transparent',
-               border: '1px solid ' + (m.win ? 'rgba(45,168,118,0.5)' : m.loss ? 'rgba(229,72,77,0.4)' : m.status === 'live' ? 'rgba(229,72,77,0.5)' : 'var(--line-strong)'),
-               display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',
-               fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700,
-               color: m.win ? 'var(--felt-2)' : m.loss ? 'var(--live)' : m.status === 'live' ? 'var(--live)' : 'var(--mute)',
-             }"
-             :title="`${phaseLabel(m)} vs ${m.opponent?.name ?? '—'}`">
-          <span v-if="m.status === 'done'">{{ m.my_score }}–{{ m.opp_score }}</span>
-          <span v-else-if="m.status === 'live'" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;vertical-align:middle;"></span>
-          <span v-else>·</span>
+    <section v-if="journey?.length" style="padding: 32px 0; border-bottom: 1px solid var(--line);">
+      <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px;">
+          <h2 class="disp-a" style="font-size: 32px;">Parcours · {{ competition?.name }}</h2>
+          <span class="mono" style="font-size: 11px; color: var(--mute); letter-spacing: 0.14em;">
+            {{ journey.filter(j => j.status === 'done').length }}/{{ journey.length }} MATCHS JOUÉS
+          </span>
         </div>
-      </div>
 
-      <!-- Détail des matchs -->
-      <div class="tbl-scroll">
-        <table class="tbl">
-          <thead>
-            <tr>
-              <th>Phase</th>
-              <th>Adversaire</th>
-              <th style="text-align: right;">Score</th>
-              <th>Résultat</th>
-              <th>Quand</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="m in journey" :key="m.id">
-              <td>{{ phaseLabel(m) }}</td>
-              <td style="font-weight: 600;">
-                <Link v-if="m.opponent" :href="`/joueurs/${m.opponent.id}`">{{ m.opponent.name }}</Link>
-                <span v-else style="color: var(--mute);">À déterminer</span>
-              </td>
-              <td class="mono tnum" style="text-align: right; font-weight: 700;">
-                <template v-if="m.status === 'done' || m.status === 'live'">{{ m.my_score }} — {{ m.opp_score }}</template>
-                <template v-else>—</template>
-              </td>
-              <td>
-                <Chip v-if="m.status === 'live'" variant="live">EN COURS</Chip>
-                <Chip v-else-if="m.win" variant="felt">VICTOIRE</Chip>
-                <Chip v-else-if="m.loss">DÉFAITE</Chip>
-                <span v-else-if="m.is_draw" class="mono" style="color: var(--mute);">NUL</span>
-                <span v-else class="mono" style="color: var(--mute);">À VENIR</span>
-              </td>
-              <td class="mono" style="font-size: 11px; color: var(--mute);">
-                <template v-if="m.scheduled_at">{{ fmtTime(m.scheduled_at) }}</template>
-                <template v-else>—</template>
-                <template v-if="m.table"> · {{ m.table }}</template>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- Frise -->
+        <div style="display: flex; gap: 6px; margin-bottom: 28px; flex-wrap: wrap;">
+          <div v-for="m in journey" :key="m.id"
+               :style="{
+                 width: '44px', height: '44px',
+                 background: m.win ? 'rgba(45,168,118,0.18)' : m.loss ? 'rgba(229,72,77,0.12)' : m.status === 'live' ? 'rgba(229,72,77,0.04)' : m.is_draw ? 'var(--ink-3)' : 'transparent',
+                 border: '1px solid ' + (m.win ? 'rgba(45,168,118,0.5)' : m.loss ? 'rgba(229,72,77,0.4)' : m.status === 'live' ? 'rgba(229,72,77,0.5)' : 'var(--line-strong)'),
+                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',
+                 fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700,
+                 color: m.win ? 'var(--felt-2)' : m.loss ? 'var(--live)' : m.status === 'live' ? 'var(--live)' : 'var(--mute)',
+               }"
+               :title="`${phaseLabel(m)} vs ${m.opponent?.name ?? '—'}`">
+            <span v-if="m.status === 'done'">{{ m.my_score }}–{{ m.opp_score }}</span>
+            <span v-else-if="m.status === 'live'" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;vertical-align:middle;"></span>
+            <span v-else>·</span>
+          </div>
+        </div>
+
+        <!-- Détail des matchs -->
+        <div class="tbl-scroll">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Phase</th>
+                <th>Adversaire</th>
+                <th style="text-align: right;">Score</th>
+                <th>Résultat</th>
+                <th>Quand</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="m in journey" :key="m.id">
+                <td>{{ phaseLabel(m) }}</td>
+                <td style="font-weight: 600;">
+                  <Link v-if="m.opponent" :href="`/joueurs/${m.opponent.id}`">{{ m.opponent.name }}</Link>
+                  <span v-else style="color: var(--mute);">À déterminer</span>
+                </td>
+                <td class="mono tnum" style="text-align: right; font-weight: 700;">
+                  <template v-if="m.status === 'done' || m.status === 'live'">{{ m.my_score }} — {{ m.opp_score }}</template>
+                  <template v-else>—</template>
+                </td>
+                <td>
+                  <Chip v-if="m.status === 'live'" variant="live">EN COURS</Chip>
+                  <Chip v-else-if="m.win" variant="felt">VICTOIRE</Chip>
+                  <Chip v-else-if="m.loss">DÉFAITE</Chip>
+                  <span v-else-if="m.is_draw" class="mono" style="color: var(--mute);">NUL</span>
+                  <span v-else class="mono" style="color: var(--mute);">À VENIR</span>
+                </td>
+                <td class="mono" style="font-size: 11px; color: var(--mute);">
+                  <template v-if="m.scheduled_at">{{ fmtTime(m.scheduled_at) }}</template>
+                  <template v-else>—</template>
+                  <template v-if="m.table"> · {{ m.table }}</template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
     <!-- Classement Elo -->
-    <section v-if="ratings?.length" style="padding: 32px 48px; border-bottom: 1px solid var(--line);">
-      <h3 class="disp-a" style="font-size: 24px; margin-bottom: 16px;">Classement Elo</h3>
-      <div class="tbl-scroll">
-        <table class="tbl">
-          <thead>
-            <tr>
-              <th>Discipline</th>
-              <th style="text-align: right;">Rating</th>
-              <th>Matchs</th>
-              <th>Statut</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="r in ratings" :key="r.discipline">
-              <td style="font-weight: 600;">{{ disciplineLabel(r.discipline) }}</td>
-              <td class="mono tnum" style="text-align: right; font-size: 18px; font-weight: 700;">{{ r.rating }}</td>
-              <td class="mono" style="color: var(--mute);">{{ r.games_played }} match{{ r.games_played !== 1 ? 's' : '' }}</td>
-              <td>
-                <span v-if="r.provisional" class="mono" style="font-size: 11px; letter-spacing: 0.12em; color: var(--mute);">PROVISOIRE</span>
-                <span v-else class="mono" style="font-size: 11px; letter-spacing: 0.12em; color: var(--felt-2);">CONFIRMÉ</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <section v-if="ratings?.length" style="padding: 32px 0; border-bottom: 1px solid var(--line);">
+      <div class="container">
+        <h3 class="disp-a" style="font-size: 24px; margin-bottom: 16px;">Classement Elo</h3>
+        <div class="tbl-scroll">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Discipline</th>
+                <th style="text-align: right;">Rating</th>
+                <th>Matchs</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="r in ratings" :key="r.discipline">
+                <td style="font-weight: 600;">{{ disciplineLabel(r.discipline) }}</td>
+                <td class="mono tnum" style="text-align: right; font-size: 18px; font-weight: 700;">{{ r.rating }}</td>
+                <td class="mono" style="color: var(--mute);">{{ r.games_played }} match{{ r.games_played !== 1 ? 's' : '' }}</td>
+                <td>
+                  <span v-if="r.provisional" class="mono" style="font-size: 11px; letter-spacing: 0.12em; color: var(--mute);">PROVISOIRE</span>
+                  <span v-else class="mono" style="font-size: 11px; letter-spacing: 0.12em; color: var(--felt-2);">CONFIRMÉ</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
     <!-- Historique hors compétition courante -->
-    <section v-if="history?.length" style="padding: 32px 48px;">
-      <h3 class="disp-a" style="font-size: 24px; margin-bottom: 16px;">Historique précédent</h3>
-      <div class="tbl-scroll">
-        <table class="tbl">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Compétition</th>
-              <th>Tour</th>
-              <th>Adversaire</th>
-              <th style="text-align: right;">Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="m in history" :key="m.id">
-              <td class="mono" style="color: var(--mute);">{{ fmtDate(m.ended_at) }}</td>
-              <td>{{ m.competition?.name }}</td>
-              <td style="color: var(--mute);">{{ m.round }}</td>
-              <td style="font-weight: 600;">
-                {{ (m.player_a_id === player.id ? m.player_b : m.player_a)?.last_name }}
-              </td>
-              <td class="mono tnum" style="text-align: right;">{{ m.score_a }}–{{ m.score_b }}</td>
-            </tr>
-          </tbody>
-        </table>
+    <section v-if="history?.length" style="padding: 32px 0;">
+      <div class="container">
+        <h3 class="disp-a" style="font-size: 24px; margin-bottom: 16px;">Historique précédent</h3>
+        <div class="tbl-scroll">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Compétition</th>
+                <th>Tour</th>
+                <th>Adversaire</th>
+                <th style="text-align: right;">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="m in history" :key="m.id">
+                <td class="mono" style="color: var(--mute);">{{ fmtDate(m.ended_at) }}</td>
+                <td>{{ m.competition?.name }}</td>
+                <td style="color: var(--mute);">{{ m.round }}</td>
+                <td style="font-weight: 600;">
+                  {{ (m.player_a_id === player.id ? m.player_b : m.player_a)?.last_name }}
+                </td>
+                <td class="mono tnum" style="text-align: right;">{{ m.score_a }}–{{ m.score_b }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   </div>

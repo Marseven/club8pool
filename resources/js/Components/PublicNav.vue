@@ -30,38 +30,39 @@ onMounted(() => {
 </script>
 
 <template>
-  <nav style="display: flex; align-items: center; justify-content: space-between;
-              padding: 14px 24px; border-bottom: 1px solid var(--line);
+  <nav style="border-bottom: 1px solid var(--line);
               background: rgba(10,10,11,0.85); backdrop-filter: blur(8px);
               position: sticky; top: 0; z-index: 50;">
-    <Link href="/" @click="open = false"><Logo :size="32" /></Link>
+    <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding-top: 14px; padding-bottom: 14px;">
+      <Link href="/" @click="open = false"><Logo :size="32" /></Link>
 
-    <div class="mobile-hidden" style="display: flex; gap: 24px; font-size: 13px; font-weight: 600;
-                letter-spacing: 0.04em; text-transform: uppercase;">
-      <template v-for="l in links" :key="l.href">
-        <a v-if="l.external" :href="l.href" target="_blank" rel="noopener"
-           :style="{ color: l.label.includes('Live') ? 'var(--live)' : 'var(--mute)' }">
-          {{ l.label }}
-        </a>
-        <Link v-else :href="l.href" style="color: var(--mute);">{{ l.label }}</Link>
-      </template>
+      <div class="mobile-hidden" style="display: flex; gap: 24px; font-size: 13px; font-weight: 600;
+                  letter-spacing: 0.04em; text-transform: uppercase;">
+        <template v-for="l in links" :key="l.href">
+          <a v-if="l.external" :href="l.href" target="_blank" rel="noopener"
+             :style="{ color: l.label.includes('Live') ? 'var(--live)' : 'var(--mute)' }">
+            {{ l.label }}
+          </a>
+          <Link v-else :href="l.href" style="color: var(--mute);">{{ l.label }}</Link>
+        </template>
+      </div>
+
+      <div class="mobile-hidden" style="display: flex; gap: 8px; align-items: center;">
+        <GabonFlag :width="20" :height="14" />
+        <template v-if="auth">
+          <Link :href="auth.role === 'referee' ? '/arbitre' : '/admin'" class="btn">Mon espace</Link>
+          <Link as="button" method="post" href="/logout" class="btn">↪</Link>
+        </template>
+        <template v-else>
+          <Link href="/login" class="btn">Se connecter</Link>
+        </template>
+      </div>
+
+      <button class="mobile-hamburger" @click="open = !open" aria-label="Menu">
+        <X v-if="open" :size="18" />
+        <Menu v-else :size="18" />
+      </button>
     </div>
-
-    <div class="mobile-hidden" style="display: flex; gap: 8px; align-items: center;">
-      <GabonFlag :width="20" :height="14" />
-      <template v-if="auth">
-        <Link :href="auth.role === 'referee' ? '/arbitre' : '/admin'" class="btn">Mon espace</Link>
-        <Link as="button" method="post" href="/logout" class="btn">↪</Link>
-      </template>
-      <template v-else>
-        <Link href="/login" class="btn">Se connecter</Link>
-      </template>
-    </div>
-
-    <button class="mobile-hamburger" @click="open = !open" aria-label="Menu">
-      <X v-if="open" :size="18" />
-      <Menu v-else :size="18" />
-    </button>
   </nav>
 
   <div v-if="open" class="mobile-drawer">

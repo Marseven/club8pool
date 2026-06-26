@@ -124,32 +124,33 @@ const abbrev = (p) => {
 
   <div style="height: 100dvh; background: var(--ink); display: flex; flex-direction: column; overflow: hidden;">
     <!-- Header -->
-    <header style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
-                   padding: clamp(8px,1.4vh,18px) clamp(12px,2.5vw,32px); border-bottom: 1px solid var(--line);
+    <header style="flex-shrink: 0; padding: clamp(8px,1.4vh,18px) 0; border-bottom: 1px solid var(--line);
                    background: rgba(10,10,11,0.92);">
-      <div style="display: flex; align-items: center; gap: 16px;">
-        <img v-if="competition?.logo_url" :src="competition.logo_url" :alt="competition.name + ' logo'"
-             style="height: 44px; width: 44px; object-fit: contain;" />
-        <Ball8 v-else :size="40" />
-        <div>
-          <div class="disp-a" style="font-size: 22px;">{{ competition?.name?.toUpperCase() }}</div>
-          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute); margin-top: 4px;">
-            {{ competition?.venue?.toUpperCase() }}
+      <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <img v-if="competition?.logo_url" :src="competition.logo_url" :alt="competition.name + ' logo'"
+               style="height: 44px; width: 44px; object-fit: contain;" />
+          <Ball8 v-else :size="40" />
+          <div>
+            <div class="disp-a" style="font-size: 22px;">{{ competition?.name?.toUpperCase() }}</div>
+            <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute); margin-top: 4px;">
+              {{ competition?.venue?.toUpperCase() }}
+            </div>
           </div>
         </div>
-      </div>
-      <div style="display: flex; gap: 14px; align-items: center;">
-        <Chip v-if="liveMatches?.length" variant="live">EN DIRECT · {{ liveMatches.length }} {{ liveMatches.length > 1 ? 'TABLES' : 'TABLE' }}</Chip>
-        <Chip v-else>PAUSE · {{ nextMatches?.length || 0 }} À VENIR</Chip>
-        <span class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.14em;">
-          MAJ · {{ secondsAgo }}s
-        </span>
-        <button @click="toggleFullscreen"
-                class="btn"
-                style="padding: 6px 12px; font-size: 11px;"
-                :title="isFullscreen ? 'Quitter plein écran' : 'Plein écran'">
-          {{ isFullscreen ? '⛶ Quitter' : '⛶ Plein écran' }}
-        </button>
+        <div style="display: flex; gap: 14px; align-items: center;">
+          <Chip v-if="liveMatches?.length" variant="live">EN DIRECT · {{ liveMatches.length }} {{ liveMatches.length > 1 ? 'TABLES' : 'TABLE' }}</Chip>
+          <Chip v-else>PAUSE · {{ nextMatches?.length || 0 }} À VENIR</Chip>
+          <span class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.14em;">
+            MAJ · {{ secondsAgo }}s
+          </span>
+          <button @click="toggleFullscreen"
+                  class="btn"
+                  style="padding: 6px 12px; font-size: 11px;"
+                  :title="isFullscreen ? 'Quitter plein écran' : 'Plein écran'">
+            {{ isFullscreen ? '⛶ Quitter' : '⛶ Plein écran' }}
+          </button>
+        </div>
       </div>
     </header>
 

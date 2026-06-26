@@ -95,33 +95,39 @@ const sections = [
     <PublicNav />
 
     <!-- Hero -->
-    <section style="padding: 32px 24px; border-bottom: 1px solid var(--line);">
-      <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute);">RÈGLEMENT OFFICIEL</div>
-      <h1 class="disp-a" style="font-size: clamp(40px, 9vw, 80px); margin-top: 14px; line-height: 0.92;">
-        Règles<br /><span style="color: var(--mute);">du jeu</span>
-      </h1>
-      <p style="font-size: 13px; color: var(--mute); max-width: 560px; margin-top: 16px; line-height: 1.7;">
-        Les compétitions Club 8 Pool se disputent selon les règles officielles de la World Pool-Billiard Association (WPA), adaptées au contexte local. En cas de litige, les règles WPA prévalent.
-      </p>
+    <section style="padding: 32px 0; border-bottom: 1px solid var(--line);">
+      <div class="container">
+        <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute);">RÈGLEMENT OFFICIEL</div>
+        <h1 class="disp-a" style="font-size: clamp(40px, 9vw, 80px); margin-top: 14px; line-height: 0.92;">
+          Règles<br /><span style="color: var(--mute);">du jeu</span>
+        </h1>
+        <p style="font-size: 13px; color: var(--mute); max-width: 560px; margin-top: 16px; line-height: 1.7;">
+          Les compétitions Club 8 Pool se disputent selon les règles officielles de la World Pool-Billiard Association (WPA), adaptées au contexte local. En cas de litige, les règles WPA prévalent.
+        </p>
+      </div>
     </section>
 
     <!-- Section tabs -->
-    <div style="display: flex; gap: 0; border-bottom: 1px solid var(--line); padding: 0 24px; overflow-x: auto;">
-      <button
-        v-for="s in sections" :key="s.id"
-        @click="openSection = s.id"
-        :style="{
-          padding: '12px 16px', background: 'transparent', border: 'none',
-          borderBottom: openSection === s.id ? '2px solid var(--felt-2)' : '2px solid transparent',
-          color: openSection === s.id ? 'var(--chalk)' : 'var(--mute)',
-          cursor: 'pointer', fontSize: '12px', fontWeight: openSection === s.id ? 700 : 400,
-          whiteSpace: 'nowrap',
-        }"
-      >{{ s.title }}</button>
-    </div>
+    <section style="border-bottom: 1px solid var(--line);">
+      <div class="container" style="padding-top: 0; padding-bottom: 0;">
+        <div style="display: flex; gap: 0; overflow-x: auto;">
+          <button
+            v-for="s in sections" :key="s.id"
+            @click="openSection = s.id"
+            :style="{
+              padding: '12px 16px', background: 'transparent', border: 'none',
+              borderBottom: openSection === s.id ? '2px solid var(--felt-2)' : '2px solid transparent',
+              color: openSection === s.id ? 'var(--chalk)' : 'var(--mute)',
+              cursor: 'pointer', fontSize: '12px', fontWeight: openSection === s.id ? 700 : 400,
+              whiteSpace: 'nowrap',
+            }"
+          >{{ s.title }}</button>
+        </div>
+      </div>
+    </section>
 
     <!-- Content -->
-    <div style="flex: 1; padding: 32px 24px; max-width: 860px;">
+    <div class="container" style="flex: 1; max-width: 860px;">
       <template v-for="s in sections" :key="s.id">
         <div v-if="openSection === s.id">
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">

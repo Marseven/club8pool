@@ -40,30 +40,34 @@ const medals = ['🥇', '🥈', '🥉'];
     <PublicNav />
 
     <!-- Hero -->
-    <section style="padding: 32px 24px; border-bottom: 1px solid var(--line);">
-      <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute);">CLASSEMENT ELO</div>
-      <h1 class="disp-a" style="font-size: clamp(40px, 9vw, 80px); margin-top: 14px; line-height: 0.92;">
-        Joueurs<br /><span style="color: var(--mute);">classés</span>
-      </h1>
-      <p style="font-size: 13px; color: var(--mute); max-width: 560px; margin-top: 16px; line-height: 1.7;">
-        Le classement Elo est mis à jour après chaque match officiel. Un joueur devient confirmé après 10 matchs joués. Plus le nombre est élevé, plus le joueur est fort.
-      </p>
+    <section style="padding: 32px 0; border-bottom: 1px solid var(--line);">
+      <div class="container">
+        <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute);">CLASSEMENT ELO</div>
+        <h1 class="disp-a" style="font-size: clamp(40px, 9vw, 80px); margin-top: 14px; line-height: 0.92;">
+          Joueurs<br /><span style="color: var(--mute);">classés</span>
+        </h1>
+        <p style="font-size: 13px; color: var(--mute); max-width: 560px; margin-top: 16px; line-height: 1.7;">
+          Le classement Elo est mis à jour après chaque match officiel. Un joueur devient confirmé après 10 matchs joués. Plus le nombre est élevé, plus le joueur est fort.
+        </p>
+      </div>
     </section>
 
     <!-- Discipline tabs -->
     <div v-if="disciplines.length > 1"
-         style="display: flex; border-bottom: 1px solid var(--line); padding: 0 24px; overflow-x: auto;">
-      <button
-        v-for="d in disciplines" :key="d"
-        @click="active = d"
-        :style="{
-          padding: '12px 18px', background: 'transparent', border: 'none',
-          borderBottom: active === d ? '2px solid var(--felt-2)' : '2px solid transparent',
-          color: active === d ? 'var(--chalk)' : 'var(--mute)',
-          cursor: 'pointer', fontFamily: 'var(--font-mono)',
-          fontSize: '11px', letterSpacing: '0.16em', whiteSpace: 'nowrap',
-        }"
-      >{{ fmtDiscipline(d) }}</button>
+         style="border-bottom: 1px solid var(--line); overflow-x: auto;">
+      <div class="container" style="display: flex;">
+        <button
+          v-for="d in disciplines" :key="d"
+          @click="active = d"
+          :style="{
+            padding: '12px 18px', background: 'transparent', border: 'none',
+            borderBottom: active === d ? '2px solid var(--felt-2)' : '2px solid transparent',
+            color: active === d ? 'var(--chalk)' : 'var(--mute)',
+            cursor: 'pointer', fontFamily: 'var(--font-mono)',
+            fontSize: '11px', letterSpacing: '0.16em', whiteSpace: 'nowrap',
+          }"
+        >{{ fmtDiscipline(d) }}</button>
+      </div>
     </div>
 
     <!-- Empty state -->
@@ -79,8 +83,8 @@ const medals = ['🥇', '🥈', '🥉'];
     </div>
 
     <!-- Ranking table -->
-    <div v-else style="flex: 1; overflow-x: auto; padding: 24px;">
-      <div style="max-width: 900px; margin: 0 auto;">
+    <div v-else style="flex: 1; overflow-x: auto; padding: 24px 0;">
+      <div class="container">
 
         <!-- Top 3 cards -->
         <div v-if="rows.length >= 3"

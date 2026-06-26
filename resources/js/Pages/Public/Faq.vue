@@ -87,47 +87,53 @@ const toggle = (id) => {
     <PublicNav />
 
     <!-- Hero + search -->
-    <section style="padding: 32px 24px 28px; border-bottom: 1px solid var(--line);">
-      <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute);">FAQ</div>
-      <h1 class="disp-a" style="font-size: clamp(40px, 9vw, 80px); margin-top: 14px; line-height: 0.92;">
-        Questions<br /><span style="color: var(--mute);">fréquentes</span>
-      </h1>
+    <section style="padding: 32px 0 28px; border-bottom: 1px solid var(--line);">
+      <div class="container">
+        <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--mute);">FAQ</div>
+        <h1 class="disp-a" style="font-size: clamp(40px, 9vw, 80px); margin-top: 14px; line-height: 0.92;">
+          Questions<br /><span style="color: var(--mute);">fréquentes</span>
+        </h1>
 
-      <!-- Search -->
-      <div style="margin-top: 24px; max-width: 540px; position: relative;">
-        <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--mute); font-size: 14px; pointer-events: none;">◎</span>
-        <input
-          v-model="search"
-          type="search"
-          placeholder="Rechercher une question…"
-          style="width: 100%; padding: 12px 14px 12px 40px;
-                 background: var(--ink-2); border: 1px solid var(--line-strong);
-                 color: var(--chalk); font-size: 14px; outline: none;
-                 font-family: var(--font-body);"
-          @focus="$event.target.style.borderColor = 'var(--felt-2)'"
-          @blur="$event.target.style.borderColor = 'var(--line-strong)'"
-        />
+        <!-- Search -->
+        <div style="margin-top: 24px; max-width: 540px; position: relative;">
+          <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--mute); font-size: 14px; pointer-events: none;">◎</span>
+          <input
+            v-model="search"
+            type="search"
+            placeholder="Rechercher une question…"
+            style="width: 100%; padding: 12px 14px 12px 40px;
+                   background: var(--ink-2); border: 1px solid var(--line-strong);
+                   color: var(--chalk); font-size: 14px; outline: none;
+                   font-family: var(--font-body);"
+            @focus="$event.target.style.borderColor = 'var(--felt-2)'"
+            @blur="$event.target.style.borderColor = 'var(--line-strong)'"
+          />
+        </div>
       </div>
     </section>
 
     <!-- Category chips -->
-    <div style="display: flex; gap: 8px; padding: 16px 24px; border-bottom: 1px solid var(--line); overflow-x: auto; flex-wrap: nowrap;">
-      <button
-        v-for="cat in categories" :key="cat.id"
-        @click="activeCategory = cat.id; openId = null"
-        :style="{
-          padding: '6px 14px',
-          border: '1px solid ' + (activeCategory === cat.id ? 'var(--felt-2)' : 'var(--line)'),
-          background: activeCategory === cat.id ? 'var(--felt)' : 'transparent',
-          color: activeCategory === cat.id ? '#fff' : 'var(--mute)',
-          cursor: 'pointer', fontSize: '11px', fontFamily: 'var(--font-mono)',
-          letterSpacing: '0.12em', whiteSpace: 'nowrap',
-        }"
-      >{{ cat.label.toUpperCase() }}</button>
-    </div>
+    <section style="border-bottom: 1px solid var(--line);">
+      <div class="container" style="padding-top: 0; padding-bottom: 0;">
+        <div style="display: flex; gap: 8px; padding: 16px 0; overflow-x: auto; flex-wrap: nowrap;">
+          <button
+            v-for="cat in categories" :key="cat.id"
+            @click="activeCategory = cat.id; openId = null"
+            :style="{
+              padding: '6px 14px',
+              border: '1px solid ' + (activeCategory === cat.id ? 'var(--felt-2)' : 'var(--line)'),
+              background: activeCategory === cat.id ? 'var(--felt)' : 'transparent',
+              color: activeCategory === cat.id ? '#fff' : 'var(--mute)',
+              cursor: 'pointer', fontSize: '11px', fontFamily: 'var(--font-mono)',
+              letterSpacing: '0.12em', whiteSpace: 'nowrap',
+            }"
+          >{{ cat.label.toUpperCase() }}</button>
+        </div>
+      </div>
+    </section>
 
     <!-- Results -->
-    <div style="flex: 1; padding: 24px; max-width: 840px; width: 100%;">
+    <div class="container" style="flex: 1; width: 100%; max-width: 840px;">
 
       <!-- No results -->
       <div v-if="filtered.length === 0"
