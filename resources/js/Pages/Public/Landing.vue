@@ -1,22 +1,74 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import PublicNav from '@/Components/PublicNav.vue';
 import PublicFooter from '@/Components/PublicFooter.vue';
 import GabonFlag from '@/Components/GabonFlag.vue';
 import Chip from '@/Components/Chip.vue';
 
 const props = defineProps({
-  competition: Object,
-  pools: Array,
-  liveMatches: Array,
-  schedule: Array,
-  stats: Object,
+  competition:    Object,
+  pools:          Array,
+  liveMatches:    Array,
+  schedule:       Array,
+  stats:          Object,
+  countdownTo:    String,   // ISO datetime string or null
+  countdownLabel: String,   // e.g. 'DÉBUT DU TOURNOI'
 });
 
 const firstLive = computed(() => props.liveMatches?.[0]);
 
+// ── Countdown ─────────────────────────────────────────────────────────────────
+const countdown = ref(null);
+
+const pad = (n) => String(Math.max(0, n)).padStart(2, '0');
+
+const tick = () => {
+  if (!props.countdownTo) { countdown.value = null; return; }
+  const diff = new Date(props.countdownTo) - Date.now();
+  if (diff <= 0) {
+    countdown.value = { days: '00', hours: '00', mins: '00', secs: '00' };
+    return;
+  }
+  countdown.value = {
+    days:  pad(Math.floor(diff / 86400000)),
+    hours: pad(Math.floor((diff % 86400000) / 3600000)),
+    mins:  pad(Math.floor((diff % 3600000) / 60000)),
+    secs:  pad(Math.floor((diff % 60000) / 1000)),
+  };
+};
+
+let timer = null;
+onMounted(() => { tick(); timer = setInterval(tick, 1000); });
+onUnmounted(() => clearInterval(timer));
+
+// ── Description paragraph ─────────────────────────────────────────────────────
+const descParts = computed(() => {
+  const c = props.competition;
+  if (!c) return [];
+  const parts = [];
+  if (c.structure?.includes('pool') && c.pool_count) {
+    const poolRace = c.pool_race_to ?? c.race_to;
+    parts.push(`${c.pool_count} poule${c.pool_count > 1 ? 's' : ''} de ${c.pool_size ?? '?'} joueurs.`);
+    parts.push(`Race to ${poolRace}.`);
+    if (c.qualifiers_per_pool) {
+      parts.push(`Les ${c.qualifiers_per_pool} meilleur${c.qualifiers_per_pool > 1 ? 's' : ''} de chaque poule se qualifient pour le tableau final.`);
+    }
+  } else if (c.structure === 'knockout') {
+    parts.push(`Élimination directe. Race to ${c.race_to}.`);
+  } else if (c.race_to) {
+    parts.push(`Race to ${c.race_to}.`);
+  }
+  if (c.venue) {
+    const prefix = c.status === 'in_progress' ? 'En cours à' : c.status === 'finished' ? 'S\'est déroulé à' : 'Tout commence à';
+    parts.push(`${prefix} ${c.venue}.`);
+  }
+  return parts;
+});
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 const fmtFcfa = (n) => {
+  if (!n) return '—';
   if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M FCFA';
   if (n >= 1000) return (n / 1000).toFixed(0) + 'k FCFA';
   return n + ' FCFA';
@@ -38,13 +90,26 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
         <img :src="competition.logo_url" :alt="competition.name + ' logo'"
              style="max-height: 96px; max-width: 200px; object-fit: contain;" />
       </div>
+
+      <!-- Status chips -->
       <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 32px; flex-wrap: wrap;">
-        <Chip variant="live">EN DIRECT · {{ liveMatches?.length || 0 }} TABLES</Chip>
-        <Chip>{{ competition?.pool_count }} POULES · {{ stats?.players }} JOUEURS</Chip>
-        <Chip>{{ competition?.city?.toUpperCase() }}</Chip>
+        <!-- Live badge only when actually in progress -->
+        <Chip v-if="competition?.status === 'in_progress'" variant="live">
+          EN DIRECT · {{ liveMatches?.length || 0 }} TABLES
+        </Chip>
+        <Chip v-else-if="competition?.status === 'registration'" variant="felt">INSCRIPTIONS OUVERTES</Chip>
+        <Chip v-else-if="competition?.status === 'draft'" variant="">BIENTÔT</Chip>
+        <Chip v-else-if="competition?.status === 'finished'" variant="">TERMINÉE</Chip>
+
+        <Chip v-if="competition?.pool_count">
+          {{ competition.pool_count }} POULES · {{ stats?.players }} JOUEURS
+        </Chip>
+        <Chip v-if="competition?.city">{{ competition.city.toUpperCase() }}</Chip>
       </div>
+
       <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 48px; align-items: end;">
         <div>
+          <!-- Discipline + format line -->
           <div class="mono" style="font-size: 12px; letter-spacing: 0.2em; color: var(--mute); margin-bottom: 18px;">
             <template v-if="competition?.discipline">{{ competition.discipline.toUpperCase() }} · </template>
             <template v-if="competition?.structure === 'pools_knockout'">
@@ -54,33 +119,70 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
             <template v-else-if="competition?.structure === 'knockout'">ÉLIMINATION DIRECTE</template>
             <template v-else-if="competition?.structure">{{ competition.structure.toUpperCase() }}</template>
           </div>
+
+          <!-- Competition name -->
           <h1 class="disp-a" style="font-size: clamp(40px, 10vw, 112px); line-height: 0.88; word-break: break-word;">
             {{ competition?.name?.toUpperCase() }}
           </h1>
-          <p style="margin-top: 28px; font-size: 16px; max-width: 520px; color: var(--chalk-2); line-height: 1.5;">
-            Quatre poules de sept joueurs. Race to {{ competition?.race_to }}. Les {{ competition?.qualifiers_per_pool }} meilleurs
-            de chaque poule se qualifient pour le tableau final. Tout commence à {{ competition?.venue }}.
+
+          <!-- Dynamic description -->
+          <p style="margin-top: 28px; font-size: 16px; max-width: 520px; color: var(--chalk-2); line-height: 1.7;">
+            {{ descParts.join(' ') }}
           </p>
+
+          <!-- CTA buttons adapt to competition status -->
           <div style="display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap;">
-            <a href="/live" target="_blank" rel="noopener" class="btn btn-felt">Suivre le live ↗</a>
-            <Link href="/competitions" class="btn">Voir le bracket</Link>
+            <template v-if="competition?.status === 'in_progress'">
+              <a href="/live" target="_blank" rel="noopener" class="btn btn-felt">Suivre le live ↗</a>
+              <Link href="/competitions" class="btn">Voir le bracket</Link>
+            </template>
+            <template v-else-if="competition?.status === 'registration'">
+              <Link :href="`/inscription/${competition.slug}`" class="btn btn-felt">S'inscrire →</Link>
+              <Link href="/competitions" class="btn">En savoir plus</Link>
+            </template>
+            <template v-else-if="competition?.status === 'finished'">
+              <Link href="/tournois" class="btn">Voir l'archive →</Link>
+              <Link href="/competitions" class="btn">Résultats</Link>
+            </template>
+            <template v-else>
+              <Link href="/competitions" class="btn">En savoir plus</Link>
+            </template>
           </div>
         </div>
 
+        <!-- Right column: countdown + live match -->
         <div style="display: flex; flex-direction: column; gap: 14px;">
-          <div style="border: 1px solid var(--line); padding: 20px;">
-            <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">PROCHAINE PHASE</div>
-            <div class="disp-a tnum" style="font-size: 64px; margin-top: 8px; display: flex; gap: 4px; align-items: baseline;">
-              <span>02</span><span style="color: var(--mute-2);">:</span>
-              <span>14</span><span style="color: var(--mute-2);">:</span>
-              <span>06</span>
+
+          <!-- Countdown block -->
+          <div style="border: 1px solid var(--line); padding: 20px 18px;">
+            <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">
+              {{ countdownLabel ?? 'PROCHAINE PHASE' }}
             </div>
-            <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);
-                                      margin-top: 8px; display: flex; justify-content: space-between;">
-              <span>JOURS</span><span>HEURES</span><span>MIN</span>
-            </div>
+
+            <!-- Active countdown -->
+            <template v-if="countdown && countdownTo">
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 12px;">
+                <div v-for="unit in [
+                  [countdown.days,  'JOURS'],
+                  [countdown.hours, 'H'],
+                  [countdown.mins,  'MIN'],
+                  [countdown.secs,  'SEC'],
+                ]" :key="unit[1]" style="text-align: center;">
+                  <div class="disp-a tnum" style="font-size: 42px; line-height: 1.05;">{{ unit[0] }}</div>
+                  <div class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.16em; margin-top: 4px;">{{ unit[1] }}</div>
+                </div>
+              </div>
+            </template>
+
+            <!-- No date available -->
+            <template v-else>
+              <div class="disp-a" style="font-size: 22px; margin-top: 12px; color: var(--mute);">
+                DATE À CONFIRMER
+              </div>
+            </template>
           </div>
 
+          <!-- Live match card (only when in_progress) -->
           <div v-if="firstLive" style="border: 1px solid var(--line);">
             <div style="padding: 10px 14px; border-bottom: 1px solid var(--line);
                         display: flex; justify-content: space-between; align-items: center;">
@@ -108,12 +210,13 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
       </div>
     </section>
 
+    <!-- Stats bar -->
     <section style="display: grid; grid-template-columns: repeat(5, 1fr); border-bottom: 1px solid var(--line);">
       <div v-for="(item, i) in [
         [String(stats?.players ?? 0).padStart(2,'0'), 'JOUEURS'],
         [String(stats?.pools ?? 0).padStart(2,'0'), 'POULES'],
         [String(stats?.tables ?? 0).padStart(2,'0'), 'TABLES'],
-        [String(stats?.matches ?? 0).padStart(2,'0'), 'MATCHS'],
+        [String(stats?.matches_done ?? stats?.matches ?? 0).padStart(2,'0'), 'MATCHS JOUÉS'],
         [fmtFcfa(stats?.prize_pool ?? 0), 'DOTATION'],
       ]" :key="i" :style="{ padding: '28px 24px', borderRight: i < 4 ? '1px solid var(--line)' : 'none' }">
         <div class="disp-a tnum" style="font-size: 44px;">{{ item[0] }}</div>
@@ -121,6 +224,7 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
       </div>
     </section>
 
+    <!-- Pool leaders -->
     <section v-if="pools?.length" style="padding: 56px 48px; border-bottom: 1px solid var(--line);">
       <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 28px; gap: 14px; flex-wrap: wrap;">
         <h2 class="disp-a" style="font-size: 56px;">En tête de poule</h2>
@@ -130,7 +234,7 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
       </div>
       <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
         <Link v-for="p in pools" :key="p.id" href="/competitions"
-              style="border: 1px solid var(--line); padding: 24px; background: var(--ink-2); display: block;">
+              style="border: 1px solid var(--line); padding: 24px; background: var(--ink-2); display: block; text-decoration: none;">
           <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">POULE {{ p.name }} · LEADER</div>
           <div class="disp-a" style="font-size: 32px; margin-top: 14px;">{{ p.leader?.name ?? '—' }}</div>
           <div class="mono" style="font-size: 11px; color: var(--mute); margin-top: 10px;">
@@ -140,7 +244,8 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
       </div>
     </section>
 
-    <section style="padding: 56px 48px; border-bottom: 1px solid var(--line);">
+    <!-- Schedule -->
+    <section v-if="schedule?.length" style="padding: 56px 48px; border-bottom: 1px solid var(--line);">
       <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 28px; gap: 14px; flex-wrap: wrap;">
         <h2 class="disp-a" style="font-size: 56px;">Programme</h2>
         <span class="mono" style="font-size: 12px; color: var(--mute); letter-spacing: 0.16em;">
@@ -164,46 +269,40 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
 
 <style scoped>
 @media (max-width: 768px) {
-  /* Hero section padding */
   section:first-of-type {
     padding: 28px 16px 24px !important;
   }
-
-  /* CTA buttons: stack on small screens */
-  div[style*="gap: 12px"][style*="margin-top: 28px"] {
-    flex-direction: column;
+  /* Hero: stack columns */
+  div[style*="grid-template-columns: 1.4fr 1fr"] {
+    grid-template-columns: 1fr !important;
   }
-  div[style*="gap: 12px"][style*="margin-top: 28px"] > a,
-  div[style*="gap: 12px"][style*="margin-top: 28px"] > a + a {
-    margin-left: 0 !important;
+  /* Stats bar: 2 columns */
+  section[style*="grid-template-columns: repeat(5, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
-
-  /* Schedule section: reduce time font size */
+  /* Pool leaders: 2 columns */
+  div[style*="grid-template-columns: repeat(4, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  section[style*="padding: 56px 48px"] {
+    padding: 28px 16px !important;
+  }
   span[style*="font-size: 32px"][style*="min-width"] {
     font-size: 22px !important;
     min-width: 60px !important;
   }
-
-  /* Reduce section paddings */
-  section[style*="padding: 56px 48px"] {
-    padding: 28px 16px !important;
-  }
-
-  /* Pool leader cards: reduce name size */
-  div.disp-a[style*="font-size: 32px"] {
-    font-size: 22px !important;
-  }
 }
 
 @media (max-width: 480px) {
-  /* Stats bar: 2x2 + last centered */
-  section[style*="grid-template-columns: repeat(5, 1fr)"] {
+  section[style*="grid-template-columns: repeat(5, 1fr)"],
+  section[style*="grid-template-columns: repeat(2, 1fr)"] {
     grid-template-columns: repeat(2, 1fr) !important;
   }
-
-  /* Stats bar big number */
   div.disp-a[style*="font-size: 44px"] {
     font-size: 30px !important;
+  }
+  div[style*="grid-template-columns: repeat(4, 1fr)"] {
+    grid-template-columns: 1fr !important;
   }
 }
 </style>
