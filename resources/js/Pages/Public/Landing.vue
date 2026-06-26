@@ -54,8 +54,8 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
             <template v-else-if="competition?.structure === 'knockout'">ÉLIMINATION DIRECTE</template>
             <template v-else-if="competition?.structure">{{ competition.structure.toUpperCase() }}</template>
           </div>
-          <h1 class="disp-a" style="font-size: clamp(48px, 13vw, 132px); line-height: 0.85; word-break: break-word;">
-            ICONE POOL<br /><span style="color: var(--felt-2);">CHAMPIONSHIP</span>
+          <h1 class="disp-a" style="font-size: clamp(40px, 10vw, 112px); line-height: 0.88; word-break: break-word;">
+            {{ competition?.name?.toUpperCase() }}
           </h1>
           <p style="margin-top: 28px; font-size: 16px; max-width: 520px; color: var(--chalk-2); line-height: 1.5;">
             Quatre poules de sept joueurs. Race to {{ competition?.race_to }}. Les {{ competition?.qualifiers_per_pool }} meilleurs
