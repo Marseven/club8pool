@@ -59,7 +59,21 @@ class RefereeApiController extends Controller
             ->orderBy('scheduled_at')
             ->get();
 
-        return response()->json($matches);
+        // Augment each match with shot_clock_config and rack_mode for the mobile queue screen
+        $augmented = $matches->map(function (GameMatch $m) {
+            $data = $m->toArray();
+            $data['shot_clock_config'] = $m->competition ? [
+                'enabled'               => $m->competition->shot_clock_enabled ?? false,
+                'seconds'               => $m->competition->shot_clock ?? 30,
+                'late_seconds'          => $m->competition->shot_clock_late_seconds ?? 15,
+                'late_rule'             => $m->competition->shot_clock_late_rule ?? 'never',
+                'extensions_per_player' => $m->competition->shot_clock_extensions_per_player ?? 1,
+            ] : null;
+            $data['rack_mode'] = $m->competition?->rack_mode ?? 'triangle';
+            return $data;
+        });
+
+        return response()->json($augmented);
     }
 
     public function tables(): JsonResponse
@@ -73,7 +87,34 @@ class RefereeApiController extends Controller
 
     public function show(GameMatch $match): JsonResponse
     {
-        return response()->json($match->load(['playerA.club', 'playerB.club', 'table', 'competition', 'signatures']));
+        $match->load(['playerA.club', 'playerB.club', 'table', 'competition', 'signatures']);
+
+        // New optional fields for mobile app v2 (backward-compatible — only adds, never removes)
+        $extra = [
+            'shot_clock_config' => $match->competition ? [
+                'enabled'                   => $match->competition->shot_clock_enabled ?? false,
+                'seconds'                   => $match->competition->shot_clock ?? 30,
+                'late_seconds'              => $match->competition->shot_clock_late_seconds ?? 15,
+                'late_rule'                 => $match->competition->shot_clock_late_rule ?? 'never',
+                'extensions_per_player'     => $match->competition->shot_clock_extensions_per_player ?? 1,
+            ] : null,
+            'rack_mode'            => $match->competition?->rack_mode ?? 'triangle',
+            'tie_break_mode'       => $match->competition?->tie_break_mode ?? 'none',
+            'push_out_enabled'     => $match->competition?->push_out_enabled ?? false,
+            'player_rating_summary' => [
+                'a' => \App\Models\PlayerRating::where('player_id', $match->player_a_id)
+                        ->where('discipline', $match->competition?->discipline ?? '8-ball')
+                        ->select('rating', 'games_played', 'provisional')
+                        ->first(),
+                'b' => \App\Models\PlayerRating::where('player_id', $match->player_b_id)
+                        ->where('discipline', $match->competition?->discipline ?? '8-ball')
+                        ->select('rating', 'games_played', 'provisional')
+                        ->first(),
+            ],
+            'allowed_events' => ['foul', 'safety', 'warning', 'miss', 'break_and_run', 'shot_clock_extension', 'shot_clock_violation', 're_rack', 'timeout', 'coaching_request', 'other'],
+        ];
+
+        return response()->json(array_merge($match->toArray(), $extra));
     }
 
     public function frame(StoreFrameRequest $request, GameMatch $match): JsonResponse
