@@ -7,7 +7,7 @@
  * Utilisé par : database/seeders/SummerEditionSeeder.php
  *
  * Ce fichier est la source de vérité pour toutes les données connues.
- * Les champs marqués TODO nécessitent une confirmation de l'organisation.
+ * Les champs null nécessitent une confirmation de l'organisation.
  */
 
 return [
@@ -17,27 +17,27 @@ return [
     // =========================================================================
 
     'competition' => [
-        'name'                   => 'Summer Edition',
-        'slug'                   => 'summer-edition',
-        'discipline'             => '8-ball',      // TODO: confirmer 8-ball vs 9-ball
-        'format'                 => 'pools',
-        'structure'              => 'pools_knockout',
-        'status'                 => 'draft',
-        'player_slots'           => 48,
-        'pool_count'             => 8,
-        'pool_size'              => 6,
-        'qualifiers_per_pool'    => 4,
-        'seed_strategy'          => 'manual',
-        'seeded_players_count'   => 8,
-        'draw_randomize_unseeded'=> true,
-        'race_to'                => 7,             // fallback global
-        'pool_race_to'           => 4,
-        'knockout_race_to'       => 7,             // fallback pour rounds non configurés
-        'prize_pool'             => 1120000,
-        'venue'                  => "L'Icône",
-        'city'                   => 'Libreville',
-        'starts_on'              => '2026-07-04',
-        'ends_on'                => '2026-07-12',
+        'name'                    => 'Summer Edition',
+        'slug'                    => 'summer-edition',
+        'discipline'              => '8-ball',      // TODO: confirmer 8-ball vs 9-ball
+        'format'                  => 'pools',
+        'structure'               => 'pools_knockout',
+        'status'                  => 'draft',
+        'player_slots'            => 48,
+        'pool_count'              => 8,
+        'pool_size'               => 6,
+        'qualifiers_per_pool'     => 4,
+        'seed_strategy'           => 'manual',
+        'seeded_players_count'    => 8,
+        'draw_randomize_unseeded' => true,
+        'race_to'                 => 7,    // fallback global
+        'pool_race_to'            => 4,
+        'knockout_race_to'        => 7,    // fallback pour rounds non configurés
+        'prize_pool'              => 1120000,
+        'venue'                   => "L'Icône",
+        'city'                    => 'Libreville',
+        'starts_on'               => '2026-07-04',
+        'ends_on'                 => '2026-07-12',
     ],
 
     // =========================================================================
@@ -45,18 +45,18 @@ return [
     // =========================================================================
 
     'format' => [
-        'shot_clock_enabled'             => true,
-        'shot_clock'                     => 30,    // secondes par tir (poules)
-        'shot_clock_late_seconds'        => 30,    // TODO: confirmer (la même en phase finale ?)
-        'shot_clock_late_rule'           => 'never',
-        'shot_clock_extensions_per_player' => 0,  // TODO: confirmer nb d'extensions
-        'tie_break_mode'                 => 'shootout', // TODO: confirmer règle ex-aequo poule
-        'rack_mode'                      => 'template',
-        'alternate_break'                => true,  // TODO: confirmer break alterné
-        'allow_draw'                     => false,
-        'enable_warnings'                => true,
-        'push_out'                       => false,
-        'push_out_enabled'               => false,
+        'shot_clock_enabled'               => true,
+        'shot_clock'                       => 30,       // secondes par tir (poules)
+        'shot_clock_late_seconds'          => 30,       // TODO: confirmer en phase finale
+        'shot_clock_late_rule'             => 'never',
+        'shot_clock_extensions_per_player' => 0,        // TODO: confirmer nb d'extensions
+        'tie_break_mode'                   => 'shootout', // TODO: confirmer règle ex-aequo
+        'rack_mode'                        => 'template',
+        'alternate_break'                  => true,     // TODO: confirmer break alterné
+        'allow_draw'                       => false,
+        'enable_warnings'                  => true,
+        'push_out'                         => false,
+        'push_out_enabled'                 => false,
     ],
 
     // =========================================================================
@@ -99,106 +99,182 @@ return [
 
     // =========================================================================
     // TÊTES DE SÉRIE (liste officielle fournie par l'organisation)
-    // ⚠️  Noms partiels — à compléter avec prénoms/FGB avant jour J.
+    // ⚠️  Noms partiels — à compléter avec noms de famille / FGB avant jour J.
     // =========================================================================
 
     'top_seeds' => [
-        ['seed' => 1, 'display_name' => 'Amauris',  'pool' => 'A'],
-        ['seed' => 2, 'display_name' => 'Paolo',    'pool' => 'B'],
-        ['seed' => 3, 'display_name' => 'Zouzou',   'pool' => 'C'],
-        ['seed' => 4, 'display_name' => 'Zack',     'pool' => 'D'],
-        ['seed' => 5, 'display_name' => 'Youssef',  'pool' => 'E'],
-        ['seed' => 6, 'display_name' => 'Mohamed',  'pool' => 'F'],
-        ['seed' => 7, 'display_name' => 'Bobby',    'pool' => 'G'],
-        ['seed' => 8, 'display_name' => 'Toto',     'pool' => 'H'],
+        ['seed' => 1, 'display_name' => 'Amauris', 'pool' => 'A'],
+        ['seed' => 2, 'display_name' => 'Paolo',   'pool' => 'B'],
+        ['seed' => 3, 'display_name' => 'Zouzou',  'pool' => 'C'],
+        ['seed' => 4, 'display_name' => 'Zack',    'pool' => 'D'],
+        ['seed' => 5, 'display_name' => 'Youssef', 'pool' => 'E'],
+        ['seed' => 6, 'display_name' => 'Mohamed', 'pool' => 'F'],
+        ['seed' => 7, 'display_name' => 'Bobby',   'pool' => 'G'],
+        ['seed' => 8, 'display_name' => 'Toto',    'pool' => 'H'],
+    ],
+
+    // =========================================================================
+    // DOTATION
+    // Montants issus du communiqué officiel (source : MRTECH).
+    // null = information non communiquée.
+    // =========================================================================
+
+    'prize_breakdown' => [
+        '1st' => [
+            'label'    => 'Champion',
+            'amount'   => 500000,
+            'currency' => 'XAF',
+            'extras'   => ['Trophée', 'Médaille Or'],
+        ],
+        '2nd' => [
+            'label'    => 'Finaliste',
+            'amount'   => 250000,
+            'currency' => 'XAF',
+            'extras'   => ['Médaille Argent'],
+        ],
+        '3rd' => [
+            'label'    => 'Troisième place',
+            'amount'   => 150000,
+            'currency' => 'XAF',
+            'extras'   => ['Médaille Bronze'],
+        ],
+        '4th' => [
+            'label'    => 'Quatrième place',
+            'amount'   => 100000,
+            'currency' => 'XAF',
+            'extras'   => ['Médaille'],
+        ],
+        '5th-8th' => [
+            'label'        => '5e–8e place',
+            'amount_each'  => 30000,
+            'players'      => 4,
+            'amount_total' => 120000,
+            'currency'     => 'XAF',
+        ],
     ],
 
     // =========================================================================
     // CALENDRIER
     // Dates juillet 2026 confirmées par les jours de semaine du communiqué.
+    // Horaires exacts non communiqués : starts_at / ends_at à null.
     // =========================================================================
 
     'schedule' => [
-        [
-            'label'      => 'Poules A, B, C',
-            'phase'      => 'pools',
-            'pools'      => ['A', 'B', 'C'],
-            'date'       => '2026-07-04',
-            'starts_at'  => '13:00',
-            'ends_at'    => '2026-07-05 01:00',
-            'tables'     => 2,
-        ],
-        [
-            'label'      => 'Poules D, E, F',
-            'phase'      => 'pools',
-            'pools'      => ['D', 'E', 'F'],
-            'date'       => '2026-07-05',
-            'starts_at'  => '13:00',
-            'ends_at'    => '2026-07-06 00:00',
-            'tables'     => 2,
-        ],
-        [
-            'label'      => 'Poules G, H',
-            'phase'      => 'pools',
-            'pools'      => ['G', 'H'],
-            'date'       => '2026-07-06',
-            'starts_at'  => '18:00',
-            'ends_at'    => '2026-07-07 01:00',
-            'tables'     => 2,
-        ],
-        [
-            'label'      => '1/16e de finale',
-            'phase'      => 'knockout',
-            'round'      => 'R32',
-            'date'       => '2026-07-07',
-            'starts_at'  => '18:00',
-            'ends_at'    => '2026-07-08 01:00',
-            'tables'     => 2,
-        ],
-        [
-            'label'      => '1/8e de finale',
-            'phase'      => 'knockout',
-            'round'      => 'R16',
-            'date'       => '2026-07-08',
-            'starts_at'  => '18:00',
-            'ends_at'    => '2026-07-09 01:00',
-            'tables'     => 2,
-        ],
-        [
-            'label'      => 'Final 8 — QF / SF / Petite finale / Finale',
-            'phase'      => 'knockout',
-            'rounds'     => ['QF', 'SF', '3P', 'F'],
-            'date'       => '2026-07-12',
-            'starts_at'  => '14:00',
-            'ends_at'    => '2026-07-13 00:00',
-            'tables'     => 2,
-        ],
-    ],
-
-    // =========================================================================
-    // DOTATION
-    // =========================================================================
-
-    'prizes' => [
-        'total'    => 1120000,
-        'currency' => 'XAF',
-        'breakdown' => [
-            ['rank' => 1,   'amount' => 500000, 'extras' => ['Trophée', 'Médaille Or']],
-            ['rank' => 2,   'amount' => 250000, 'extras' => ['Médaille Argent']],
-            ['rank' => 3,   'amount' => 150000, 'extras' => ['Médaille Bronze']],
-            ['rank' => 4,   'amount' => 100000, 'extras' => ['Médaille']],
-            ['rank' => '5-8', 'amount_each' => 30000, 'players' => 4, 'total' => 120000],
+        'timezone'              => 'Africa/Libreville',
+        'registration_deadline' => null,   // TODO: à confirmer
+        'days' => [
+            [
+                'date'  => '2026-07-04',
+                'label' => 'Samedi 4 juillet 2026',
+                'items' => [
+                    [
+                        'phase'      => 'pools',
+                        'label'      => 'Phase de poules — Poules A, B, C',
+                        'pool_range' => ['A', 'C'],
+                        'starts_at'  => null,
+                        'ends_at'    => null,
+                    ],
+                ],
+            ],
+            [
+                'date'  => '2026-07-05',
+                'label' => 'Dimanche 5 juillet 2026',
+                'items' => [
+                    [
+                        'phase'      => 'pools',
+                        'label'      => 'Phase de poules — Poules D, E, F',
+                        'pool_range' => ['D', 'F'],
+                        'starts_at'  => null,
+                        'ends_at'    => null,
+                    ],
+                ],
+            ],
+            [
+                'date'  => '2026-07-06',
+                'label' => 'Lundi 6 juillet 2026',
+                'items' => [
+                    [
+                        'phase'      => 'pools',
+                        'label'      => 'Phase de poules — Poules G, H',
+                        'pool_range' => ['G', 'H'],
+                        'starts_at'  => null,
+                        'ends_at'    => null,
+                    ],
+                ],
+            ],
+            [
+                'date'  => '2026-07-07',
+                'label' => 'Mardi 7 juillet 2026',
+                'items' => [
+                    [
+                        'phase'     => 'knockout',
+                        'label'     => '1/16e de finale (R32)',
+                        'rounds'    => ['R32'],
+                        'starts_at' => null,
+                        'ends_at'   => null,
+                    ],
+                ],
+            ],
+            [
+                'date'  => '2026-07-08',
+                'label' => 'Mercredi 8 juillet 2026',
+                'items' => [
+                    [
+                        'phase'     => 'knockout',
+                        'label'     => '1/8e de finale (R16)',
+                        'rounds'    => ['R16'],
+                        'starts_at' => null,
+                        'ends_at'   => null,
+                    ],
+                ],
+            ],
+            [
+                'date'  => '2026-07-12',
+                'label' => 'Samedi 12 juillet 2026',
+                'items' => [
+                    [
+                        'phase'     => 'knockout',
+                        'label'     => 'Final 8 — QF / SF / Petite finale / Finale',
+                        'rounds'    => ['QF', 'SF', '3P', 'F'],
+                        'starts_at' => null,
+                        'ends_at'   => null,
+                    ],
+                ],
+            ],
         ],
     ],
 
     // =========================================================================
     // INSCRIPTION / PAIEMENT
+    // Informations issues du communiqué (contact Dimitri).
+    // null = non communiqué.
     // =========================================================================
 
     'payment' => [
-        'method'       => 'Mobile Money',
-        'contact_name' => 'Dimitri',
-        'phone'        => '077 79 10 57',
+        'registration_fee' => null,   // montant inscription non communiqué
+        'currency'         => 'XAF',
+        'methods'          => [
+            [
+                'type'         => 'mobile_money',
+                'provider'     => null,   // opérateur non précisé
+                'phone'        => '077 79 10 57',
+                'account_name' => 'Dimitri',
+            ],
+            [
+                'type'         => 'cash',
+                'location'     => null,
+                'contact_name' => 'Dimitri',
+                'phone'        => '077 79 10 57',
+            ],
+        ],
+        'contacts' => [
+            [
+                'role'  => 'Organisation',
+                'name'  => 'Dimitri',
+                'phone' => '077 79 10 57',
+                'email' => null,
+            ],
+        ],
     ],
 
     // =========================================================================
@@ -209,14 +285,19 @@ return [
         'Noms de famille des 8 têtes de série (seuls les prénoms/pseudos sont connus)',
         'Numéros de carte FGB des 8 têtes de série',
         'Liste des 40 autres joueurs inscrits (noms, FGB, clubs)',
+        'Clubs de chaque joueur inscrit',
         'Confirmation de la discipline (8-ball / 9-ball / 10-ball)',
-        'Règle de shot clock en phase finale (30s comme en poules ?)',
-        'Nombre d\'extensions de shot clock autorisées (0 ou 1 ?)',
-        'Règle d\'ex-aequo en poule (shootout / race_to_one / points particuliers ?)',
-        'Break alterné ou break fixe ?',
+        'Format de break : alterné ou fixe ?',
         'Push-out rule activée ou non ?',
+        'Règle de shot clock en phase finale (30s comme en poules ?)',
+        "Nombre d'extensions de shot clock autorisées (0 ou 1 ?)",
+        "Règle d'ex-aequo en poule (shootout / race_to_one / points particuliers ?)",
+        "Montant de l'inscription (registration_fee)",
+        'Opérateur Mobile Money exact (Airtel Money / Moov / autre)',
+        "Contacts complets de l'organisation (email, autres responsables)",
+        'Horaires exacts de chaque phase (par jour)',
+        'Date et heure exactes de clôture des inscriptions',
         'Entrée du public : gratuite ou payante ?',
-        'Date exacte de clôture des inscriptions',
     ],
 
 ];

@@ -70,6 +70,7 @@ class RefereeApiController extends Controller
                 'extensions_per_player' => $m->competition->shot_clock_extensions_per_player ?? 1,
             ] : null;
             $data['rack_mode'] = $m->competition?->rack_mode ?? 'triangle';
+            $data['race_to']   = $m->competition?->raceForRound($m->round ?? '') ?? $m->competition?->race_to;
             return $data;
         });
 
@@ -112,6 +113,7 @@ class RefereeApiController extends Controller
                         ->first(),
             ],
             'allowed_events' => ['foul', 'safety', 'warning', 'miss', 'break_and_run', 'shot_clock_extension', 'shot_clock_violation', 're_rack', 'timeout', 'coaching_request', 'other'],
+            'race_to'        => $match->competition?->raceForRound($match->round ?? '') ?? $match->competition?->race_to,
         ];
 
         return response()->json(array_merge($match->toArray(), $extra));

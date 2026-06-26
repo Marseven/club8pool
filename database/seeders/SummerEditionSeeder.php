@@ -40,12 +40,12 @@ class SummerEditionSeeder extends Seeder
                 $cfg['format'],
                 [
                     'settings' => [
-                        'round_race_to'          => $cfg['round_race_to'],
-                        'has_third_place_match'  => true,
-                        'prize_breakdown'        => $cfg['prizes']['breakdown'],
-                        'schedule'               => $cfg['schedule'],
-                        'payment'                => $cfg['payment'],
-                        'public_announcement'    => [
+                        'round_race_to'         => $cfg['round_race_to'],
+                        'has_third_place_match' => true,
+                        'prize_breakdown'       => $cfg['prize_breakdown'],
+                        'schedule'              => $cfg['schedule'],
+                        'payment'               => $cfg['payment'],
+                        'public_announcement'   => [
                             'missing_information' => $cfg['missing_information'],
                         ],
                     ],
@@ -62,7 +62,7 @@ class SummerEditionSeeder extends Seeder
                     'settings' => array_merge($competition->settings ?? [], [
                         'round_race_to'         => $cfg['round_race_to'],
                         'has_third_place_match' => true,
-                        'prize_breakdown'       => $cfg['prizes']['breakdown'],
+                        'prize_breakdown'       => $cfg['prize_breakdown'],
                         'schedule'              => $cfg['schedule'],
                         'payment'               => $cfg['payment'],
                     ]),
