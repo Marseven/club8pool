@@ -4,13 +4,20 @@ namespace Tests\Feature\Security;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\RateLimiter;
 use Tests\TestCase;
 
 class RefereeLoginRateLimitTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Flush array cache so rate-limit counters from previous tests don't bleed in.
+        Cache::flush();
+    }
 
     private function makeReferee(string $name = 'TestRef', string $pin = '1234'): User
     {
@@ -82,10 +89,6 @@ class RefereeLoginRateLimitTest extends TestCase
 
     public function test_referee_login_is_rate_limited(): void
     {
-        // Clear any cached rate-limit counters for this IP so the test is
-        // reproducible regardless of run order.
-        RateLimiter::clear('api');
-
         $lastResponse = null;
 
         for ($i = 1; $i <= 6; $i++) {
