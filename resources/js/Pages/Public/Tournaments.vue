@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import PublicNav from '@/Components/PublicNav.vue';
+import PublicFooter from '@/Components/PublicFooter.vue';
 import Chip from '@/Components/Chip.vue';
 
 defineProps({
@@ -110,6 +111,8 @@ const structureLabel = {
         </Link>
       </div>
     </section>
+
+    <PublicFooter />
   </div>
 </template>
 

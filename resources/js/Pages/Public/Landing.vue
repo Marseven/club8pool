@@ -2,6 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import PublicNav from '@/Components/PublicNav.vue';
+import PublicFooter from '@/Components/PublicFooter.vue';
 import GabonFlag from '@/Components/GabonFlag.vue';
 import Chip from '@/Components/Chip.vue';
 
@@ -151,17 +152,7 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
       </div>
     </section>
 
-    <footer style="padding: 32px 24px; display: flex; justify-content: space-between;
-                   align-items: center; color: var(--mute); font-size: 12px;
-                   gap: 14px; flex-wrap: wrap;">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <GabonFlag :width="26" :height="18" />
-        <span class="mono" style="letter-spacing: 0.18em; text-transform: uppercase;">
-          Icone Pool · {{ competition?.city ?? 'Libreville' }}
-        </span>
-      </div>
-      <div class="mono" style="letter-spacing: 0.18em; text-transform: uppercase;">© 2026 · Club 8 Pool</div>
-    </footer>
+    <PublicFooter />
   </div>
 </template>
 
