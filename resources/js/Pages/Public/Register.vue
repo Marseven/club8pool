@@ -11,6 +11,7 @@ const props = defineProps({
   slots: Number,
   registered: Number,
   isOpen: Boolean,
+  isFull: Boolean,
   closedReason: String,
 });
 
@@ -78,8 +79,9 @@ const closesLabel = computed(() => {
     <section class="register-layout" style="display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 73px);">
       <div class="register-sidebar" style="padding: 48px 56px; border-right: 1px solid var(--line);
                   background: var(--ink-2); display: flex; flex-direction: column;">
-        <Chip v-if="isOpen" style="width: fit-content;" variant="felt">INSCRIPTIONS OUVERTES</Chip>
+        <Chip v-if="isOpen && !isFull" style="width: fit-content;" variant="felt">INSCRIPTIONS OUVERTES</Chip>
         <Chip v-else style="width: fit-content;" variant="live">INSCRIPTIONS FERMÉES</Chip>
+        <Chip v-if="isOpen && isFull" style="width: fit-content; margin-top: 4px;" variant="">TABLEAU COMPLET</Chip>
         <h1 class="disp-a" style="font-size: 80px; line-height: 0.92; margin-top: 24px;">
           {{ competition?.name?.split(' — ')[0] }}<br />
           <span style="color: var(--felt-2);">{{ yearLabel }}</span>
@@ -117,8 +119,32 @@ const closesLabel = computed(() => {
       </div>
 
       <div class="register-form-panel" style="padding: 48px 56px;">
-        <!-- État : inscriptions fermées -->
-        <div v-if="!isOpen" style="display: flex; flex-direction: column; align-items: flex-start; gap: 22px; padding: 40px 0;">
+
+        <!-- État 1 : inscriptions ouvertes mais tableau complet → contact organisateur -->
+        <div v-if="isOpen && isFull" style="display: flex; flex-direction: column; align-items: flex-start; gap: 22px; padding: 40px 0;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(45,168,118,0.10);
+                        border: 1px solid rgba(45,168,118,0.35); display: flex; align-items: center; justify-content: center;
+                        font-family: var(--font-display-a); font-size: 26px; color: var(--felt-2);">48</div>
+            <div>
+              <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--felt-2);">INSCRIPTIONS OUVERTES</div>
+              <div class="disp-a" style="font-size: 26px; margin-top: 6px;">Tableau complet</div>
+            </div>
+          </div>
+          <p style="font-size: 14px; color: var(--chalk-2); max-width: 480px; line-height: 1.6;">
+            Les {{ slots }} places ont été attribuées. Les inscriptions se font sur place auprès de l'organisateur.
+          </p>
+          <p style="font-size: 13px; color: var(--mute); line-height: 1.6;">
+            Vous souhaitez vous inscrire sur liste d'attente ou obtenir plus d'informations ? Contactez directement la FGB.
+          </p>
+          <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
+            <a :href="`/competitions/${competition?.slug}`" class="btn btn-felt">Voir la compétition →</a>
+            <a href="/joueurs" class="btn">Liste des joueurs</a>
+          </div>
+        </div>
+
+        <!-- État 2 : inscriptions fermées -->
+        <div v-else-if="!isOpen" style="display: flex; flex-direction: column; align-items: flex-start; gap: 22px; padding: 40px 0;">
           <div style="display: flex; align-items: center; gap: 12px;">
             <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(229,72,77,0.12);
                         border: 1px solid rgba(229,72,77,0.4); display: flex; align-items: center; justify-content: center;
@@ -126,7 +152,7 @@ const closesLabel = computed(() => {
             <div>
               <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--live);">INSCRIPTIONS FERMÉES</div>
               <div class="disp-a" style="font-size: 26px; margin-top: 6px;">
-                {{ competition?.status === 'in_progress' ? 'La compétition a démarré' : competition?.status === 'finished' ? 'Compétition terminée' : 'Tableau complet' }}
+                {{ competition?.status === 'in_progress' ? 'La compétition a démarré' : competition?.status === 'finished' ? 'Compétition terminée' : 'Inscriptions closes' }}
               </div>
             </div>
           </div>
@@ -136,7 +162,7 @@ const closesLabel = computed(() => {
           <p style="font-size: 13px; color: var(--mute); line-height: 1.6;">
             Vous pouvez suivre la compétition en direct ou consulter le bracket et les classements de poules.
           </p>
-          <div style="display: flex; gap: 10px; margin-top: 8px;">
+          <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
             <a href="/live" target="_blank" class="btn btn-felt">Suivre le live →</a>
             <a href="/competitions" class="btn">Voir la compétition</a>
             <a href="/joueurs" class="btn">Liste des joueurs</a>
@@ -144,7 +170,7 @@ const closesLabel = computed(() => {
         </div>
 
         <!-- Formulaire d'inscription -->
-        <div v-if="isOpen" class="steps-bar" style="display: flex; gap: 0; margin-bottom: 36px;">
+        <div v-if="isOpen && !isFull" class="steps-bar" style="display: flex; gap: 0; margin-bottom: 36px;">
           <div v-for="(s, i) in steps" :key="i" style="flex: 1; display: flex; align-items: center; gap: 10px;">
             <span :style="{
               width: '28px', height: '28px', borderRadius: '50%',
