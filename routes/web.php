@@ -75,6 +75,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('/arbitres', [AdminRefereeController::class, 'index'])->name('referees.index');
     Route::post('/arbitres', [AdminRefereeController::class, 'store'])->name('referees.store');
+
+    Route::get('/classement', [\App\Http\Controllers\Admin\RatingController::class, 'index'])->name('rating.index');
+
+    Route::get('/competitions/{competition}/stats', [\App\Http\Controllers\Admin\StatsController::class, 'show'])->name('competitions.stats');
+    Route::post('/competitions/{competition}/stats/recalculate', [\App\Http\Controllers\Admin\StatsController::class, 'recalculate'])->name('competitions.stats.recalculate');
 });
 
 // Référee (espace mobile web fallback)

@@ -28,11 +28,14 @@ class CompetitionController extends Controller
 
     public function create(): Response
     {
+        $this->authorize('create', Competition::class);
+
         return Inertia::render('Admin/Competitions/Create');
     }
 
     public function store(StoreCompetitionRequest $request): RedirectResponse
     {
+        $this->authorize('create', Competition::class);
         $data = $request->validated();
         $data['slug'] = Str::slug($data['name']) . '-' . now()->timestamp;
         $data['status'] = 'draft';
@@ -67,6 +70,8 @@ class CompetitionController extends Controller
 
     public function edit(Competition $competition): Response
     {
+        $this->authorize('update', $competition);
+
         return Inertia::render('Admin/Competitions/Edit', [
             'competition' => $competition,
         ]);
@@ -74,6 +79,7 @@ class CompetitionController extends Controller
 
     public function update(UpdateCompetitionRequest $request, Competition $competition): RedirectResponse
     {
+        $this->authorize('update', $competition);
         $data = $request->validated();
         $data['format'] = $this->mapFormat($data['structure']);
         $competition->update($data);
@@ -85,6 +91,8 @@ class CompetitionController extends Controller
 
     public function uploadLogo(UploadCompetitionLogoRequest $request, Competition $competition): RedirectResponse
     {
+        $this->authorize('update', $competition);
+
         if ($competition->logo_path && Storage::disk('public')->exists($competition->logo_path)) {
             Storage::disk('public')->delete($competition->logo_path);
         }
@@ -97,6 +105,8 @@ class CompetitionController extends Controller
 
     public function removeLogo(Competition $competition): RedirectResponse
     {
+        $this->authorize('update', $competition);
+
         if ($competition->logo_path && Storage::disk('public')->exists($competition->logo_path)) {
             Storage::disk('public')->delete($competition->logo_path);
         }

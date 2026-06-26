@@ -266,8 +266,12 @@ class RefereeApiController extends Controller
 
     public function recordEvent(Request $request, GameMatch $match): JsonResponse
     {
+        if ($match->referee_id && $match->referee_id !== $request->user()->id && $request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Vous n\'êtes pas l\'arbitre assigné à ce match.'], 403);
+        }
+
         $data = $request->validate([
-            'event_type'   => ['required', 'string'],
+            'event_type'   => ['required', 'string', 'in:foul,safety,warning,miss,break_and_run,shot_clock_extension,shot_clock_violation,re_rack,timeout,coaching_request,other'],
             'player'       => ['nullable', 'in:A,B'],
             'frame_number' => ['nullable', 'integer', 'min:1'],
             'metadata'     => ['nullable', 'array'],

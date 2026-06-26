@@ -31,8 +31,9 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
             <div class="disp-a" style="font-size: 24px; margin-top: 6px;">{{ competition.name }}</div>
           </div>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
           <Link :href="`/competitions/${competition.slug}`" class="btn">Aperçu public ↗</Link>
+          <Link :href="`/admin/competitions/${competition.id}/stats`" class="btn">Statistiques →</Link>
           <Link :href="`/admin/competitions/${competition.id}/edit`" class="btn btn-felt">Éditer</Link>
         </div>
       </header>

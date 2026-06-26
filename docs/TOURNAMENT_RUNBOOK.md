@@ -24,11 +24,24 @@ This document covers the full lifecycle of a Club 8 Pool tournament from initial
 - [ ] Run `php artisan c8p:health-check` and resolve any failures.
 - [ ] Verify TV scoreboard displays correctly (see section 9).
 
+### Shot Clock Setup
+
+If the competition uses a shot clock, set the following before starting the event:
+
+1. In **Admin → Competitions → [Competition] → Settings**, enable `shot_clock_enabled = true`.
+2. Default values (can be overridden per competition):
+   - Main clock: **30 seconds**
+   - Late warning threshold: **15 seconds**
+   - Extensions allowed: **1 per player per match**
+3. Shot clock values are config-driven and displayed live in the referee interface — they are not hardcoded. Changes take effect immediately without a deployment.
+4. The referee app exposes `shot_clock_config` in the match payload (see `docs/API_REFEREE.md`).
+
 ### T-0 (day of event)
 - [ ] Run `php artisan c8p:health-check` one final time.
 - [ ] Confirm all referees have logged in to the mobile app successfully.
 - [ ] Confirm the public live page loads.
 - [ ] Brief referees on the incident procedure (see section 8).
+- [ ] If using shot clock: verify `shot_clock_enabled` is set and values are correct.
 
 ---
 
@@ -222,7 +235,29 @@ To show only specific tables (for multi-screen setups), append a query parameter
 
 ---
 
-## 10. Post-Competition
+## 10. Player Ratings
+
+Elo ratings are automatically updated when a match is closed by a referee.
+
+- Players can view their personal rating at `/joueurs/{player}` (discipline breakdown, games played, provisional/confirmed status).
+- Admins can view the full ranking at `/admin/classement`.
+- Ratings are per-discipline (e.g. `8ball`, `9ball`). A rating is **provisional** until the player has played enough rated games.
+
+### Recalculating ratings
+
+To recalculate all ratings from match history (e.g. after a result override):
+
+```bash
+php artisan c8p:recalculate-ratings
+# or for a specific competition:
+php artisan c8p:recalculate-ratings nationale-2025
+```
+
+This is safe to run multiple times — it is idempotent.
+
+---
+
+## 11. Post-Competition
 
 ### Export results
 
@@ -283,7 +318,7 @@ php artisan tinker
 
 ---
 
-## 11. Deployment Checklist
+## 12. Deployment Checklist
 
 Run this checklist for every production deployment.
 

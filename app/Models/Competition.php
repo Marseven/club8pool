@@ -15,6 +15,8 @@ class Competition extends Model
         'settings' => 'array',
         'alternate_break' => 'boolean',
         'push_out' => 'boolean',
+        'draw_randomize_unseeded' => 'boolean',
+        'seeded_players_count' => 'integer',
     ];
 
     protected $appends = ['logo_url'];

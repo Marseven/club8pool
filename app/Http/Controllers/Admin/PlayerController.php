@@ -26,6 +26,8 @@ class PlayerController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create', Player::class);
+
         $data = $request->validate([
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],

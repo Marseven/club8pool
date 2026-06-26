@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\AuditLogService;
 use App\Services\KnockoutGenerator;
 use App\Services\PlayerRatingService;
+use App\Services\SeedingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,12 @@ class KnockoutController extends Controller
 
         $qualifiers = $generator->qualifiers($competition);
         $ties = $generator->ties($qualifiers, $competition);
-        $pairs = $generator->seedPairs($qualifiers);
+
+        // Apply seeding strategy to get an ordered flat list of qualifiers,
+        // then produce bracket pairs from that ordering.
+        $seeder = new SeedingService();
+        $orderedFlat = $seeder->orderQualifiers($competition, $qualifiers);
+        $pairs = $generator->seedPairs($qualifiers, $orderedFlat);
 
         // Matchs déjà créés s'ils existent
         $existing = GameMatch::with(['playerA', 'playerB'])
@@ -94,10 +100,16 @@ class KnockoutController extends Controller
 
     public function closeMatch(Request $request, GameMatch $match): RedirectResponse
     {
+        $this->authorize('scoreFrame', $match);
+
         $data = $request->validate([
             'score_a' => ['required', 'integer', 'min:0'],
             'score_b' => ['required', 'integer', 'min:0'],
         ]);
+
+        if ($match->phase === 'knockout' && $data['score_a'] === $data['score_b']) {
+            return back()->withErrors(['score_a' => 'Un match de phase finale ne peut pas se terminer sur une égalité.']);
+        }
 
         $before = [
             'score_a' => $match->score_a,
@@ -114,7 +126,7 @@ class KnockoutController extends Controller
 
         try {
             (new \App\Services\BracketProgression())->advanceWinner($match->fresh());
-            PlayerRatingService::applyMatchResult($match->fresh());
+            (new PlayerRatingService())->applyMatchResult($match->fresh());
             AuditLogService::matchClosed($match->fresh(), $before);
         } catch (\Throwable $e) {
             // Log the error but don't block the response
@@ -137,6 +149,7 @@ class KnockoutController extends Controller
         ]);
 
         $competition = Competition::firstOrFail();
+        $this->authorize('generateBracket', $competition);
 
         DB::transaction(function () use ($competition, $data) {
             // Sanity : on attend autant de paires que (player_slots / 2) à la louche

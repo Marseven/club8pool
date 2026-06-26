@@ -34,14 +34,15 @@ class PlayerRatingService
         $match->loadMissing('competition');
         $discipline = $match->competition?->discipline ?? '8-ball';
 
-        // Idempotency: one event per match
-        if (RatingEvent::where('match_id', $match->id)->exists()) return;
-
         DB::transaction(function () use ($match, $discipline) {
             $playerA = Player::lockForUpdate()->find($match->player_a_id);
             $playerB = Player::lockForUpdate()->find($match->player_b_id);
 
             if (!$playerA || !$playerB) return;
+
+            // Idempotency check INSIDE transaction, after row-level locks on players,
+            // so concurrent calls are serialized and see the committed state.
+            if (RatingEvent::where('match_id', $match->id)->exists()) return;
 
             $ratingA = PlayerRating::lockForUpdate()->firstOrCreate(
                 ['player_id' => $playerA->id, 'discipline' => $discipline],

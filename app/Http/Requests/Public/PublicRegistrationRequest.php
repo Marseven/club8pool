@@ -16,10 +16,13 @@ class PublicRegistrationRequest extends FormRequest
         return [
             'first_name' => ['required', 'string', 'max:80'],
             'last_name'  => ['required', 'string', 'max:80'],
-            'email'      => ['nullable', 'email', 'max:160'],
-            'phone'      => ['nullable', 'string', 'max:30'],
-            'club_name'  => ['nullable', 'string', 'max:100'],
-            'fgb_card'   => ['nullable', 'string', 'max:30'],
+            'birthdate'  => ['required', 'date'],
+            'fgb_card'   => ['required', 'string', 'max:30'],
+            'phone'      => ['required', 'string', 'max:30'],
+            'email'      => ['required', 'email', 'max:160'],
+            'address'    => ['required', 'string', 'max:255'],
+            'club_id'    => ['nullable', 'exists:clubs,id'],
+            'cue'        => ['nullable', 'string', 'max:100'],
         ];
     }
 }

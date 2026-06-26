@@ -11,6 +11,9 @@ class Player extends Model
         'birthdate', 'cue', 'address', 'flag', 'rating', 'wins', 'losses',
     ];
 
+    // Never expose PII in public JSON serialization
+    protected $hidden = ['phone', 'email', 'address', 'birthdate'];
+
     protected $casts = [
         'birthdate' => 'date',
     ];

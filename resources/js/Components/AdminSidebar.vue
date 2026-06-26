@@ -18,6 +18,7 @@ const items = [
   ['players', 'Joueurs', '○', '/admin/joueurs'],
   ['referees', 'Arbitres', '△', '/admin/arbitres'],
   ['knockout', 'Phase finale', '⊙', '/admin/phase-finale'],
+  ['rating', 'Classement Elo', '≋', '/admin/classement'],
 ];
 
 const initials = (s) => (s || '??').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();

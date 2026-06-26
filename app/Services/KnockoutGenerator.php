@@ -87,9 +87,17 @@ class KnockoutGenerator
      *
      * Pour d'autres formats on tombe en repli sur un seeding 1-vs-N
      * en alternant les poules.
+     *
+     * If $orderedFlat is provided (pre-ordered by SeedingService), the pool-based
+     * logic is bypassed and standard 1-vs-N single-elimination pairing is used.
      */
-    public function seedPairs(array $qualifiers): array
+    public function seedPairs(array $qualifiers, array $orderedFlat = []): array
     {
+        // If a pre-ordered flat list is supplied, use standard bracket seeding.
+        if (! empty($orderedFlat)) {
+            return $this->pairsFromFlat($orderedFlat);
+        }
+
         $poolKeys = array_keys($qualifiers);
         sort($poolKeys);
         $size = count($poolKeys) > 0 ? count($qualifiers[$poolKeys[0]]) : 0;
@@ -116,10 +124,20 @@ class KnockoutGenerator
         foreach ($poolKeys as $key) {
             foreach ($qualifiers[$key] as $q) $flat[] = $q;
         }
-        $half = count($flat) / 2;
+        return $this->pairsFromFlat($flat);
+    }
+
+    /**
+     * Standard single-elimination pairing from an ordered flat list:
+     *   seed 1 vs seed N, seed 2 vs seed N-1, etc.
+     */
+    public function pairsFromFlat(array $flat): array
+    {
+        $total = count($flat);
+        $half  = (int) ($total / 2);
         $pairs = [];
         for ($i = 0; $i < $half; $i++) {
-            $pairs[] = [$flat[$i] ?? null, $flat[count($flat) - 1 - $i] ?? null];
+            $pairs[] = [$flat[$i] ?? null, $flat[$total - 1 - $i] ?? null];
         }
         return $pairs;
     }

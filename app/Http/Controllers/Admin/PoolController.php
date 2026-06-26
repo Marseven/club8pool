@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateMatchRequest;
 use App\Models\Competition;
 use App\Models\GameMatch;
 use App\Models\Pool;
@@ -68,16 +69,9 @@ class PoolController extends Controller
         ]);
     }
 
-    public function updateMatch(Request $request, GameMatch $match): RedirectResponse
+    public function updateMatch(UpdateMatchRequest $request, GameMatch $match): RedirectResponse
     {
-        $data = $request->validate([
-            'score_a' => ['required', 'integer', 'min:0'],
-            'score_b' => ['required', 'integer', 'min:0'],
-            'is_draw' => ['boolean'],
-            'warning_a' => ['boolean'],
-            'warning_b' => ['boolean'],
-            'note' => ['nullable', 'string'],
-        ]);
+        $data = $request->validated();
 
         $data['status'] = 'done';
         $data['ended_at'] = now();
