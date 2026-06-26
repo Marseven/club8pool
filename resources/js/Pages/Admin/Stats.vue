@@ -6,6 +6,7 @@ import AdminSidebar from '@/Components/AdminSidebar.vue';
 const props = defineProps({
   competition: Object,
   statistics: Array,
+  active: { type: String, default: 'comps' },
 });
 
 const recalculating = ref(false);
@@ -13,13 +14,10 @@ const recalculating = ref(false);
 const recalculate = () => {
   if (recalculating.value) return;
   recalculating.value = true;
-  router.post(
-    `/admin/competitions/${props.competition.id}/stats/recalculate`,
-    {},
-    {
-      onFinish: () => { recalculating.value = false; },
-    }
-  );
+  const url = props.active === 'stats'
+    ? '/admin/statistiques/recalculer'
+    : `/admin/competitions/${props.competition.id}/stats/recalculate`;
+  router.post(url, {}, { onFinish: () => { recalculating.value = false; } });
 };
 
 const winRate = (s) => {
@@ -31,7 +29,7 @@ const winRate = (s) => {
 <template>
   <Head :title="`Stats · ${competition.name}`" />
   <div style="display: flex; min-height: 100vh; background: var(--ink);">
-    <AdminSidebar active="comps" />
+    <AdminSidebar :active="active" />
     <main style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
 
       <header style="display: flex; justify-content: space-between; align-items: center;

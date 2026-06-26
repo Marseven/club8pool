@@ -14,10 +14,12 @@ const items = [
   ['dashboard', 'Tableau de bord', '◰', '/admin'],
   ['comps', 'Compétitions', '◇', '/admin/competitions'],
   ['pools', 'Poules', '▤', '/admin/poules'],
+  ['knockout', 'Phase finale', '⊙', '/admin/phase-finale'],
   ['import', 'Import Excel', '↓', '/admin/import'],
+  ['export', 'Exports', '⇩', '/admin/exports'],
   ['players', 'Joueurs', '○', '/admin/joueurs'],
   ['referees', 'Arbitres', '△', '/admin/arbitres'],
-  ['knockout', 'Phase finale', '⊙', '/admin/phase-finale'],
+  ['stats', 'Statistiques', '◈', '/admin/statistiques'],
   ['rating', 'Classement Elo', '≋', '/admin/classement'],
 ];
 

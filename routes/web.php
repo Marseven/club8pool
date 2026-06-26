@@ -82,6 +82,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('/competitions/{competition}/stats', [\App\Http\Controllers\Admin\StatsController::class, 'show'])->name('competitions.stats');
     Route::post('/competitions/{competition}/stats/recalculate', [\App\Http\Controllers\Admin\StatsController::class, 'recalculate'])->name('competitions.stats.recalculate');
+
+    Route::get('/statistiques', [\App\Http\Controllers\Admin\StatsController::class, 'showCurrent'])->name('stats.current');
+    Route::post('/statistiques/recalculer', [\App\Http\Controllers\Admin\StatsController::class, 'recalculateCurrent'])->name('stats.recalculate.current');
+
+    Route::get('/exports', [\App\Http\Controllers\Admin\ExportController::class, 'index'])->name('exports.index');
+    Route::get('/exports/excel', [\App\Http\Controllers\Admin\ExportController::class, 'downloadExcel'])->name('exports.excel');
+    Route::get('/exports/pdf', [\App\Http\Controllers\Admin\ExportController::class, 'printPdf'])->name('exports.pdf');
 });
 
 // Référee (espace mobile web fallback)
