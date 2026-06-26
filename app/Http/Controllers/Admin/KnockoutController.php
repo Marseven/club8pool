@@ -7,9 +7,12 @@ use App\Models\Competition;
 use App\Models\GameMatch;
 use App\Models\PoolTable;
 use App\Models\User;
+use App\Services\AuditLogService;
 use App\Services\KnockoutGenerator;
+use App\Services\PlayerRatingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -95,13 +98,32 @@ class KnockoutController extends Controller
             'score_a' => ['required', 'integer', 'min:0'],
             'score_b' => ['required', 'integer', 'min:0'],
         ]);
+
+        $before = [
+            'score_a' => $match->score_a,
+            'score_b' => $match->score_b,
+            'status'  => $match->status,
+        ];
+
         $data['status']   = 'done';
         $data['ended_at'] = now();
         if ($match->started_at && ! $match->ended_at) {
             $data['duration_seconds'] = (int) $match->started_at->diffInSeconds(now());
         }
         $match->update($data);
-        (new \App\Services\BracketProgression())->advanceWinner($match->fresh());
+
+        try {
+            (new \App\Services\BracketProgression())->advanceWinner($match->fresh());
+            PlayerRatingService::applyMatchResult($match->fresh());
+            AuditLogService::matchClosed($match->fresh(), $before);
+        } catch (\Throwable $e) {
+            // Log the error but don't block the response
+            \Illuminate\Support\Facades\Log::error('closeMatch post-processing failed', [
+                'match_id' => $match->id,
+                'error'    => $e->getMessage(),
+            ]);
+        }
+
         return back()->with('success', 'Match clôturé.');
     }
 
@@ -116,8 +138,11 @@ class KnockoutController extends Controller
 
         $competition = Competition::firstOrFail();
 
-        // Sanity : on attend autant de paires que (player_slots / 2) à la louche
-        (new KnockoutGenerator())->generate($competition, $data['pairs']);
+        DB::transaction(function () use ($competition, $data) {
+            // Sanity : on attend autant de paires que (player_slots / 2) à la louche
+            (new KnockoutGenerator())->generate($competition, $data['pairs']);
+            AuditLogService::bracketGenerated($competition);
+        });
 
         return back()->with('success', count($data['pairs']) . ' matchs de phase finale créés.');
     }
