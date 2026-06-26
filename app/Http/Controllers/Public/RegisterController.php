@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Public\PublicRegistrationRequest;
 use App\Models\Club;
 use App\Models\Competition;
 use App\Models\Player;
 use App\Models\Registration;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -56,7 +56,7 @@ class RegisterController extends Controller
         ]);
     }
 
-    public function store(Request $request, Competition $competition): RedirectResponse
+    public function store(PublicRegistrationRequest $request, Competition $competition): RedirectResponse
     {
         if (! $this->registrationsOpen($competition)) {
             return back()->with('error', $this->closedReason(
@@ -66,17 +66,7 @@ class RegisterController extends Controller
             ));
         }
 
-        $data = $request->validate([
-            'first_name' => ['required', 'string'],
-            'last_name' => ['required', 'string'],
-            'birthdate' => ['required', 'date'],
-            'fgb_card' => ['required', 'string'],
-            'phone' => ['required', 'string'],
-            'email' => ['required', 'email'],
-            'address' => ['required', 'string'],
-            'club_id' => ['nullable', 'exists:clubs,id'],
-            'cue' => ['nullable', 'string'],
-        ]);
+        $data = $request->validated();
 
         $player = Player::firstOrCreate(
             ['fgb_card' => $data['fgb_card']],

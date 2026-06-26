@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Registration extends Model
 {
-    protected $fillable = ['competition_id', 'pool_id', 'pool_slot', 'player_id', 'seed', 'status', 'registered_at'];
+    protected $fillable = ['competition_id', 'pool_id', 'pool_slot', 'player_id', 'seed', 'seed_rating', 'status', 'registered_at'];
 
     protected $casts = [
         'registered_at' => 'datetime',

@@ -153,6 +153,10 @@ class PlayerController extends Controller
             ->limit(10)
             ->get();
 
+        $ratings = \App\Models\PlayerRating::where('player_id', $player->id)
+            ->orderByDesc('rating')
+            ->get(['discipline', 'rating', 'games_played', 'provisional', 'last_match_at']);
+
         return Inertia::render('Public/Player', [
             'player' => $player->load('club'),
             'competition' => $competition,
@@ -166,6 +170,13 @@ class PlayerController extends Controller
             'totalPlayersInPool' => $totalPlayersInPool,
             'journey' => $journey,
             'history' => $history,
+            'ratings' => $ratings->map(fn ($r) => [
+                'discipline'    => $r->discipline,
+                'rating'        => $r->rating,
+                'games_played'  => $r->games_played,
+                'provisional'   => $r->provisional,
+                'last_match_at' => $r->last_match_at?->toIso8601String(),
+            ]),
         ]);
     }
 }

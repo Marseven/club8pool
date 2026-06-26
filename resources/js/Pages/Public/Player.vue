@@ -15,6 +15,7 @@ const props = defineProps({
   totalPlayersInPool: Number,
   journey: Array,
   history: Array,
+  ratings: { type: Array, default: () => [] },
 });
 
 const initials = computed(() => `${props.player.first_name?.[0] ?? ''}${props.player.last_name?.[0] ?? ''}`);
@@ -41,6 +42,8 @@ const fmtTime = (iso) => {
   const d = new Date(iso);
   return `${d.getUTCHours().toString().padStart(2, '0')}h${d.getUTCMinutes().toString().padStart(2, '0')}`;
 };
+
+const disciplineLabel = (d) => ({ '8ball': '8-Ball', '9ball': '9-Ball', '10ball': '10-Ball', 'snooker': 'Snooker' }[d] ?? d);
 </script>
 
 <template>
@@ -206,6 +209,34 @@ const fmtTime = (iso) => {
                 <template v-if="m.scheduled_at">{{ fmtTime(m.scheduled_at) }}</template>
                 <template v-else>—</template>
                 <template v-if="m.table"> · {{ m.table }}</template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Classement Elo -->
+    <section v-if="ratings?.length" style="padding: 32px 48px; border-bottom: 1px solid var(--line);">
+      <h3 class="disp-a" style="font-size: 24px; margin-bottom: 16px;">Classement Elo</h3>
+      <div class="tbl-scroll">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Discipline</th>
+              <th style="text-align: right;">Rating</th>
+              <th>Matchs</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="r in ratings" :key="r.discipline">
+              <td style="font-weight: 600;">{{ disciplineLabel(r.discipline) }}</td>
+              <td class="mono tnum" style="text-align: right; font-size: 18px; font-weight: 700;">{{ r.rating }}</td>
+              <td class="mono" style="color: var(--mute);">{{ r.games_played }} match{{ r.games_played !== 1 ? 's' : '' }}</td>
+              <td>
+                <span v-if="r.provisional" class="mono" style="font-size: 11px; letter-spacing: 0.12em; color: var(--mute);">PROVISOIRE</span>
+                <span v-else class="mono" style="font-size: 11px; letter-spacing: 0.12em; color: var(--felt-2);">CONFIRMÉ</span>
               </td>
             </tr>
           </tbody>

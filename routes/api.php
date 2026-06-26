@@ -3,7 +3,7 @@
 use App\Http\Controllers\Api\RefereeApiController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/referee/login', [RefereeApiController::class, 'login']);
+Route::post('/referee/login', [RefereeApiController::class, 'login'])->middleware('throttle:5,1');
 
 Route::middleware('auth:sanctum')->prefix('referee')->group(function () {
     Route::get('/me', [RefereeApiController::class, 'me']);
@@ -19,4 +19,7 @@ Route::middleware('auth:sanctum')->prefix('referee')->group(function () {
     Route::post('/matches/{match}/table', [RefereeApiController::class, 'assignTable']);
     Route::post('/matches/{match}/undo-frame', [RefereeApiController::class, 'undoFrame']);
     Route::post('/matches/{match}/warning', [RefereeApiController::class, 'addWarning']);
+    Route::post('/matches/{match}/events', [RefereeApiController::class, 'recordEvent']);
+    Route::post('/matches/{match}/incident', [RefereeApiController::class, 'createIncident']);
+    Route::post('/matches/{match}/tie-break', [RefereeApiController::class, 'resolveTiebreak']);
 });
