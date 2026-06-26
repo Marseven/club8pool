@@ -46,7 +46,13 @@ const statusLabel = (s) => ({ done: 'TERMINÉ', live: 'EN COURS', next: 'À VENI
       <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 48px; align-items: end;">
         <div>
           <div class="mono" style="font-size: 12px; letter-spacing: 0.2em; color: var(--mute); margin-bottom: 18px;">
-            {{ competition?.discipline?.toUpperCase() }} · POULES + PHASE FINALE
+            <template v-if="competition?.discipline">{{ competition.discipline.toUpperCase() }} · </template>
+            <template v-if="competition?.structure === 'pools_knockout'">
+              POULES<template v-if="['in_progress', 'finished'].includes(competition?.status)"> + PHASE FINALE</template>
+            </template>
+            <template v-else-if="competition?.structure === 'pools_only'">PHASE DE POULES</template>
+            <template v-else-if="competition?.structure === 'knockout'">ÉLIMINATION DIRECTE</template>
+            <template v-else-if="competition?.structure">{{ competition.structure.toUpperCase() }}</template>
           </div>
           <h1 class="disp-a" style="font-size: clamp(48px, 13vw, 132px); line-height: 0.85; word-break: break-word;">
             ICONE POOL<br /><span style="color: var(--felt-2);">CHAMPIONSHIP</span>

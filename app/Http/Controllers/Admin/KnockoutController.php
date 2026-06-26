@@ -19,10 +19,17 @@ use Inertia\Response;
 
 class KnockoutController extends Controller
 {
-    public function show(): Response
+    public function show(): \Illuminate\Http\RedirectResponse
     {
-        $competition = Competition::current(['pools'])
-            ?? Competition::with('pools')->orderByDesc('starts_on')->firstOrFail();
+        $competition = Competition::current()
+            ?? Competition::orderByDesc('starts_on')->firstOrFail();
+
+        return redirect()->route('admin.competition.knockout', $competition);
+    }
+
+    public function showCompetition(Competition $competition): Response
+    {
+        $competition->load('pools');
         $generator = new KnockoutGenerator();
 
         $qualifiers = $generator->qualifiers($competition);
@@ -140,6 +147,25 @@ class KnockoutController extends Controller
         return back()->with('success', 'Match clôturé.');
     }
 
+    public function generateForCompetition(Request $request, Competition $competition): RedirectResponse
+    {
+        $data = $request->validate([
+            'pairs' => ['required', 'array', 'min:1'],
+            'pairs.*' => ['array', 'size:2'],
+            'pairs.*.0.player_id' => ['nullable', 'integer', 'exists:players,id'],
+            'pairs.*.1.player_id' => ['nullable', 'integer', 'exists:players,id'],
+        ]);
+
+        $this->authorize('generateBracket', $competition);
+
+        DB::transaction(function () use ($competition, $data) {
+            (new KnockoutGenerator())->generate($competition, $data['pairs']);
+            AuditLogService::bracketGenerated($competition);
+        });
+
+        return back()->with('success', count($data['pairs']) . ' matchs de phase finale créés.');
+    }
+
     public function generate(Request $request): RedirectResponse
     {
         $data = $request->validate([
@@ -154,7 +180,6 @@ class KnockoutController extends Controller
         $this->authorize('generateBracket', $competition);
 
         DB::transaction(function () use ($competition, $data) {
-            // Sanity : on attend autant de paires que (player_slots / 2) à la louche
             (new KnockoutGenerator())->generate($competition, $data['pairs']);
             AuditLogService::bracketGenerated($competition);
         });

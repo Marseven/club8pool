@@ -117,6 +117,10 @@ const playerLabel = (pool, playerId) => {
             PHASE DE POULES · RACE TO {{ competition.pool_race_to ?? competition.race_to }}
           </div>
           <div class="disp-a" style="font-size: 28px; margin-top: 6px;">{{ competition.name }}</div>
+          <a :href="`/admin/competitions/${competition.id}`"
+             style="font-size: 11px; color: var(--mute); text-decoration: none; margin-top: 4px; display: inline-block;">
+            ← Compétition
+          </a>
         </div>
         <div class="pool-selector" style="display: flex; gap: 8px;">
           <button v-for="p in pools" :key="p.id" @click="selectedPool = p.id" :style="{

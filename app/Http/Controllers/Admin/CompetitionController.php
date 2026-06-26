@@ -115,6 +115,25 @@ class CompetitionController extends Controller
         return back()->with('success', 'Logo retiré.');
     }
 
+    public function archive(Competition $competition): RedirectResponse
+    {
+        $this->authorize('update', $competition);
+        $competition->update(['status' => 'finished']);
+
+        return redirect()->route('admin.competitions.show', $competition)
+            ->with('success', 'Compétition archivée.');
+    }
+
+    public function activate(Competition $competition, string $status): RedirectResponse
+    {
+        $this->authorize('update', $competition);
+        abort_unless(in_array($status, ['draft', 'registration', 'in_progress']), 422);
+        $competition->update(['status' => $status]);
+
+        return redirect()->route('admin.competitions.show', $competition)
+            ->with('success', 'Statut mis à jour.');
+    }
+
     private function mapFormat(string $structure): string
     {
         return match ($structure) {

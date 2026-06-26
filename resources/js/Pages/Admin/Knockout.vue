@@ -59,7 +59,7 @@ const generate = () => {
     ? 'Cela écrasera le bracket existant. Continuer ?'
     : 'Générer le bracket avec ces qualifiés ?')) return;
   submitting.value = true;
-  router.post('/admin/phase-finale', { pairs: localPairs.value }, {
+  router.post(`/admin/competitions/${props.competition.id}/phase-finale/generer`, { pairs: localPairs.value }, {
     onFinish: () => { submitting.value = false; },
   });
 };
@@ -145,6 +145,10 @@ const closeMatchToEdit = (m) => { scoringMatchId.value = null; openSaisir(m); };
         <div>
           <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">PHASE FINALE</div>
           <div class="disp-a" style="font-size: 28px; margin-top: 6px;">{{ competition.name }}</div>
+          <a :href="`/admin/competitions/${competition.id}`"
+             style="font-size: 11px; color: var(--mute); text-decoration: none; margin-top: 4px; display: inline-block;">
+            ← Compétition
+          </a>
         </div>
         <Chip :variant="progress.pool_ready ? 'felt' : 'live'">
           {{ progress.pool_done }}/{{ progress.pool_total }} POULES JOUÉES

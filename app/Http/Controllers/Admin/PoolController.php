@@ -17,10 +17,17 @@ use Inertia\Response;
 
 class PoolController extends Controller
 {
-    public function index(): Response
+    public function index(): \Illuminate\Http\RedirectResponse
     {
-        $competition = Competition::current(['pools.players.club'])
-            ?? Competition::with('pools.players.club')->orderByDesc('starts_on')->firstOrFail();
+        $competition = Competition::current()
+            ?? Competition::orderByDesc('starts_on')->firstOrFail();
+
+        return redirect()->route('admin.competition.pools', $competition);
+    }
+
+    public function showCompetition(Competition $competition): Response
+    {
+        $competition->load('pools.players.club');
 
         $pools = $competition->pools->map(function ($pool) {
             $matches = GameMatch::with(['playerA', 'playerB', 'table', 'referee'])

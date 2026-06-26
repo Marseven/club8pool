@@ -1,10 +1,24 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 import Chip from '@/Components/Chip.vue';
 import { competitionStatus, competitionStatusChip, registrationStatus, registrationStatusChip, label } from '@/utils/labels.js';
 
-defineProps({ competition: Object });
+const props = defineProps({ competition: Object });
+
+const archiving = ref(false);
+const archive = () => {
+  if (!confirm('Archiver cette compétition ? Elle ne sera plus visible sur les pages actives.')) return;
+  archiving.value = true;
+  router.post(`/admin/competitions/${props.competition.id}/archiver`, {}, {
+    onFinish: () => { archiving.value = false; },
+  });
+};
+
+const setStatus = (status) => {
+  router.post(`/admin/competitions/${props.competition.id}/statut/${status}`, {});
+};
 
 const structureLabel = {
   knockout:       'Élimination directe',
@@ -31,10 +45,28 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
             <div class="disp-a" style="font-size: 24px; margin-top: 6px;">{{ competition.name }}</div>
           </div>
         </div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <Link :href="`/competitions/${competition.slug}`" class="btn">Aperçu public ↗</Link>
-          <Link :href="`/admin/competitions/${competition.id}/stats`" class="btn">Statistiques →</Link>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+          <Link :href="`/competitions/${competition.slug}`" class="btn">Aperçu ↗</Link>
+          <Link v-if="competition.structure?.includes('pool')" :href="`/admin/competitions/${competition.id}/poules`" class="btn">Poules →</Link>
+          <Link v-if="competition.structure?.includes('knockout')" :href="`/admin/competitions/${competition.id}/phase-finale`" class="btn">Phase finale →</Link>
+          <Link :href="`/admin/competitions/${competition.id}/stats`" class="btn">Stats →</Link>
           <Link :href="`/admin/competitions/${competition.id}/edit`" class="btn btn-felt">Éditer</Link>
+          <!-- Status transitions -->
+          <template v-if="competition.status !== 'finished'">
+            <button v-if="competition.status === 'draft'" class="btn" @click="setStatus('registration')" style="cursor:pointer;">
+              → Inscriptions
+            </button>
+            <button v-if="competition.status === 'registration'" class="btn" @click="setStatus('in_progress')" style="cursor:pointer;">
+              → En cours
+            </button>
+            <button
+              class="btn"
+              style="border-color: #c0392b; color: #c0392b; cursor:pointer;"
+              :disabled="archiving"
+              @click="archive"
+            >{{ archiving ? '…' : 'Archiver ✕' }}</button>
+          </template>
+          <Chip v-else variant="">ARCHIVÉE</Chip>
         </div>
       </header>
 
@@ -116,7 +148,7 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
               <div class="disp-a" style="font-size: 18px;">POULE {{ p.name }}</div>
               <div class="mono" style="font-size: 10px; color: var(--mute); margin-top: 4px;">{{ p.size }} JOUEURS</div>
             </div>
-            <Link href="/admin/poules" class="btn" style="padding: 4px 10px; font-size: 11px;">Gérer →</Link>
+            <Link :href="`/admin/competitions/${competition.id}/poules`" class="btn" style="padding: 4px 10px; font-size: 11px;">Gérer →</Link>
           </div>
         </div>
 

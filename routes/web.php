@@ -58,6 +58,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/tirage', [DrawController::class, 'show'])->name('draw');
     Route::post('/tirage', [DrawController::class, 'commit'])->name('draw.commit');
 
+    // Competition-scoped pools + knockout (canonical)
+    Route::get('/competitions/{competition}/poules', [\App\Http\Controllers\Admin\PoolController::class, 'showCompetition'])->name('competition.pools');
+    Route::get('/competitions/{competition}/phase-finale', [\App\Http\Controllers\Admin\KnockoutController::class, 'showCompetition'])->name('competition.knockout');
+    Route::post('/competitions/{competition}/phase-finale/generer', [\App\Http\Controllers\Admin\KnockoutController::class, 'generateForCompetition'])->name('competition.knockout.generate');
+    Route::post('/competitions/{competition}/archiver', [\App\Http\Controllers\Admin\CompetitionController::class, 'archive'])->name('competitions.archive');
+    Route::post('/competitions/{competition}/statut/{status}', [\App\Http\Controllers\Admin\CompetitionController::class, 'activate'])->name('competitions.activate');
+
+    // Legacy redirects → current competition
     Route::get('/phase-finale', [\App\Http\Controllers\Admin\KnockoutController::class, 'show'])->name('knockout.show');
     Route::post('/phase-finale', [\App\Http\Controllers\Admin\KnockoutController::class, 'generate'])->name('knockout.generate');
     Route::post('/phase-finale/matchs/{match}/lancer', [\App\Http\Controllers\Admin\KnockoutController::class, 'startMatch'])->name('knockout.match.start');

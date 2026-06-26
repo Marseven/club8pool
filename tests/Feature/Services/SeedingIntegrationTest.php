@@ -259,13 +259,17 @@ class SeedingIntegrationTest extends TestCase
         // Competition must exist for Competition::with('pools')->firstOrFail()
         $comp = $this->makeCompetition();
 
+        // /admin/phase-finale now redirects to the competition-scoped URL
         $response = $this->actingAs($admin)
                          ->get('/admin/phase-finale');
+        $response->assertRedirect("/admin/competitions/{$comp->id}/phase-finale");
 
-        $response->assertStatus(200);
+        // Follow the redirect and verify the Inertia page renders with a 'pairs' prop
+        $response2 = $this->actingAs($admin)
+                          ->get("/admin/competitions/{$comp->id}/phase-finale");
+        $response2->assertStatus(200);
 
-        // Inertia returns component props as JSON in the page — 'pairs' must be present
-        $content = $response->getContent();
-        $this->assertStringContainsString('"pairs"', $content, 'KnockoutController::show() must pass pairs to the Inertia view');
+        $content = $response2->getContent();
+        $this->assertStringContainsString('"pairs"', $content, 'KnockoutController::showCompetition() must pass pairs to the Inertia view');
     }
 }

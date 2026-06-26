@@ -54,14 +54,32 @@ class Competition extends Model
     }
 
     /**
+     * Mark as finished any competition whose ends_on is in the past.
+     * Safe to call on every request — no-op when nothing needs closing.
+     */
+    public static function autoCloseExpired(): void
+    {
+        static::whereNotNull('ends_on')
+            ->whereDate('ends_on', '<', now()->toDateString())
+            ->whereNotIn('status', ['finished'])
+            ->update(['status' => 'finished']);
+    }
+
+    /**
      * Returns the competition that should be shown on public/admin pages.
      * Priority: in_progress → registration → draft (newest starts_on).
+     * Competitions without starts_on are ranked last.
      * Never returns a finished competition.
      */
     public static function current(array $with = []): ?self
     {
+        static::autoCloseExpired();
+
         foreach (['in_progress', 'registration', 'draft'] as $status) {
-            $query = static::where('status', $status)->orderByDesc('starts_on');
+            $query = static::where('status', $status)
+                // NULL starts_on sorted last (IS NULL = 1 > 0)
+                ->orderByRaw('(starts_on IS NULL) ASC')
+                ->orderByDesc('starts_on');
             if ($with) {
                 $query->with($with);
             }
