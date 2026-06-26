@@ -61,4 +61,15 @@ class Competition extends Model
             default => (int) $this->race_to,
         };
     }
+
+    /**
+     * Returns the race-to for a specific knockout round.
+     * Reads from settings['round_race_to'][round] if set, otherwise falls back
+     * to knockout_race_to, then race_to.
+     */
+    public function raceForRound(string $round): int
+    {
+        $perRound = $this->settings['round_race_to'] ?? [];
+        return (int) ($perRound[$round] ?? $this->knockout_race_to ?? $this->race_to);
+    }
 }

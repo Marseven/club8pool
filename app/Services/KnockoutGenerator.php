@@ -162,6 +162,12 @@ class KnockoutGenerator
             ->delete();
 
         $rounds = $this->roundChain(count($pairs));
+
+        // Determine before shifting whether the bracket includes a semi-final
+        // (needed to decide whether to create a 3P placeholder).
+        $hasThirdPlace = ($competition->settings['has_third_place_match'] ?? false)
+            && in_array('SF', $rounds, true);
+
         $firstRound = array_shift($rounds);
 
         foreach ($pairs as $i => [$a, $b]) {
@@ -192,15 +198,27 @@ class KnockoutGenerator
                 ]);
             }
         }
+
+        // Petite finale (3P) — created only when the competition explicitly enables it
+        if ($hasThirdPlace) {
+            GameMatch::create([
+                'competition_id' => $competition->id,
+                'phase'          => 'knockout',
+                'round'          => '3P',
+                'round_position' => 0,
+                'status'         => 'pending',
+            ]);
+        }
     }
 
     private function roundChain(int $pairs): array
     {
         return match (true) {
-            $pairs >= 8 => ['R16', 'QF', 'SF', 'F'],
-            $pairs === 4 => ['QF', 'SF', 'F'],
-            $pairs === 2 => ['SF', 'F'],
-            default => ['F'],
+            $pairs >= 16 => ['R32', 'R16', 'QF', 'SF', 'F'],
+            $pairs >= 8  => ['R16', 'QF', 'SF', 'F'],
+            $pairs >= 4  => ['QF', 'SF', 'F'],
+            $pairs >= 2  => ['SF', 'F'],
+            default      => ['F'],
         };
     }
 }
