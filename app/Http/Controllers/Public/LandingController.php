@@ -16,7 +16,7 @@ class LandingController extends Controller
 {
     public function __invoke(): Response
     {
-        $competition = Competition::with('pools')->first();
+        $competition = Competition::current(['pools']);
 
         $liveMatches = GameMatch::with(['playerA', 'playerB', 'table'])
             ->where('competition_id', $competition?->id)

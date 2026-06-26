@@ -19,7 +19,8 @@ class PoolController extends Controller
 {
     public function index(): Response
     {
-        $competition = Competition::with('pools.players.club')->firstOrFail();
+        $competition = Competition::current(['pools.players.club'])
+            ?? Competition::with('pools.players.club')->orderByDesc('starts_on')->firstOrFail();
 
         $pools = $competition->pools->map(function ($pool) {
             $matches = GameMatch::with(['playerA', 'playerB', 'table', 'referee'])

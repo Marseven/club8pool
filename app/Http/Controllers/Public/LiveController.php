@@ -13,7 +13,7 @@ class LiveController extends Controller
 {
     public function __invoke(): Response
     {
-        $competition = Competition::with('pools')->firstOrFail();
+        $competition = Competition::current(['pools']) ?? abort(404);
 
         $liveMatches = GameMatch::with(['playerA.club', 'playerB.club', 'table', 'referee'])
             ->where('competition_id', $competition->id)

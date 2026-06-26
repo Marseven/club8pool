@@ -15,7 +15,7 @@ class CompetitionController extends Controller
     {
         $competition = $slug
             ? Competition::where('slug', $slug)->firstOrFail()
-            : Competition::firstOrFail();
+            : (Competition::current() ?? abort(404));
 
         $pools = $competition->pools()->with(['players.club'])->get();
 

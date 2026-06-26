@@ -15,7 +15,8 @@ class DrawController extends Controller
 {
     public function show(): Response
     {
-        $competition = Competition::firstOrFail();
+        $competition = Competition::current()
+            ?? Competition::orderByDesc('starts_on')->firstOrFail();
         $registrations = Registration::with('player.club')
             ->where('competition_id', $competition->id)
             ->orderBy('seed')
@@ -40,7 +41,8 @@ class DrawController extends Controller
             'pairings.*' => ['array', 'size:2'],
         ]);
 
-        $competition = Competition::firstOrFail();
+        $competition = Competition::current()
+            ?? Competition::orderByDesc('starts_on')->firstOrFail();
 
         GameMatch::where('competition_id', $competition->id)->where('round', 'R16')->delete();
 

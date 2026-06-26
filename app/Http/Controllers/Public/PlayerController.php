@@ -15,7 +15,7 @@ class PlayerController extends Controller
 {
     public function index(): Response
     {
-        $competition = Competition::with('pools')->first();
+        $competition = Competition::current(['pools']);
 
         $registrations = Registration::with(['player.club', 'pool'])
             ->where('competition_id', $competition?->id)
@@ -76,7 +76,7 @@ class PlayerController extends Controller
 
     public function show(Player $player): Response
     {
-        $competition = Competition::first();
+        $competition = Competition::current();
 
         $registration = Registration::with('pool')
             ->where('competition_id', $competition?->id)

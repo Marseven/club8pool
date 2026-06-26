@@ -53,6 +53,26 @@ class Competition extends Model
         return $this->belongsToMany(Player::class, 'registrations')->withPivot(['seed', 'status'])->withTimestamps();
     }
 
+    /**
+     * Returns the competition that should be shown on public/admin pages.
+     * Priority: in_progress → registration → draft (newest starts_on).
+     * Never returns a finished competition.
+     */
+    public static function current(array $with = []): ?self
+    {
+        foreach (['in_progress', 'registration', 'draft'] as $status) {
+            $query = static::where('status', $status)->orderByDesc('starts_on');
+            if ($with) {
+                $query->with($with);
+            }
+            $comp = $query->first();
+            if ($comp) {
+                return $comp;
+            }
+        }
+        return null;
+    }
+
     public function raceForPhase(string $phase): int
     {
         return match ($phase) {

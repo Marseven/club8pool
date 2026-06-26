@@ -15,7 +15,8 @@ class DashboardController extends Controller
 {
     public function __invoke(): Response
     {
-        $competition = Competition::with('pools')->firstOrFail();
+        $competition = Competition::current(['pools'])
+            ?? Competition::with('pools')->orderByDesc('starts_on')->firstOrFail();
 
         $tables = PoolTable::with(['liveMatch.playerA', 'liveMatch.playerB', 'liveMatch.referee'])
             ->where('competition_id', $competition->id)

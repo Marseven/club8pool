@@ -12,6 +12,7 @@ use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Public\LiveController;
 use App\Http\Controllers\Public\PlayerController;
 use App\Http\Controllers\Public\RegisterController;
+use App\Http\Controllers\Public\TournamentsController;
 use App\Http\Controllers\Public\TvController;
 use App\Http\Controllers\Referee\RefereeController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,7 @@ Route::get('/joueurs/{player}', [PlayerController::class, 'show'])->name('player
 Route::get('/inscription', [RegisterController::class, 'index'])->name('register.index');
 Route::get('/inscription/{competition:slug}', [RegisterController::class, 'show'])->name('register.show');
 Route::post('/inscription/{competition:slug}', [RegisterController::class, 'store'])->name('register.store');
+Route::get('/tournois', [TournamentsController::class, 'index'])->name('tournaments.index');
 Route::get('/live', LiveController::class)->name('live');
 Route::get('/tv', [TvController::class, 'show'])->name('tv');
 Route::get('/tv/table/{tableId}', [TvController::class, 'show'])->name('tv.table');

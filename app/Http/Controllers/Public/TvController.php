@@ -13,7 +13,7 @@ class TvController extends Controller
 {
     public function show(?int $tableId = null): Response
     {
-        $competition = Competition::firstOrFail();
+        $competition = Competition::current() ?? abort(404);
 
         $match = GameMatch::with(['playerA.club', 'playerB.club', 'table', 'referee'])
             ->where('competition_id', $competition->id);

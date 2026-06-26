@@ -21,7 +21,8 @@ class KnockoutController extends Controller
 {
     public function show(): Response
     {
-        $competition = Competition::with('pools')->firstOrFail();
+        $competition = Competition::current(['pools'])
+            ?? Competition::with('pools')->orderByDesc('starts_on')->firstOrFail();
         $generator = new KnockoutGenerator();
 
         $qualifiers = $generator->qualifiers($competition);
@@ -148,7 +149,8 @@ class KnockoutController extends Controller
             'pairs.*.1.player_id' => ['nullable', 'integer', 'exists:players,id'],
         ]);
 
-        $competition = Competition::firstOrFail();
+        $competition = Competition::current()
+            ?? Competition::orderByDesc('starts_on')->firstOrFail();
         $this->authorize('generateBracket', $competition);
 
         DB::transaction(function () use ($competition, $data) {

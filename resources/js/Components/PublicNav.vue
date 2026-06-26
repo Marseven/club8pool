@@ -11,6 +11,7 @@ const open = ref(false);
 
 const links = [
   { label: 'Compétitions', href: '/competitions', external: false },
+  { label: 'Tournois', href: '/tournois', external: false },
   { label: 'Joueurs', href: '/joueurs', external: false },
   { label: 'Inscription', href: '/inscription', external: false },
   { label: 'Live ↗', href: '/live', external: true },

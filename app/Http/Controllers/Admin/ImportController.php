@@ -16,7 +16,8 @@ class ImportController extends Controller
     public function show(Request $request): Response
     {
         $preview = $request->session()->get('import_preview');
-        $competition = Competition::with('pools')->firstOrFail();
+        $competition = Competition::current(['pools'])
+            ?? Competition::with('pools')->orderByDesc('starts_on')->firstOrFail();
 
         return Inertia::render('Admin/Import', [
             'competition' => $competition,
