@@ -79,9 +79,9 @@ const closesLabel = computed(() => {
     <section class="register-layout" style="display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 73px);">
       <div class="register-sidebar" style="padding: 48px 56px; border-right: 1px solid var(--line);
                   background: var(--ink-2); display: flex; flex-direction: column;">
-        <Chip v-if="isOpen && !isFull" style="width: fit-content;" variant="felt">INSCRIPTIONS OUVERTES</Chip>
+        <Chip v-if="isOpen" style="width: fit-content;" variant="felt">INSCRIPTIONS OUVERTES</Chip>
         <Chip v-else style="width: fit-content;" variant="live">INSCRIPTIONS FERMÉES</Chip>
-        <Chip v-if="isOpen && isFull" style="width: fit-content; margin-top: 4px;" variant="">TABLEAU COMPLET</Chip>
+        <Chip v-if="isOpen && isFull" style="width: fit-content; margin-top: 6px;" variant="">TABLEAU COMPLET</Chip>
         <h1 class="disp-a" style="font-size: 80px; line-height: 0.92; margin-top: 24px;">
           {{ competition?.name?.split(' — ')[0] }}<br />
           <span style="color: var(--felt-2);">{{ yearLabel }}</span>
@@ -186,7 +186,7 @@ const closesLabel = computed(() => {
           </div>
         </div>
 
-        <form v-if="isOpen && step !== 3" @submit.prevent="submit">
+        <form v-if="isOpen && !isFull && step !== 3" @submit.prevent="submit">
           <template v-if="step === 0">
             <h2 class="disp-a" style="font-size: 40px;">Identité du joueur</h2>
             <p style="font-size: 13px; color: var(--mute); margin-top: 8px;">
@@ -268,7 +268,7 @@ const closesLabel = computed(() => {
           </div>
         </form>
 
-        <div v-if="isOpen && step === 3" style="padding: 60px 0; text-align: center;">
+        <div v-if="isOpen && !isFull && step === 3" style="padding: 60px 0; text-align: center;">
           <div style="color: var(--felt-2);"><Check :size="48" /></div>
           <h2 class="disp-a" style="font-size: 40px; margin-top: 18px;">Inscription envoyée</h2>
           <p style="font-size: 14px; color: var(--mute); margin-top: 12px;">
