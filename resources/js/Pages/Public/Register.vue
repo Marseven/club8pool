@@ -12,6 +12,7 @@ const props = defineProps({
   registered: Number,
   isOpen: Boolean,
   isFull: Boolean,
+  onlineRegistrationEnabled: { type: Boolean, default: true },
   closedReason: String,
 });
 
@@ -120,19 +121,23 @@ const closesLabel = computed(() => {
 
       <div class="register-form-panel" style="padding: 48px 56px;">
 
-        <!-- État 1 : inscriptions ouvertes mais tableau complet → contact organisateur -->
-        <div v-if="isOpen && isFull" style="display: flex; flex-direction: column; align-items: flex-start; gap: 22px; padding: 40px 0;">
+        <!-- État 1 : ouvertes en présentiel (no online) OU tableau complet -->
+        <div v-if="isOpen && (!onlineRegistrationEnabled || isFull)" style="display: flex; flex-direction: column; align-items: flex-start; gap: 22px; padding: 40px 0;">
           <div style="display: flex; align-items: center; gap: 12px;">
             <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(45,168,118,0.10);
                         border: 1px solid rgba(45,168,118,0.35); display: flex; align-items: center; justify-content: center;
-                        font-family: var(--font-display-a); font-size: 26px; color: var(--felt-2);">48</div>
+                        font-family: var(--font-display-a); font-size: 26px; color: var(--felt-2);">{{ registered }}</div>
             <div>
               <div class="mono" style="font-size: 11px; letter-spacing: 0.22em; color: var(--felt-2);">INSCRIPTIONS OUVERTES</div>
-              <div class="disp-a" style="font-size: 26px; margin-top: 6px;">Tableau complet</div>
+              <div class="disp-a" style="font-size: 26px; margin-top: 6px;">
+                {{ isFull ? 'Tableau complet' : 'En présentiel uniquement' }}
+              </div>
             </div>
           </div>
           <p style="font-size: 14px; color: var(--chalk-2); max-width: 480px; line-height: 1.6;">
-            Les {{ slots }} places ont été attribuées. Les inscriptions se font sur place auprès de l'organisateur.
+            <template v-if="isFull">Les {{ slots }} places ont été attribuées. Les</template>
+            <template v-else">Les</template>
+            inscriptions se font sur place auprès de l'organisateur.
           </p>
           <p style="font-size: 13px; color: var(--mute); line-height: 1.6;">
             Vous souhaitez vous inscrire sur liste d'attente ou obtenir plus d'informations ? Contactez directement la FGB.
@@ -170,7 +175,7 @@ const closesLabel = computed(() => {
         </div>
 
         <!-- Formulaire d'inscription -->
-        <div v-if="isOpen && !isFull" class="steps-bar" style="display: flex; gap: 0; margin-bottom: 36px;">
+        <div v-if="isOpen && onlineRegistrationEnabled && !isFull" class="steps-bar" style="display: flex; gap: 0; margin-bottom: 36px;">
           <div v-for="(s, i) in steps" :key="i" style="flex: 1; display: flex; align-items: center; gap: 10px;">
             <span :style="{
               width: '28px', height: '28px', borderRadius: '50%',
@@ -186,7 +191,7 @@ const closesLabel = computed(() => {
           </div>
         </div>
 
-        <form v-if="isOpen && !isFull && step !== 3" @submit.prevent="submit">
+        <form v-if="isOpen && onlineRegistrationEnabled && !isFull && step !== 3" @submit.prevent="submit">
           <template v-if="step === 0">
             <h2 class="disp-a" style="font-size: 40px;">Identité du joueur</h2>
             <p style="font-size: 13px; color: var(--mute); margin-top: 8px;">
@@ -268,7 +273,7 @@ const closesLabel = computed(() => {
           </div>
         </form>
 
-        <div v-if="isOpen && !isFull && step === 3" style="padding: 60px 0; text-align: center;">
+        <div v-if="isOpen && onlineRegistrationEnabled && !isFull && step === 3" style="padding: 60px 0; text-align: center;">
           <div style="color: var(--felt-2);"><Check :size="48" /></div>
           <h2 class="disp-a" style="font-size: 40px; margin-top: 18px;">Inscription envoyée</h2>
           <p style="font-size: 14px; color: var(--mute); margin-top: 12px;">

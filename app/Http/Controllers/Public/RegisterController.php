@@ -49,6 +49,7 @@ class RegisterController extends Controller
             'registered' => $registered,
             'isOpen' => $this->registrationsOpen($competition),
             'isFull' => $registered >= $slots,
+            'onlineRegistrationEnabled' => (bool) ($competition->settings['online_registration'] ?? true),
             'closedReason' => $this->closedReason($competition, $registered, $slots),
             'other' => Competition::where('id', '!=', $competition->id)
                 ->orderByDesc('starts_on')

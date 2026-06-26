@@ -58,6 +58,7 @@ const form = useForm({
   starts_on: props.competition.starts_on?.slice(0, 10),
   ends_on: props.competition.ends_on?.slice(0, 10),
   registration_closes_at: props.competition.registration_closes_at?.slice(0, 16),
+  online_registration_enabled: props.competition.settings?.online_registration ?? true,
 });
 
 const racePresets = [3, 5, 7, 9, 11];
@@ -278,6 +279,12 @@ const submit = () => {
             <input v-model.number="form.prize_pool" type="number" />
           </label>
         </div>
+
+        <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; cursor: pointer;">
+          <input v-model="form.online_registration_enabled" type="checkbox" style="width: auto; margin: 0;" />
+          <span style="font-size: 13px; font-weight: 600;">Inscriptions en ligne activées</span>
+          <span style="font-size: 12px; color: var(--mute); margin-left: 4px;">— décocher pour mode présentiel uniquement</span>
+        </label>
 
         <div style="display: flex; gap: 10px;">
           <Link :href="`/admin/competitions/${competition.id}`" class="btn">Annuler</Link>

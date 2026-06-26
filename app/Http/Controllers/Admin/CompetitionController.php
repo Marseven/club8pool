@@ -82,6 +82,9 @@ class CompetitionController extends Controller
         $this->authorize('update', $competition);
         $data = $request->validated();
         $data['format'] = $this->mapFormat($data['structure']);
+        $onlineReg = $data['online_registration_enabled'] ?? true;
+        unset($data['online_registration_enabled']);
+        $data['settings'] = array_merge($competition->settings ?? [], ['online_registration' => (bool) $onlineReg]);
         $competition->update($data);
 
         AuditLogService::log('competition.updated', $competition, [], ['name' => $competition->name], $competition->id);

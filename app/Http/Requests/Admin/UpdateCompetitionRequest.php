@@ -41,6 +41,7 @@ class UpdateCompetitionRequest extends FormRequest
             'ends_on'               => ['nullable', 'date', 'after_or_equal:starts_on'],
             'registration_closes_at' => ['nullable', 'date'],
             'status'                => ['nullable', 'in:draft,registration,in_progress,finished'],
+            'online_registration_enabled' => ['boolean'],
         ];
     }
 }
