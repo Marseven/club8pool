@@ -2,21 +2,40 @@
 
 namespace App\Models;
 
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 
-class Player extends Model
+class Player extends Model implements AuthenticatableContract
 {
+    use Authenticatable;
+
     protected $fillable = [
         'first_name', 'last_name', 'club_id', 'fgb_card', 'phone', 'email',
         'birthdate', 'cue', 'address', 'flag', 'rating', 'wins', 'losses',
+        'login_name', 'login_slug', 'password', 'must_change_password',
+        'last_login_at', 'profile_photo_path', 'is_player_account_enabled',
     ];
 
     // Never expose PII in public JSON serialization
-    protected $hidden = ['phone', 'email', 'address', 'birthdate'];
+    protected $hidden = ['phone', 'email', 'address', 'birthdate', 'password', 'remember_token'];
 
     protected $casts = [
-        'birthdate' => 'date',
+        'birthdate'                  => 'date',
+        'must_change_password'       => 'boolean',
+        'is_player_account_enabled'  => 'boolean',
+        'last_login_at'              => 'datetime',
     ];
+
+    public function getAuthIdentifierName(): string
+    {
+        return 'id';
+    }
+
+    public function getAuthPasswordName(): string
+    {
+        return 'password';
+    }
 
     public function getNameAttribute(): string
     {
@@ -52,5 +71,15 @@ class Player extends Model
     public function matchesAsB()
     {
         return $this->hasMany(GameMatch::class, 'player_b_id');
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(PlayerRating::class);
+    }
+
+    public function competitionStats()
+    {
+        return $this->hasMany(PlayerCompetitionStatistic::class);
     }
 }

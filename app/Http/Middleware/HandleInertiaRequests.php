@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -43,6 +44,15 @@ class HandleInertiaRequests extends Middleware
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
                     'role' => $request->user()->role,
+                ] : null,
+            ],
+            'auth_player' => [
+                'player' => Auth::guard('player')->check() ? [
+                    'id'                   => Auth::guard('player')->user()->id,
+                    'name'                 => Auth::guard('player')->user()->name,
+                    'login_name'           => Auth::guard('player')->user()->login_name,
+                    'must_change_password' => Auth::guard('player')->user()->must_change_password,
+                    'profile_photo_path'   => Auth::guard('player')->user()->profile_photo_path,
                 ] : null,
             ],
             'flash' => [

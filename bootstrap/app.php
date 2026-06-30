@@ -20,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureAdmin::class,
             'referee' => \App\Http\Middleware\EnsureReferee::class,
+            'player.auth' => \App\Http\Middleware\EnsurePlayerAuth::class,
+            'player.pwd' => \App\Http\Middleware\EnsurePlayerPasswordChanged::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
