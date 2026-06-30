@@ -9,11 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('matches', function (Blueprint $table) {
-            $table->unsignedInteger('race_to_override')->nullable()->after('race_to');
-            $table->text('race_to_override_reason')->nullable()->after('race_to_override');
-            $table->foreignId('race_to_overridden_by')->nullable()->after('race_to_override_reason')
+            $table->unsignedInteger('race_to_override')->nullable();
+            $table->text('race_to_override_reason')->nullable();
+            $table->foreignId('race_to_overridden_by')->nullable()
                 ->constrained('users')->nullOnDelete();
-            $table->timestamp('race_to_overridden_at')->nullable()->after('race_to_overridden_by');
+            $table->timestamp('race_to_overridden_at')->nullable();
         });
     }
 
