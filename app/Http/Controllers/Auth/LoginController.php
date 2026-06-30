@@ -52,17 +52,23 @@ class LoginController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string'],
-            'pin' => ['required', 'string'],
+            'pin'  => ['required', 'string'],
         ]);
 
-        $user = User::whereRaw('LOWER(name) = ?', [strtolower(trim($data['name']))])
-            ->where('role', 'referee')
-            ->first();
+        $resolver = new \App\Services\RefereeLoginResolver();
+        $error = null;
+        $user = $resolver->resolve($data['name'], $error);
 
-        if (! $user || ! $user->pin || ! Hash::check($data['pin'], $user->pin)) {
-            return back()->withErrors([
-                'name' => 'Prénom ou PIN invalide.',
-            ])->onlyInput('name');
+        if (!$user) {
+            return back()->withErrors(['name' => $error ?? 'Prénom ou PIN invalide.'])->onlyInput('name');
+        }
+
+        if (!($user->is_referee_active ?? true)) {
+            return back()->withErrors(['name' => 'Ce compte arbitre est désactivé.'])->onlyInput('name');
+        }
+
+        if (!$user->pin || !Hash::check($data['pin'], $user->pin)) {
+            return back()->withErrors(['name' => 'Prénom ou PIN invalide.'])->onlyInput('name');
         }
 
         Auth::login($user, $request->boolean('remember'));

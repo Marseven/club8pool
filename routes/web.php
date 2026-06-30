@@ -106,7 +106,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/exports/pdf', [\App\Http\Controllers\Admin\ExportController::class, 'printPdf'])->name('exports.pdf');
 });
 
-// Référee (espace mobile web fallback)
+// Référée (espace mobile web fallback)
 Route::middleware(['auth', 'referee'])->prefix('arbitre')->name('referee.')->group(function () {
     Route::get('/', [RefereeController::class, 'queue'])->name('queue');
     Route::get('/tables', [RefereeController::class, 'tables'])->name('tables');
@@ -116,4 +116,30 @@ Route::middleware(['auth', 'referee'])->prefix('arbitre')->name('referee.')->gro
     Route::post('/match/{match}/frame', [RefereeController::class, 'commitFrame'])->name('match.frame');
     Route::post('/match/{match}/signer', [RefereeController::class, 'sign'])->name('match.sign');
     Route::post('/match/{match}/claim', [RefereeController::class, 'claim'])->name('match.claim');
+});
+
+// ─── Espace joueur ───────────────────────────────────────────────────────────
+use App\Http\Controllers\Player\PlayerAuthController;
+use App\Http\Controllers\Player\PlayerDashboardController;
+use App\Http\Controllers\Player\PlayerPhotoController;
+
+Route::prefix('joueur')->name('player.')->group(function () {
+    // Auth (unauthenticated)
+    Route::get('/login',  [PlayerAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [PlayerAuthController::class, 'login'])->name('login.post')
+        ->middleware('throttle:10,1');
+    Route::post('/logout', [PlayerAuthController::class, 'logout'])->name('logout');
+
+    // Password change (requires player auth, can access even if must_change_password)
+    Route::middleware(['player.auth'])->group(function () {
+        Route::get('/password/change',  [PlayerAuthController::class, 'showPasswordChange'])->name('password.change');
+        Route::post('/password/change', [PlayerAuthController::class, 'changePassword'])->name('password.change.post');
+    });
+
+    // Protected player area (requires auth + password changed)
+    Route::middleware(['player.auth', 'player.pwd'])->group(function () {
+        Route::get('/dashboard',                  [PlayerDashboardController::class, 'dashboard'])->name('dashboard');
+        Route::get('/competitions/{competition}', [PlayerDashboardController::class, 'competition'])->name('competition');
+        Route::post('/photo',                     [PlayerPhotoController::class, 'store'])->name('photo');
+    });
 });
