@@ -18,38 +18,34 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Comptes
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@club8pool.ga',
+        User::firstOrCreate(['email' => 'admin@club8pool.ga'], [
+            'name'     => 'Admin',
             'password' => Hash::make('password'),
-            'role' => 'admin',
-            'title' => 'Directeur de compétition',
+            'role'     => 'admin',
+            'title'    => 'Directeur de compétition',
         ]);
 
-        User::create([
-            'name' => 'Eric',
-            'email' => 'eric@club8pool.ga',
+        User::firstOrCreate(['email' => 'eric@club8pool.ga'], [
+            'name'     => 'Eric',
             'fgb_card' => 'ICN-ARB-001',
-            'pin' => Hash::make('12345'),
+            'pin'      => Hash::make('12345'),
             'password' => Hash::make('password'),
-            'role' => 'referee',
-            'title' => 'Arbitre',
+            'role'     => 'referee',
+            'title'    => 'Arbitre',
         ]);
 
-        User::create([
-            'name' => 'T-One',
-            'email' => 'tone@club8pool.ga',
+        User::firstOrCreate(['email' => 'tone@club8pool.ga'], [
+            'name'     => 'T-One',
             'fgb_card' => 'ICN-ARB-002',
-            'pin' => Hash::make('12345'),
+            'pin'      => Hash::make('12345'),
             'password' => Hash::make('password'),
-            'role' => 'referee',
-            'title' => 'Arbitre',
+            'role'     => 'referee',
+            'title'    => 'Arbitre',
         ]);
 
-        $club = Club::create([
+        $club = Club::firstOrCreate(['slug' => 'icone-pool'], [
             'name' => 'Icone Pool',
             'city' => 'Libreville',
-            'slug' => 'icone-pool',
         ]);
 
         // Liste des joueurs par poule (cf. fichier Excel)
@@ -60,7 +56,7 @@ class DatabaseSeeder extends Seeder
             'D' => ['Amaury', 'Dimitri', 'Hakim', 'Hani', 'Zhao', 'Dr Joel', 'Ismael'],
         ];
 
-        $competition = Competition::create([
+        $competition = Competition::firstOrCreate(['slug' => 'icone-pool-championship-2026'], [
             'name' => 'Icone Pool Championship',
             'slug' => 'icone-pool-championship-2026',
             'discipline' => '8-ball',
@@ -104,59 +100,63 @@ class DatabaseSeeder extends Seeder
             ['Table 1', 'Salle principale', 'live'],
             ['Table 2', 'Salle principale', 'live'],
         ] as $t) {
-            $tableModels->push(PoolTable::create([
-                'competition_id' => $competition->id,
-                'name' => $t[0],
-                'location' => $t[1],
-                'status' => $t[2],
-            ]));
+            $tableModels->push(PoolTable::firstOrCreate(
+                ['competition_id' => $competition->id, 'name' => $t[0]],
+                ['location' => $t[1], 'status' => $t[2]]
+            ));
         }
 
         // Création des joueurs et des poules + inscriptions
         $playersByLabel = [];
+        $fgbIndex = 1;
         foreach ($pools as $poolName => $names) {
-            $pool = Pool::create([
-                'competition_id' => $competition->id,
-                'name' => $poolName,
-                'position' => ord($poolName) - ord('A'),
-                'size' => count($names),
-            ]);
+            $pool = Pool::firstOrCreate(
+                ['competition_id' => $competition->id, 'name' => $poolName],
+                ['position' => ord($poolName) - ord('A'), 'size' => count($names)]
+            );
 
             foreach ($names as $slot => $name) {
                 $parts = explode(' ', $name);
                 $first = $parts[0];
-                $last = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '';
+                $last  = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '';
+                $fgb   = 'ICN-2026-' . sprintf('%03d', $fgbIndex++);
 
-                $player = Player::create([
-                    'first_name' => $first,
-                    'last_name' => $last !== '' ? strtoupper($last) : '',
-                    'club_id' => $club->id,
-                    'fgb_card' => 'ICN-2026-' . sprintf('%03d', count($playersByLabel) + 1),
-                    'phone' => null,
-                    'email' => null,
-                    'birthdate' => null,
-                    'cue' => null,
-                    'address' => null,
-                    'rating' => 1500,
-                    'wins' => 0,
-                    'losses' => 0,
-                ]);
+                $player = Player::firstOrCreate(
+                    ['fgb_card' => $fgb],
+                    [
+                        'first_name' => $first,
+                        'last_name'  => $last !== '' ? strtoupper($last) : '',
+                        'club_id'    => $club->id,
+                        'phone'      => null,
+                        'email'      => null,
+                        'birthdate'  => null,
+                        'cue'        => null,
+                        'address'    => null,
+                        'rating'     => 1500,
+                        'wins'       => 0,
+                        'losses'     => 0,
+                    ]
+                );
 
-                Registration::create([
-                    'competition_id' => $competition->id,
-                    'pool_id' => $pool->id,
-                    'pool_slot' => $slot + 1,
-                    'player_id' => $player->id,
-                    'seed' => null,
-                    'status' => 'paid',
-                    'registered_at' => now()->subDays(rand(5, 20)),
-                ]);
+                Registration::firstOrCreate(
+                    ['competition_id' => $competition->id, 'player_id' => $player->id],
+                    [
+                        'pool_id'      => $pool->id,
+                        'pool_slot'    => $slot + 1,
+                        'seed'         => null,
+                        'status'       => 'paid',
+                        'registered_at'=> now()->subDays(rand(5, 20)),
+                    ]
+                );
 
                 $playersByLabel[$poolName . ($slot + 1)] = $player;
                 $playersByLabel[$name] = $player;
             }
 
-            RoundRobinGenerator::generate($pool);
+            // Génère les matchs seulement si la poule n'en a pas encore
+            if ($pool->matches()->count() === 0) {
+                RoundRobinGenerator::generate($pool);
+            }
         }
 
         // Aucun match joué pour l'instant : tous les 84 matchs de poule
