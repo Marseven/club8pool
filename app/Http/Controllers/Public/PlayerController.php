@@ -17,6 +17,28 @@ class PlayerController extends Controller
     {
         $competition = Competition::current(['pools']);
 
+        // If no active competition, show all players globally
+        if (!$competition) {
+            $allPlayers = \App\Models\Player::with('club')
+                ->orderByDesc('rating')
+                ->limit(100)
+                ->get()
+                ->map(fn ($p) => [
+                    'id'    => $p->id,
+                    'name'  => trim($p->first_name . ' ' . $p->last_name),
+                    'club'  => $p->club?->name,
+                    'rating'=> $p->rating,
+                ]);
+
+            return Inertia::render('Public/Players', [
+                'competition' => null,
+                'pools'       => collect(),
+                'unassigned'  => collect(),
+                'allPlayers'  => $allPlayers,
+                'totalPlayers'=> $allPlayers->count(),
+            ]);
+        }
+
         $registrations = Registration::with(['player.club', 'pool'])
             ->where('competition_id', $competition?->id)
             ->orderBy('pool_id')
@@ -70,6 +92,7 @@ class PlayerController extends Controller
                 'club' => $r->player->club?->name,
                 'rating' => $r->player->rating,
             ]),
+            'allPlayers'  => collect(),
             'totalPlayers' => $registrations->count(),
         ]);
     }

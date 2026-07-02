@@ -11,6 +11,28 @@ use Inertia\Response;
 
 class CompetitionController extends Controller
 {
+    public function index(): Response
+    {
+        $competitions = Competition::withCount(['registrations', 'matches'])
+            ->orderByDesc('starts_on')
+            ->get()
+            ->groupBy('status')
+            ->map(fn ($group) => $group->values());
+
+        // Ordered status groups for display
+        $grouped = [
+            'in_progress'  => $competitions->get('in_progress', collect()),
+            'registration' => $competitions->get('registration', collect()),
+            'draft'        => $competitions->get('draft', collect()),
+            'finished'     => $competitions->get('finished', collect()),
+        ];
+
+        return Inertia::render('Public/Competitions', [
+            'grouped' => $grouped,
+            'total'   => Competition::count(),
+        ]);
+    }
+
     public function show(?string $slug = null): Response
     {
         $competition = $slug

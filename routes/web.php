@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public
 Route::get('/', LandingController::class)->name('home');
-Route::get('/competitions', [CompetitionController::class, 'show'])->name('competition.current');
+Route::get('/competitions', [CompetitionController::class, 'index'])->name('competitions.index');
 Route::get('/competitions/{slug}', [CompetitionController::class, 'show'])->name('competition.show');
 Route::get('/joueurs', [PlayerController::class, 'index'])->name('players.index');
 Route::get('/joueurs/{player}', [PlayerController::class, 'show'])->name('player.show');
@@ -42,6 +42,11 @@ Route::get('/tv/table/{tableId}', [TvController::class, 'show'])->name('tv.table
 Route::get('/login', [LoginController::class, 'showLogin'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Alias referee login — redirects to /login with referee mode pre-selected
+Route::get('/arbitre/login', function () {
+    return redirect('/login?mode=referee');
+})->name('referee.login');
 
 // Admin
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
