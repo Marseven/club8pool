@@ -172,15 +172,17 @@ class KnockoutGenerator
 
         foreach ($pairs as $i => [$a, $b]) {
             GameMatch::create([
-                'competition_id' => $competition->id,
-                'phase' => 'knockout',
-                'round' => $firstRound,
-                'round_position' => $i,
-                'player_a_id' => $a['player_id'] ?? null,
-                'player_b_id' => $b['player_id'] ?? null,
-                'score_a' => 0,
-                'score_b' => 0,
-                'status' => 'scheduled',
+                'competition_id'  => $competition->id,
+                'phase'           => 'knockout',
+                'round'           => $firstRound,
+                'round_position'  => $i,
+                'player_a_id'     => $a['player_id'] ?? null,
+                'player_b_id'     => $b['player_id'] ?? null,
+                'player_a_source' => $a['source'] ?? null,
+                'player_b_source' => $b['source'] ?? null,
+                'score_a'         => 0,
+                'score_b'         => 0,
+                'status'          => 'scheduled',
             ]);
         }
 

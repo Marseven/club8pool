@@ -132,6 +132,11 @@ class SummerEditionSeeder extends Seeder
             }
         }
 
+        // Always ensure knockout_mapping_strategy is set (idempotent backfill for existing records)
+        if (! $competition->knockout_mapping_strategy) {
+            $competition->update(['knockout_mapping_strategy' => $cfg['competition']['knockout_mapping_strategy']]);
+        }
+
         // ── 2. Tables de jeu ─────────────────────────────────────────────────
         foreach ($cfg['tables'] as $tableData) {
             PoolTable::firstOrCreate(

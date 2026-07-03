@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\AuditLogService;
 use App\Services\KnockoutGenerator;
 use App\Services\PlayerRatingService;
+use App\Services\PoolKnockoutMappingService;
 use App\Services\SeedingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,11 +36,22 @@ class KnockoutController extends Controller
         $qualifiers = $generator->qualifiers($competition);
         $ties = $generator->ties($qualifiers, $competition);
 
-        // Apply seeding strategy to get an ordered flat list of qualifiers,
-        // then produce bracket pairs from that ordering.
-        $seeder = new SeedingService();
-        $orderedFlat = $seeder->orderQualifiers($competition, $qualifiers);
-        $pairs = $generator->seedPairs($qualifiers, $orderedFlat);
+        // Detect knockout mapping strategy
+        $knockoutStrategy = $competition->knockout_mapping_strategy ?? null;
+
+        if ($knockoutStrategy === PoolKnockoutMappingService::STRATEGY) {
+            $mappingService = new PoolKnockoutMappingService();
+            try {
+                $pairs = $mappingService->buildPairs($qualifiers);
+            } catch (\InvalidArgumentException $e) {
+                $pairs = [];
+            }
+        } else {
+            // Default: apply seeding strategy then standard bracket pairing
+            $seeder = new SeedingService();
+            $orderedFlat = $seeder->orderQualifiers($competition, $qualifiers);
+            $pairs = $generator->seedPairs($qualifiers, $orderedFlat);
+        }
 
         // Matchs déjà créés s'ils existent
         $existing = GameMatch::with(['playerA', 'playerB'])
@@ -69,6 +81,10 @@ class KnockoutController extends Controller
                 'pool_total' => $poolTotal,
                 'pool_ready' => $poolDone === $poolTotal && $poolTotal > 0,
             ],
+            'knockoutMappingStrategy' => $knockoutStrategy,
+            'sourceLabelMap'          => $knockoutStrategy === PoolKnockoutMappingService::STRATEGY
+                ? (new PoolKnockoutMappingService())->getSourceLabelMap()
+                : [],
         ]);
     }
 
