@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 
@@ -9,6 +9,8 @@ const props = defineProps({
 });
 
 const activeDiscipline = ref(props.disciplines?.[0] ?? null);
+const confirmAction    = ref(null); // 'reset' | 'recalculate' | null
+const processing       = ref(false);
 
 const rows = computed(() => {
   if (!activeDiscipline.value) return [];
@@ -21,6 +23,22 @@ const fmtDate = (d) => {
 };
 
 const fmtDiscipline = (d) => (d ?? '').replace(/_/g, ' ').toUpperCase();
+
+const totalPlayers = computed(() =>
+  Object.values(props.byDiscipline ?? {}).reduce((s, arr) => s + arr.length, 0)
+);
+
+function doConfirm() {
+  processing.value = true;
+  router.post(`/admin/classement/${confirmAction.value}`, {}, {
+    onFinish: () => { processing.value = false; confirmAction.value = null; },
+  });
+}
+
+const confirmLabels = {
+  reset:       { title: 'Réinitialiser le classement ELO ?', text: 'Toutes les notes ELO et l\'historique de calcul seront supprimés. Les matchs ne sont pas effacés.', btn: 'Réinitialiser' },
+  recalculate: { title: 'Recalculer le classement ELO ?',    text: 'Le classement sera entièrement recalculé depuis les matchs terminés. Cette opération peut prendre quelques secondes.', btn: 'Recalculer' },
+};
 </script>
 
 <template>
@@ -30,12 +48,19 @@ const fmtDiscipline = (d) => (d ?? '').replace(/_/g, ' ').toUpperCase();
     <main style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
 
       <header style="display: flex; justify-content: space-between; align-items: center;
-                     padding: 20px 32px; border-bottom: 1px solid var(--line);">
+                     padding: 20px 32px; border-bottom: 1px solid var(--line); flex-wrap: wrap; gap: 12px;">
         <div>
           <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">ADMIN</div>
-          <div class="disp-a" style="font-size: 24px; margin-top: 6px;">Classement Elo</div>
+          <div class="disp-a" style="font-size: 24px; margin-top: 6px;">
+            Classement Elo
+            <span class="mono" style="font-size: 13px; color: var(--mute); margin-left: 10px;">{{ totalPlayers }} joueurs</span>
+          </div>
         </div>
-        <Link href="/admin" class="btn">← Tableau de bord</Link>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn btn-outline-warn" @click="confirmAction = 'recalculate'">↻ Recalculer</button>
+          <button class="btn btn-outline-danger" @click="confirmAction = 'reset'">⊘ Réinitialiser</button>
+          <Link href="/admin" class="btn">← Tableau de bord</Link>
+        </div>
       </header>
 
       <!-- Discipline tabs -->
@@ -151,18 +176,63 @@ const fmtDiscipline = (d) => (d ?? '').replace(/_/g, ' ').toUpperCase();
 
     </main>
   </div>
+
+  <!-- Confirmation modal -->
+  <Teleport to="body">
+    <div v-if="confirmAction" class="modal-backdrop" @click.self="confirmAction = null">
+      <div class="modal-box">
+        <div class="disp-a" style="font-size: 20px; margin-bottom: 12px;">
+          {{ confirmLabels[confirmAction].title }}
+        </div>
+        <p style="color: var(--mute); margin-bottom: 24px; font-size: 14px; line-height: 1.6;">
+          {{ confirmLabels[confirmAction].text }}
+        </p>
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+          <button class="btn btn-ghost" :disabled="processing" @click="confirmAction = null">Annuler</button>
+          <button class="btn btn-danger" :disabled="processing" @click="doConfirm">
+            {{ processing ? '...' : confirmLabels[confirmAction].btn }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
+.btn-outline-warn {
+  background: transparent;
+  border: 1px solid #c9a035;
+  color: #c9a035;
+  transition: background 0.15s;
+}
+.btn-outline-warn:hover { background: rgba(201,160,53,.1); }
+
+.btn-outline-danger {
+  background: transparent;
+  border: 1px solid #e05252;
+  color: #e05252;
+  transition: background 0.15s;
+}
+.btn-outline-danger:hover { background: rgba(224,82,82,.1); }
+
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.65);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999;
+}
+.modal-box {
+  background: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 32px;
+  max-width: 440px;
+  width: 90%;
+}
+.btn-danger  { background: #e05252 !important; border-color: #e05252 !important; color: #fff !important; }
+.btn-ghost   { background: transparent; border-color: var(--line); color: var(--mute); }
+
 @media (max-width: 768px) {
-  header {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 12px !important;
-  }
-  header > a {
-    width: 100%;
-    justify-content: center;
-  }
+  header { flex-direction: column !important; align-items: flex-start !important; }
 }
 </style>

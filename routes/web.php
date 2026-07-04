@@ -97,8 +97,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('/arbitres', [AdminRefereeController::class, 'index'])->name('referees.index');
     Route::post('/arbitres', [AdminRefereeController::class, 'store'])->name('referees.store');
+    Route::put('/arbitres/{user}', [AdminRefereeController::class, 'update'])->name('referees.update');
+    Route::delete('/arbitres/{user}', [AdminRefereeController::class, 'destroy'])->name('referees.destroy');
 
     Route::get('/classement', [\App\Http\Controllers\Admin\RatingController::class, 'index'])->name('rating.index');
+    Route::post('/classement/reset', [\App\Http\Controllers\Admin\RatingController::class, 'reset'])->name('rating.reset');
+    Route::post('/classement/recalculate', [\App\Http\Controllers\Admin\RatingController::class, 'recalculate'])->name('rating.recalculate');
 
     Route::get('/competitions/{competition}/stats', [\App\Http\Controllers\Admin\StatsController::class, 'show'])->name('competitions.stats');
     Route::post('/competitions/{competition}/stats/recalculate', [\App\Http\Controllers\Admin\StatsController::class, 'recalculate'])->name('competitions.stats.recalculate');
