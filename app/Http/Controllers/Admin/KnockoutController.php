@@ -39,10 +39,12 @@ class KnockoutController extends Controller
         // Detect knockout mapping strategy
         $knockoutStrategy = $competition->knockout_mapping_strategy ?? null;
 
-        if ($knockoutStrategy === PoolKnockoutMappingService::STRATEGY) {
+        $supportedStrategies = [PoolKnockoutMappingService::STRATEGY, PoolKnockoutMappingService::STRATEGY_2Q];
+
+        if ($knockoutStrategy && in_array($knockoutStrategy, $supportedStrategies, true)) {
             $mappingService = new PoolKnockoutMappingService();
             try {
-                $pairs = $mappingService->buildPairs($qualifiers);
+                $pairs = $mappingService->buildPairs($qualifiers, $knockoutStrategy);
             } catch (\InvalidArgumentException $e) {
                 $pairs = [];
             }
@@ -68,6 +70,10 @@ class KnockoutController extends Controller
         $poolDone = $poolMatches->where('status', 'done')->count();
         $poolTotal = $poolMatches->count();
 
+        $sourceLabelMap = ($knockoutStrategy && in_array($knockoutStrategy, $supportedStrategies, true))
+            ? (new PoolKnockoutMappingService())->getSourceLabelMap($knockoutStrategy)
+            : [];
+
         return Inertia::render('Admin/Knockout', [
             'competition' => $competition,
             'qualifiers'  => $qualifiers,
@@ -82,9 +88,7 @@ class KnockoutController extends Controller
                 'pool_ready' => $poolDone === $poolTotal && $poolTotal > 0,
             ],
             'knockoutMappingStrategy' => $knockoutStrategy,
-            'sourceLabelMap'          => $knockoutStrategy === PoolKnockoutMappingService::STRATEGY
-                ? (new PoolKnockoutMappingService())->getSourceLabelMap()
-                : [],
+            'sourceLabelMap'          => $sourceLabelMap,
         ]);
     }
 

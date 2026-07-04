@@ -54,7 +54,7 @@ class SummerEditionDemoResultsTest extends TestCase
         $this->assertGreaterThan(0, $scheduledCount, 'Pool H should still have scheduled matches');
     }
 
-    public function test_scores_are_valid_for_race_to_4(): void
+    public function test_scores_are_valid_for_race_to_5(): void
     {
         $this->seedBoth();
 
@@ -66,12 +66,12 @@ class SummerEditionDemoResultsTest extends TestCase
 
         foreach ($doneMatches as $m) {
             $this->assertTrue(
-                $m->score_a === 4 || $m->score_b === 4,
-                "Match #{$m->id}: neither score is 4 ({$m->score_a}/{$m->score_b})"
+                $m->score_a === 5 || $m->score_b === 5,
+                "Match #{$m->id}: neither score is 5 ({$m->score_a}/{$m->score_b})"
             );
             $this->assertFalse(
-                $m->score_a === 4 && $m->score_b === 4,
-                "Match #{$m->id}: both scores are 4"
+                $m->score_a === 5 && $m->score_b === 5,
+                "Match #{$m->id}: both scores are 5"
             );
         }
     }
@@ -122,11 +122,11 @@ class SummerEditionDemoResultsTest extends TestCase
 
         foreach (['A', 'B', 'C', 'D', 'E', 'F', 'G'] as $poolName) {
             $pool = Pool::where('competition_id', $comp->id)->where('name', $poolName)->first();
-            // C(6,2) = 15 matches per pool
+            // C(5,2) = 10 matches per pool
             $this->assertSame(
-                15,
+                10,
                 GameMatch::where('pool_id', $pool->id)->where('phase', 'pool')->count(),
-                "Pool {$poolName} should have exactly 15 matches"
+                "Pool {$poolName} should have exactly 10 matches"
             );
         }
     }

@@ -241,8 +241,8 @@ class SummerEditionSettingsTest extends TestCase
         $comp = Competition::where('slug', 'summer-edition')->first();
         $this->assertEquals(8, $comp->pools()->count());
 
-        // Registration count stays at 48
-        $this->assertEquals(48, $comp->registrations()->count());
+        // Registration count stays at 40 (5 players × 8 pools)
+        $this->assertEquals(40, $comp->registrations()->count());
     }
 
     // ── 6. API: race_to in referee show ──────────────────────────────────────

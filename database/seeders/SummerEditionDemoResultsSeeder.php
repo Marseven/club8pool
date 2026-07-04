@@ -76,8 +76,8 @@ class SummerEditionDemoResultsSeeder extends Seeder
                 };
 
                 $match->update([
-                    'score_a'    => $winA ? 4 : $loserScore,
-                    'score_b'    => $winA ? $loserScore : 4,
+                    'score_a'    => $winA ? 5 : $loserScore,
+                    'score_b'    => $winA ? $loserScore : 5,
                     'status'     => 'done',
                     'started_at' => now()->subHours(rand(2, 6)),
                     'ended_at'   => now()->subHours(rand(0, 2)),

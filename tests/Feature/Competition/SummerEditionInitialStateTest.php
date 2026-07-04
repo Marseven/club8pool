@@ -32,12 +32,12 @@ class SummerEditionInitialStateTest extends TestCase
         $this->assertSame(8, $comp->pools()->count());
     }
 
-    public function test_seeder_creates_48_registrations(): void
+    public function test_seeder_creates_40_registrations(): void
     {
         $this->artisan('db:seed', ['--class' => SummerEditionSeeder::class])->assertSuccessful();
 
         $comp = Competition::where('slug', 'summer-edition')->first();
-        $this->assertSame(48, $comp->registrations()->count());
+        $this->assertSame(40, $comp->registrations()->count());
     }
 
     public function test_seeder_generates_pool_matches(): void
@@ -45,12 +45,12 @@ class SummerEditionInitialStateTest extends TestCase
         $this->artisan('db:seed', ['--class' => SummerEditionSeeder::class])->assertSuccessful();
 
         $comp = Competition::where('slug', 'summer-edition')->first();
-        // 8 pools × C(6,2) = 8 × 15 = 120 matches
+        // 8 pools × C(5,2) = 8 × 10 = 80 matches
         $poolMatches = GameMatch::where('competition_id', $comp->id)
             ->where('phase', 'pool')
             ->count();
 
-        $this->assertSame(120, $poolMatches);
+        $this->assertSame(80, $poolMatches);
     }
 
     public function test_seeder_does_not_create_knockout_matches(): void
@@ -74,10 +74,10 @@ class SummerEditionInitialStateTest extends TestCase
 
         $this->assertSame(1, Competition::where('slug', 'summer-edition')->count());
         $this->assertSame(8, $comp->pools()->count());
-        $this->assertSame(48, $comp->registrations()->count());
+        $this->assertSame(40, $comp->registrations()->count());
         // Pool matches should NOT double (guard prevents regeneration)
         $this->assertSame(
-            120,
+            80,
             GameMatch::where('competition_id', $comp->id)->where('phase', 'pool')->count()
         );
     }
@@ -92,10 +92,10 @@ class SummerEditionInitialStateTest extends TestCase
             ->whereNotNull('password')
             ->count();
 
-        $this->assertSame(48, $withAccounts);
+        $this->assertSame(40, $withAccounts);
     }
 
-    public function test_each_pool_has_exactly_six_players(): void
+    public function test_each_pool_has_exactly_five_players(): void
     {
         $this->artisan('db:seed', ['--class' => SummerEditionSeeder::class])->assertSuccessful();
 
@@ -104,7 +104,7 @@ class SummerEditionInitialStateTest extends TestCase
         foreach (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] as $poolName) {
             $pool = Pool::where('competition_id', $comp->id)->where('name', $poolName)->first();
             $this->assertNotNull($pool, "Pool {$poolName} not found");
-            $this->assertSame(6, $pool->registrations()->count(), "Pool {$poolName} should have 6 registrations");
+            $this->assertSame(5, $pool->registrations()->count(), "Pool {$poolName} should have 5 registrations");
         }
     }
 
