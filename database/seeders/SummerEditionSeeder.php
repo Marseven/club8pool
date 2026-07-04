@@ -126,10 +126,12 @@ class SummerEditionSeeder extends Seeder
             }
         }
 
-        // Always sync knockout_mapping_strategy with config (idempotent)
-        if ($competition->knockout_mapping_strategy !== $cfg['competition']['knockout_mapping_strategy']) {
-            $competition->update(['knockout_mapping_strategy' => $cfg['competition']['knockout_mapping_strategy']]);
+        // Always sync format fields with config (idempotent)
+        $syncFields = ['knockout_mapping_strategy' => $cfg['competition']['knockout_mapping_strategy']];
+        if (isset($cfg['format']['shot_clock_first_shot'])) {
+            $syncFields['shot_clock_first_shot'] = $cfg['format']['shot_clock_first_shot'];
         }
+        $competition->update($syncFields);
 
         // ── 2. Tables de jeu ─────────────────────────────────────────────────
         foreach ($cfg['tables'] as $tableData) {

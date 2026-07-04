@@ -46,6 +46,7 @@ return [
     'format' => [
         'shot_clock_enabled'               => true,
         'shot_clock'                       => 30,
+        'shot_clock_first_shot'            => 45,
         'shot_clock_late_seconds'          => 30,
         'shot_clock_late_rule'             => 'never',
         'shot_clock_extensions_per_player' => 0,

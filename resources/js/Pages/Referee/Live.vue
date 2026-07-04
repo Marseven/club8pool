@@ -7,11 +7,12 @@ const props = defineProps({ match: Object });
 
 // ── Shot clock config ──────────────────────────────────────
 const competition = computed(() => props.match.competition ?? {});
-const shotClockEnabled = computed(() => competition.value.shot_clock_enabled !== false);
-const shotClockMax    = computed(() => competition.value.shot_clock ?? 30);
-const lateThreshold   = computed(() => competition.value.shot_clock_late_seconds ?? 15);
+const shotClockEnabled  = computed(() => competition.value.shot_clock_enabled !== false);
+const shotClockMax      = computed(() => competition.value.shot_clock ?? 30);
+const shotClockFirstShot = computed(() => competition.value.shot_clock_first_shot ?? shotClockMax.value);
+const lateThreshold     = computed(() => competition.value.shot_clock_late_seconds ?? 15);
 
-const shotClock  = ref(shotClockMax.value);
+const shotClock  = ref(shotClockFirstShot.value);
 const matchTime  = ref(0);
 const localScore = ref({ a: props.match.score_a, b: props.match.score_b });
 

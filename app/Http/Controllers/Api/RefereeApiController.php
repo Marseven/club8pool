@@ -65,6 +65,7 @@ class RefereeApiController extends Controller
             $data['shot_clock_config'] = $m->competition ? [
                 'enabled'               => $m->competition->shot_clock_enabled ?? false,
                 'seconds'               => $m->competition->shot_clock ?? 30,
+                'first_shot_seconds'    => $m->competition->shot_clock_first_shot ?? $m->competition->shot_clock ?? 30,
                 'late_seconds'          => $m->competition->shot_clock_late_seconds ?? 15,
                 'late_rule'             => $m->competition->shot_clock_late_rule ?? 'never',
                 'extensions_per_player' => $m->competition->shot_clock_extensions_per_player ?? 1,
@@ -95,6 +96,7 @@ class RefereeApiController extends Controller
             'shot_clock_config' => $match->competition ? [
                 'enabled'                   => $match->competition->shot_clock_enabled ?? false,
                 'seconds'                   => $match->competition->shot_clock ?? 30,
+                'first_shot_seconds'        => $match->competition->shot_clock_first_shot ?? $match->competition->shot_clock ?? 30,
                 'late_seconds'              => $match->competition->shot_clock_late_seconds ?? 15,
                 'late_rule'                 => $match->competition->shot_clock_late_rule ?? 'never',
                 'extensions_per_player'     => $match->competition->shot_clock_extensions_per_player ?? 1,
