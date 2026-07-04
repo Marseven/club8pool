@@ -113,14 +113,21 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 // Référée (espace mobile web fallback)
 Route::middleware(['auth', 'referee'])->prefix('arbitre')->name('referee.')->group(function () {
-    Route::get('/', [RefereeController::class, 'queue'])->name('queue');
-    Route::get('/tables', [RefereeController::class, 'tables'])->name('tables');
-    Route::get('/match/{match}/pre', [RefereeController::class, 'preMatch'])->name('match.pre');
+    Route::get('/',        [RefereeController::class, 'queue'])->name('queue');
+    Route::get('/archive', [RefereeController::class, 'archive'])->name('archive');
+    Route::get('/tables',  [RefereeController::class, 'tables'])->name('tables');
+
+    Route::get('/match/{match}/pre',  [RefereeController::class, 'preMatch'])->name('match.pre');
     Route::get('/match/{match}/live', [RefereeController::class, 'live'])->name('match.live');
-    Route::get('/match/{match}/fin', [RefereeController::class, 'endMatch'])->name('match.end');
-    Route::post('/match/{match}/frame', [RefereeController::class, 'commitFrame'])->name('match.frame');
-    Route::post('/match/{match}/signer', [RefereeController::class, 'sign'])->name('match.sign');
-    Route::post('/match/{match}/claim', [RefereeController::class, 'claim'])->name('match.claim');
+    Route::get('/match/{match}/fin',  [RefereeController::class, 'endMatch'])->name('match.end');
+
+    Route::post('/match/{match}/claim',      [RefereeController::class, 'claim'])->name('match.claim');
+    Route::post('/match/{match}/start',      [RefereeController::class, 'start'])->name('match.start');
+    Route::post('/match/{match}/frame',      [RefereeController::class, 'commitFrame'])->name('match.frame');
+    Route::post('/match/{match}/undo-frame', [RefereeController::class, 'undoFrame'])->name('match.undo');
+    Route::post('/match/{match}/extension',  [RefereeController::class, 'extension'])->name('match.extension');
+    Route::post('/match/{match}/clore',      [RefereeController::class, 'close'])->name('match.close');
+    Route::post('/match/{match}/signer',     [RefereeController::class, 'sign'])->name('match.sign');
 });
 
 // ─── Espace joueur ───────────────────────────────────────────────────────────

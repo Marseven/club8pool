@@ -1,325 +1,476 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3';
-import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { Pause } from 'lucide-vue-next';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { Play, Pause, RotateCcw } from 'lucide-vue-next';
 
-const props = defineProps({ match: Object });
+const props = defineProps({
+  match:          Object,
+  raceTo:         Number,
+  extensionUsedA: Boolean,
+  extensionUsedB: Boolean,
+});
 
-// ── Shot clock config ──────────────────────────────────────
-const competition = computed(() => props.match.competition ?? {});
-const shotClockEnabled  = computed(() => competition.value.shot_clock_enabled !== false);
-const shotClockMax      = computed(() => competition.value.shot_clock ?? 30);
-const shotClockFirstShot = computed(() => competition.value.shot_clock_first_shot ?? shotClockMax.value);
-const lateThreshold     = computed(() => competition.value.shot_clock_late_seconds ?? 15);
+// ── Config compétition ─────────────────────────────────────
+const competition    = computed(() => props.match.competition ?? {});
+const shotEnabled    = computed(() => competition.value.shot_clock_enabled !== false);
+const shotMax        = computed(() => competition.value.shot_clock ?? 30);
+const shotFirst      = computed(() => competition.value.shot_clock_first_shot ?? shotMax.value);
+const lateThreshold  = computed(() => competition.value.shot_clock_late_seconds ?? 15);
+const extAllowed     = computed(() => competition.value.shot_clock_extensions_per_player ?? 0);
 
-const shotClock  = ref(shotClockFirstShot.value);
-const matchTime  = ref(0);
-const localScore = ref({ a: props.match.score_a, b: props.match.score_b });
+// ── État compteur ──────────────────────────────────────────
+const shotClock    = ref(shotFirst.value);
+const clockRunning = ref(false);
+const matchTime    = ref(0);
+let shotI  = null;
+let matchI = null;
 
-const resetShotClock = () => { shotClock.value = shotClockMax.value; };
+const startClock = () => {
+  if (shotI || !shotEnabled.value) return;
+  clockRunning.value = true;
+  shotI = setInterval(() => {
+    if (shotClock.value > 0) shotClock.value--;
+  }, 1000);
+};
 
-let shotI, matchI;
-onMounted(() => {
-  if (shotClockEnabled.value) {
-    shotI = setInterval(() => {
-      shotClock.value = shotClock.value <= 0 ? shotClockMax.value : shotClock.value - 1;
-    }, 1000);
+const pauseClock = () => {
+  clearInterval(shotI);
+  shotI = null;
+  clockRunning.value = false;
+};
+
+const resetClock = (startAfter = null) => {
+  shotClock.value = shotMax.value;
+  if (startAfter ?? clockRunning.value) {
+    clearInterval(shotI);
+    shotI = null;
+    startClock();
   }
+};
+
+onMounted(() => {
+  if (shotEnabled.value) startClock();
   matchI = setInterval(() => matchTime.value++, 1000);
 });
 onUnmounted(() => { clearInterval(shotI); clearInterval(matchI); });
 
-const fmt = (s) => {
-  const m = Math.floor(s / 60), sec = s % 60;
-  return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+// ── Score local ────────────────────────────────────────────
+const localScore = ref({ a: props.match.score_a, b: props.match.score_b });
+
+// ── Main (hand) ────────────────────────────────────────────
+const currentHand = ref(null); // null | 'a' | 'b'
+
+const setHand = (side) => {
+  currentHand.value = side;
+  resetClock(true); // toujours redémarrer après changement de main
 };
 
-const danger = computed(() => shotClockEnabled.value && shotClock.value <= 10);
-const late   = computed(() => shotClockEnabled.value && shotClock.value <= lateThreshold.value);
+const handName = computed(() => {
+  if (currentHand.value === 'a') return props.match.player_a?.first_name ?? 'Joueur A';
+  if (currentHand.value === 'b') return props.match.player_b?.first_name ?? 'Joueur B';
+  return null;
+});
 
-// ── Frame scoring ──────────────────────────────────────────
+// ── Extension ──────────────────────────────────────────────
+const extUsedA   = ref(props.extensionUsedA);
+const extUsedB   = ref(props.extensionUsedB);
+const extLoading = ref(false);
+
+const useExtension = (side) => {
+  if (extLoading.value) return;
+  extLoading.value = true;
+  router.post(`/arbitre/match/${props.match.id}/extension`, { player: side.toUpperCase() }, {
+    preserveScroll: true,
+    preserveState:  true,
+    onSuccess: () => {
+      if (side === 'a') extUsedA.value = true;
+      else              extUsedB.value = true;
+      resetClock(true);
+    },
+    onFinish: () => { extLoading.value = false; },
+  });
+};
+
+// ── Scoring ────────────────────────────────────────────────
+const raceReached = computed(() =>
+  localScore.value.a >= props.raceTo || localScore.value.b >= props.raceTo
+);
+
 const winFrame = (side) => {
   localScore.value[side]++;
-  resetShotClock();
+  resetClock(true);
   router.post(`/arbitre/match/${props.match.id}/frame`, {
-    winner: side === 'a' ? 'A' : 'B',
+    winner: side.toUpperCase(),
   }, { preserveScroll: true, preserveState: true });
 };
 
-// ── Pro Events panel ───────────────────────────────────────
-const eventsOpen    = ref(false);
-const toast         = ref(null);
-const toastTimer    = ref(null);
-const eventLoading  = ref(false);
-
-const showToast = (msg, isError = false) => {
-  clearTimeout(toastTimer.value);
-  toast.value = { msg, isError };
-  toastTimer.value = setTimeout(() => { toast.value = null; }, 2000);
+const undoFrame = (side) => {
+  if (localScore.value[side] <= 0) return;
+  localScore.value[side]--;
+  router.post(`/arbitre/match/${props.match.id}/undo-frame`, {
+    player: side.toUpperCase(),
+  }, { preserveScroll: true, preserveState: true });
 };
 
-const currentFrame = computed(() => localScore.value.a + localScore.value.b + 1);
+// ── Clôture ────────────────────────────────────────────────
+const showConfirm  = ref(false);
+const closePending = ref(false);
 
-const sendEvent = async (event_type, player = null) => {
+const confirmClose = () => {
+  closePending.value = true;
+  pauseClock();
+  router.post(`/arbitre/match/${props.match.id}/clore`, {}, {
+    onFinish: () => { closePending.value = false; },
+  });
+};
+
+// ── Panel événements ───────────────────────────────────────
+const eventsOpen   = ref(false);
+const eventLoading = ref(false);
+const toast        = ref(null);
+let toastTimer     = null;
+
+const showToast = (msg, isError = false) => {
+  clearTimeout(toastTimer);
+  toast.value = { msg, isError };
+  toastTimer = setTimeout(() => { toast.value = null; }, 2500);
+};
+
+const sendEvent = async (type, player = null) => {
   if (eventLoading.value) return;
   eventLoading.value = true;
-
-  const payload = { event_type, frame_number: currentFrame.value };
+  const payload = { event_type: type, frame_number: localScore.value.a + localScore.value.b + 1 };
   if (player) payload.player = player;
-
   try {
     await window.axios.post(`/api/referee/matches/${props.match.id}/events`, payload);
-
-    const labels = {
-      foul:                  'Foul',
-      safety:                'Safety',
-      miss:                  'Missed shot',
-      shot_clock_extension:  'Extension',
-      shot_clock_violation:  'Clock violation',
-      break_and_run:         'Break & Run',
-      re_rack:               'Re-rack',
-    };
-    const playerLabel = player ? ` · ${player === 'a' ? props.match.player_a?.last_name : props.match.player_b?.last_name}` : '';
-    showToast(`✓ ${labels[event_type] ?? event_type}${playerLabel}`);
-  } catch (e) {
-    showToast('Error — could not record event', true);
+    const labels = { foul: 'Faute', safety: 'Safety', miss: 'Tir raté',
+                     break_and_run: 'Break & Run', re_rack: 'Re-rack',
+                     shot_clock_violation: 'Violation horloge' };
+    const pName = player === 'A' ? props.match.player_a?.first_name
+                : player === 'B' ? props.match.player_b?.first_name : null;
+    showToast(`✓ ${labels[type] ?? type}${pName ? ' · ' + pName : ''}`);
+  } catch {
+    showToast('Erreur — événement non enregistré', true);
   } finally {
     eventLoading.value = false;
   }
 };
 
-// Per-player events that need A or B
-const perPlayerEvents = computed(() => {
-  const base = [
-    { type: 'foul',   label: 'FOUL' },
-    { type: 'safety', label: 'SAFETY' },
-    { type: 'miss',   label: 'MISS' },
-  ];
-  if (shotClockEnabled.value) {
-    base.push({ type: 'shot_clock_extension', label: 'EXTENSION' });
-    base.push({ type: 'shot_clock_violation', label: 'CLK VIOLATION' });
-  }
-  return base;
+// ── Phase label ────────────────────────────────────────────
+const phaseLabel = computed(() => {
+  if (props.match.pool) return `Poule ${props.match.pool.name}`;
+  const map = { R32: '1/32e', R16: '1/16e', QF: 'Quart', SF: 'Demi', F: 'Finale', '3P': '3e place' };
+  return map[props.match.round] ?? props.match.round ?? '—';
 });
+
+const fmt = (s) => {
+  const m = Math.floor(s / 60), sec = s % 60;
+  return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+};
+
+const danger = computed(() => shotEnabled.value && shotClock.value <= 10);
+const late   = computed(() => shotEnabled.value && shotClock.value <= lateThreshold.value);
 </script>
 
 <template>
-  <Head title="Match en cours" />
+  <Head title="Arbitrage du match" />
   <div style="max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--ink);
               display: flex; flex-direction: column;">
 
-    <!-- Header -->
-    <header style="padding: 8px 18px 14px; border-bottom: 1px solid var(--line);
-                   display: flex; justify-content: space-between; align-items: center;">
-      <a href="/arbitre" style="font-size: 18px; color: var(--mute);">←</a>
-      <div>
-        <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute);">
-          {{ match.round }} · {{ match.table?.name?.toUpperCase() }}
+    <!-- ── En-tête ─────────────────────────────────────────── -->
+    <header style="padding: 8px 18px 12px; border-bottom: 1px solid var(--line);">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <a href="/arbitre" style="font-size: 18px; color: var(--mute); line-height: 1;">←</a>
+        <div style="text-align: center;">
+          <div class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute);">
+            {{ phaseLabel }} · {{ match.table?.name?.toUpperCase() ?? '—' }}
+          </div>
+          <div style="font-size: 13px; font-weight: 700; margin-top: 2px;">
+            {{ match.competition?.name?.split(' — ')[0] }}
+          </div>
         </div>
-        <div style="font-size: 13px; font-weight: 700;">{{ match.competition?.name?.split(' — ')[0] }}</div>
+        <span class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.12em;">
+          RACE À {{ raceTo }}
+        </span>
       </div>
-      <span class="mono" style="padding: 3px 7px; border: 1px solid rgba(45,168,118,0.4);
-                                background: rgba(45,168,118,0.08); border-radius: 2px;
-                                font-size: 9px; color: var(--felt-2); letter-spacing: 0.14em;
-                                display:inline-flex; align-items:center; gap:4px;">
-        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;"></span>EN LIGNE
-      </span>
     </header>
 
-    <!-- Shot clock (hidden if disabled) -->
-    <div v-if="shotClockEnabled" :style="{
-      padding: '16px 18px 8px',
+    <!-- ── Compteur shot clock ─────────────────────────────── -->
+    <div v-if="shotEnabled" :style="{
+      padding: '12px 18px 10px',
       background: danger ? 'rgba(229,72,77,0.06)' : 'transparent',
       borderBottom: '1px solid var(--line)',
       transition: 'background .3s',
     }">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span class="mono" style="font-size: 9px; letter-spacing: 0.2em; color: var(--mute);">SHOT CLOCK</span>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span class="mono" :style="{ fontSize: '9px', letterSpacing: '0.18em',
-                color: danger ? 'var(--live)' : late ? 'var(--chalk-2)' : 'var(--mute)' }">
-            {{ danger ? 'WARNING' : late ? 'LATE' : 'NORMAL' }}
-          </span>
-          <!-- RESET button -->
-          <button @click="resetShotClock"
-                  class="mono"
-                  style="background: rgba(255,255,255,0.06); border: 1px solid var(--line-strong);
-                         color: var(--chalk-2); font-size: 9px; letter-spacing: 0.14em;
-                         padding: 2px 7px; border-radius: 2px; cursor: pointer; line-height: 1.6;">
-            RESET
-          </button>
-        </div>
+      <!-- Indicateur main -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span class="mono" style="font-size: 9px; letter-spacing: 0.18em;"
+              :style="{ color: handName ? 'var(--chalk-2)' : 'var(--mute)' }">
+          {{ handName ? `MAIN : ${handName.toUpperCase()}` : 'MAIN NON DÉFINIE' }}
+        </span>
+        <span class="mono" :style="{
+          fontSize: '9px', letterSpacing: '0.18em',
+          color: danger ? 'var(--live)' : late ? 'var(--chalk-2)' : 'var(--mute)',
+        }">{{ danger ? 'ATTENTION' : late ? 'LATE' : 'NORMAL' }}</span>
       </div>
-      <!-- Tappable clock display also resets -->
-      <div class="disp-a tnum"
-           @click="resetShotClock"
-           :style="{
-             fontSize: '124px', lineHeight: 0.9, textAlign: 'center', marginTop: '4px',
-             color: danger ? 'var(--live)' : late ? 'var(--chalk-2)' : 'var(--chalk)',
-             cursor: 'pointer', userSelect: 'none',
-           }">{{ String(shotClock).padStart(2, '0') }}</div>
-      <div style="height: 4px; background: var(--line); overflow: hidden;">
+
+      <!-- Grand compteur -->
+      <div class="disp-a tnum" :style="{
+        fontSize: '120px', lineHeight: 0.88, textAlign: 'center',
+        color: danger ? 'var(--live)' : late ? 'var(--chalk-2)' : 'var(--chalk)',
+        userSelect: 'none',
+      }">{{ String(shotClock).padStart(2,'0') }}</div>
+
+      <!-- Barre de progression -->
+      <div style="height: 3px; background: var(--line); overflow: hidden; margin-top: 6px;">
         <div :style="{
-          width: (shotClock / shotClockMax) * 100 + '%', height: '100%',
+          width: (shotClock / shotMax) * 100 + '%', height: '100%',
           background: danger ? 'var(--live)' : late ? 'var(--chalk-2)' : 'var(--felt-2)',
           transition: 'width .8s linear',
         }" />
       </div>
+
+      <!-- Contrôles Play / Pause / Reset -->
+      <div style="display: flex; gap: 8px; margin-top: 10px;">
+        <button v-if="!clockRunning" @click="startClock"
+                class="mono" style="flex: 1; min-height: 40px; border-radius: 2px; cursor: pointer;
+                  background: rgba(45,168,118,0.12); border: 1px solid rgba(45,168,118,0.4);
+                  color: var(--felt-2); font-size: 10px; letter-spacing: 0.14em;
+                  display: inline-flex; align-items: center; justify-content: center; gap: 5px;">
+          <Play :size="12" /> PLAY
+        </button>
+        <button v-else @click="pauseClock"
+                class="mono" style="flex: 1; min-height: 40px; border-radius: 2px; cursor: pointer;
+                  background: rgba(229,72,77,0.1); border: 1px solid rgba(229,72,77,0.4);
+                  color: var(--live); font-size: 10px; letter-spacing: 0.14em;
+                  display: inline-flex; align-items: center; justify-content: center; gap: 5px;">
+          <Pause :size="12" /> PAUSE
+        </button>
+        <button @click="resetClock()"
+                class="mono" style="min-height: 40px; padding: 0 16px; border-radius: 2px; cursor: pointer;
+                  background: rgba(255,255,255,0.06); border: 1px solid var(--line-strong);
+                  color: var(--chalk-2); font-size: 10px; letter-spacing: 0.14em;
+                  display: inline-flex; align-items: center; justify-content: center; gap: 5px;">
+          <RotateCcw :size="12" /> RESET
+        </button>
+      </div>
+
+      <!-- Temps match + manche -->
       <div style="display: flex; justify-content: space-between; margin-top: 8px;">
-        <span class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.14em;">
-          FRAME {{ localScore.a + localScore.b + 1 }} · RACE TO {{ match.competition?.race_to }}
+        <span class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.12em;">
+          MANCHE {{ localScore.a + localScore.b + 1 }}
         </span>
-        <span class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.14em;">MATCH {{ fmt(matchTime) }}</span>
+        <span class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.12em;">
+          MATCH {{ fmt(matchTime) }}
+        </span>
       </div>
     </div>
 
-    <!-- Frame + match time row when shot clock is hidden -->
+    <!-- Sans shot clock -->
     <div v-else style="padding: 10px 18px; border-bottom: 1px solid var(--line);
                         display: flex; justify-content: space-between;">
-      <span class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.14em;">
-        FRAME {{ localScore.a + localScore.b + 1 }} · RACE TO {{ match.competition?.race_to }}
+      <span class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.12em;">
+        MANCHE {{ localScore.a + localScore.b + 1 }} · RACE À {{ raceTo }}
       </span>
-      <span class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.14em;">MATCH {{ fmt(matchTime) }}</span>
+      <span class="mono" style="font-size: 10px; color: var(--mute); letter-spacing: 0.12em;">
+        MATCH {{ fmt(matchTime) }}
+      </span>
     </div>
 
-    <!-- Scores -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--line);">
+    <!-- ── Deux colonnes joueurs ──────────────────────────── -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; flex: 1;">
+
       <div v-for="(p, i) in [
-        { player: match.player_a, score: localScore.a, side: 'a' },
-        { player: match.player_b, score: localScore.b, side: 'b' },
-      ]" :key="i" :style="{ padding: '18px 16px 16px',
-            borderRight: i === 0 ? '1px solid var(--line)' : 'none' }">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span class="mono" style="font-size: 9px; color: var(--mute);">SEED #{{ p.player?.id }}</span>
+        { player: match.player_a, score: localScore.a, side: 'a', extUsed: extUsedA },
+        { player: match.player_b, score: localScore.b, side: 'b', extUsed: extUsedB },
+      ]" :key="i" :style="{
+        padding: '14px 12px',
+        borderRight: i === 0 ? '1px solid var(--line)' : 'none',
+        borderBottom: '1px solid var(--line)',
+        display: 'flex', flexDirection: 'column', gap: '8px',
+      }">
+        <!-- Nom -->
+        <div style="font-size: 13px; font-weight: 700; line-height: 1.2; min-height: 32px;">
+          {{ p.player?.first_name }}<br />
+          <span style="font-size: 11px; font-weight: 400; color: var(--chalk-2);">
+            {{ p.player?.last_name }}
+          </span>
         </div>
-        <div style="font-size: 12px; font-weight: 700; line-height: 1.1; min-height: 28px;">
-          {{ p.player?.first_name }}<br />{{ p.player?.last_name }}
-        </div>
-        <div class="disp-a tnum" :style="{ fontSize: '80px', lineHeight: 0.9, marginTop: '4px',
-              color: p.score > (i === 0 ? localScore.b : localScore.a) ? 'var(--felt-2)' : 'var(--chalk)' }">{{ p.score }}</div>
+
+        <!-- Score -->
+        <div class="disp-a tnum" :style="{
+          fontSize: '72px', lineHeight: 0.9, textAlign: 'center',
+          color: p.score > (i === 0 ? localScore.b : localScore.a) ? 'var(--felt-2)' : 'var(--chalk)',
+        }">{{ p.score }}</div>
+
+        <!-- + Manche -->
+        <button @click="winFrame(p.side)"
+                class="btn btn-felt" style="width: 100%; justify-content: center;
+                  min-height: 48px; font-size: 13px; font-weight: 700;">
+          + Manche
+        </button>
+
+        <!-- - Manche -->
+        <button @click="undoFrame(p.side)" :disabled="p.score <= 0"
+                class="btn" style="width: 100%; justify-content: center;
+                  min-height: 40px; font-size: 12px;"
+                :style="{ opacity: p.score <= 0 ? 0.35 : 1 }">
+          − Manche
+        </button>
+
+        <!-- Main -->
+        <button @click="setHand(p.side)"
+                :class="['btn', currentHand === p.side ? 'btn-felt' : '']"
+                :style="{
+                  width: '100%', justifyContent: 'center', minHeight: '40px',
+                  fontSize: '11px', fontFamily: 'var(--font-mono)', letterSpacing: '0.14em',
+                  background: currentHand === p.side ? 'rgba(45,168,118,0.15)' : 'transparent',
+                  borderColor: currentHand === p.side ? 'var(--felt-2)' : 'var(--line-strong)',
+                  color: currentHand === p.side ? 'var(--felt-2)' : 'var(--chalk-2)',
+                }">
+          MAIN
+        </button>
+
+        <!-- Extension -->
+        <button v-if="extAllowed >= 1"
+                @click="useExtension(p.side)"
+                :disabled="p.extUsed || extLoading"
+                :style="{
+                  width: '100%', minHeight: '36px',
+                  padding: '6px', borderRadius: '2px', cursor: p.extUsed ? 'default' : 'pointer',
+                  background: p.extUsed ? 'rgba(255,255,255,0.04)' : 'rgba(255,190,0,0.08)',
+                  border: '1px solid ' + (p.extUsed ? 'var(--line)' : 'rgba(255,190,0,0.4)'),
+                  color: p.extUsed ? 'var(--mute)' : 'rgba(255,190,0,0.9)',
+                  fontSize: '9px', fontFamily: 'var(--font-mono)', letterSpacing: '0.14em',
+                  opacity: p.extUsed ? 0.5 : 1,
+                }">
+          {{ p.extUsed ? 'EXT. UTILISÉE' : 'EXTENSION' }}
+        </button>
       </div>
     </div>
 
-    <!-- Frame scoring buttons -->
-    <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <button class="btn btn-felt" style="padding: 16px 12px; justify-content: center; min-height: 52px;"
-                @click="winFrame('a')">+ Frame · {{ match.player_a?.last_name }}</button>
-        <button class="btn" style="padding: 16px 12px; justify-content: center; min-height: 52px;"
-                @click="winFrame('b')">+ Frame · {{ match.player_b?.last_name }}</button>
-      </div>
-
-      <!-- EVENTS toggle button -->
+    <!-- ── Panel événements (masqué par défaut) ──────────── -->
+    <div style="padding: 10px 16px; border-top: 1px solid var(--line); background: var(--ink-2);">
       <button @click="eventsOpen = !eventsOpen"
-              class="mono"
-              :style="{
-                background: eventsOpen ? 'rgba(255,255,255,0.06)' : 'transparent',
-                border: '1px solid ' + (eventsOpen ? 'var(--line-strong)' : 'var(--line)'),
-                color: eventsOpen ? 'var(--chalk)' : 'var(--mute)',
-                fontSize: '10px', letterSpacing: '0.18em', padding: '9px 12px',
-                borderRadius: '2px', cursor: 'pointer', width: '100%',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                minHeight: '44px',
-              }">
-        <span>EVENTS</span>
-        <span style="opacity: 0.6; font-size: 11px;">{{ eventsOpen ? '▲' : '▼' }}</span>
+              class="mono" style="width: 100%; min-height: 38px; border-radius: 2px; cursor: pointer;
+                background: transparent; border: 1px solid var(--line);
+                color: var(--mute); font-size: 9px; letter-spacing: 0.18em;
+                display: flex; justify-content: space-between; align-items: center; padding: 0 12px;">
+        <span>ÉVÉNEMENTS (FOUL · SAFETY · …)</span>
+        <span>{{ eventsOpen ? '▲' : '▼' }}</span>
       </button>
 
-      <!-- Pro Events panel -->
-      <div v-if="eventsOpen"
-           style="border: 1px solid var(--line); border-radius: 2px; overflow: hidden; background: var(--ink-2);">
+      <div v-if="eventsOpen" style="margin-top: 8px; border: 1px solid var(--line); border-radius: 2px;
+                                     overflow: hidden; background: var(--ink);">
+        <!-- Toast -->
+        <div v-if="toast" :style="{
+          padding: '8px 14px', fontSize: '11px', fontFamily: 'var(--font-mono)',
+          textAlign: 'center', letterSpacing: '0.1em',
+          background: toast.isError ? 'rgba(229,72,77,0.12)' : 'rgba(45,168,118,0.12)',
+          color: toast.isError ? 'var(--live)' : 'var(--felt-2)',
+          borderBottom: '1px solid var(--line)',
+        }">{{ toast.msg }}</div>
 
-        <!-- Toast notification -->
-        <div v-if="toast"
-             :style="{
-               padding: '8px 14px', fontSize: '11px', fontFamily: 'var(--font-mono)',
-               letterSpacing: '0.1em', textAlign: 'center',
-               background: toast.isError ? 'rgba(229,72,77,0.12)' : 'rgba(45,168,118,0.12)',
-               color: toast.isError ? 'var(--live)' : 'var(--felt-2)',
-               borderBottom: '1px solid var(--line)',
-             }">
-          {{ toast.msg }}
-        </div>
-
-        <!-- Per-player events header -->
-        <div class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.22em;
-                                  padding: 10px 14px 6px; border-bottom: 1px solid var(--line);">
-          PER PLAYER — SELECT A OR B
-        </div>
-
-        <div v-for="ev in perPlayerEvents" :key="ev.type"
-             style="display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 0;
-                    border-bottom: 1px solid var(--line); padding: 8px 12px;">
+        <!-- Événements par joueur -->
+        <div v-for="ev in [
+          { type: 'foul',   label: 'FAUTE' },
+          { type: 'safety', label: 'SAFETY' },
+          { type: 'miss',   label: 'TIR RATÉ' },
+          { type: 'shot_clock_violation', label: 'VIOLATION HORLOGE' },
+        ]" :key="ev.type"
+             style="display: grid; grid-template-columns: 1fr auto auto; align-items: center;
+                    border-bottom: 1px solid var(--line); padding: 8px 12px; gap: 6px;">
           <span class="mono" style="font-size: 10px; color: var(--chalk-2); letter-spacing: 0.1em;">{{ ev.label }}</span>
-          <button @click="sendEvent(ev.type, 'a')" :disabled="eventLoading"
-                  style="min-height: 44px; min-width: 56px; padding: 8px 10px; margin-left: 8px;
-                         background: rgba(45,168,118,0.08); border: 1px solid rgba(45,168,118,0.3);
-                         color: var(--felt-2); font-size: 11px; font-weight: 700;
-                         border-radius: 2px; cursor: pointer; font-family: var(--font-mono);
-                         opacity: eventLoading ? 0.5 : 1;">
-            {{ match.player_a?.last_name?.slice(0, 3)?.toUpperCase() ?? 'A' }}
+          <button @click="sendEvent(ev.type, 'A')" :disabled="eventLoading"
+                  style="min-height: 40px; min-width: 52px; background: rgba(45,168,118,0.08);
+                         border: 1px solid rgba(45,168,118,0.3); color: var(--felt-2);
+                         font-size: 10px; font-weight: 700; border-radius: 2px; cursor: pointer;
+                         font-family: var(--font-mono);">
+            {{ match.player_a?.first_name?.slice(0,3)?.toUpperCase() ?? 'A' }}
           </button>
-          <button @click="sendEvent(ev.type, 'b')" :disabled="eventLoading"
-                  style="min-height: 44px; min-width: 56px; padding: 8px 10px; margin-left: 6px;
-                         background: rgba(255,255,255,0.04); border: 1px solid var(--line-strong);
-                         color: var(--chalk-2); font-size: 11px; font-weight: 700;
-                         border-radius: 2px; cursor: pointer; font-family: var(--font-mono);
-                         opacity: eventLoading ? 0.5 : 1;">
-            {{ match.player_b?.last_name?.slice(0, 3)?.toUpperCase() ?? 'B' }}
+          <button @click="sendEvent(ev.type, 'B')" :disabled="eventLoading"
+                  style="min-height: 40px; min-width: 52px; background: rgba(255,255,255,0.04);
+                         border: 1px solid var(--line-strong); color: var(--chalk-2);
+                         font-size: 10px; font-weight: 700; border-radius: 2px; cursor: pointer;
+                         font-family: var(--font-mono);">
+            {{ match.player_b?.first_name?.slice(0,3)?.toUpperCase() ?? 'B' }}
           </button>
         </div>
 
-        <!-- Match-level events -->
-        <div class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.22em;
-                                  padding: 10px 14px 6px; border-bottom: 1px solid var(--line);">
-          MATCH EVENTS
-        </div>
-
-        <!-- Break & Run — needs player selection -->
-        <div style="display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 0;
-                    border-bottom: 1px solid var(--line); padding: 8px 12px;">
+        <!-- Break & Run + Re-rack -->
+        <div style="display: grid; grid-template-columns: 1fr auto auto; align-items: center;
+                    border-bottom: 1px solid var(--line); padding: 8px 12px; gap: 6px;">
           <span class="mono" style="font-size: 10px; color: var(--chalk-2); letter-spacing: 0.1em;">BREAK &amp; RUN</span>
-          <button @click="sendEvent('break_and_run', 'a')" :disabled="eventLoading"
-                  style="min-height: 44px; min-width: 56px; padding: 8px 10px; margin-left: 8px;
-                         background: rgba(45,168,118,0.08); border: 1px solid rgba(45,168,118,0.3);
-                         color: var(--felt-2); font-size: 11px; font-weight: 700;
-                         border-radius: 2px; cursor: pointer; font-family: var(--font-mono);">
-            {{ match.player_a?.last_name?.slice(0, 3)?.toUpperCase() ?? 'A' }}
+          <button @click="sendEvent('break_and_run','A')" :disabled="eventLoading"
+                  style="min-height: 40px; min-width: 52px; background: rgba(45,168,118,0.08);
+                         border: 1px solid rgba(45,168,118,0.3); color: var(--felt-2);
+                         font-size: 10px; font-weight: 700; border-radius: 2px; cursor: pointer;
+                         font-family: var(--font-mono);">
+            {{ match.player_a?.first_name?.slice(0,3)?.toUpperCase() ?? 'A' }}
           </button>
-          <button @click="sendEvent('break_and_run', 'b')" :disabled="eventLoading"
-                  style="min-height: 44px; min-width: 56px; padding: 8px 10px; margin-left: 6px;
-                         background: rgba(255,255,255,0.04); border: 1px solid var(--line-strong);
-                         color: var(--chalk-2); font-size: 11px; font-weight: 700;
-                         border-radius: 2px; cursor: pointer; font-family: var(--font-mono);">
-            {{ match.player_b?.last_name?.slice(0, 3)?.toUpperCase() ?? 'B' }}
+          <button @click="sendEvent('break_and_run','B')" :disabled="eventLoading"
+                  style="min-height: 40px; min-width: 52px; background: rgba(255,255,255,0.04);
+                         border: 1px solid var(--line-strong); color: var(--chalk-2);
+                         font-size: 10px; font-weight: 700; border-radius: 2px; cursor: pointer;
+                         font-family: var(--font-mono);">
+            {{ match.player_b?.first_name?.slice(0,3)?.toUpperCase() ?? 'B' }}
           </button>
         </div>
-
-        <!-- Re-rack — no player -->
         <div style="padding: 8px 12px;">
           <button @click="sendEvent('re_rack')" :disabled="eventLoading"
-                  style="min-height: 44px; width: 100%; padding: 10px 12px;
-                         background: rgba(255,255,255,0.04); border: 1px solid var(--line-strong);
-                         color: var(--chalk-2); font-size: 10px; font-weight: 700;
-                         border-radius: 2px; cursor: pointer; font-family: var(--font-mono);
-                         letter-spacing: 0.14em;">
+                  style="width: 100%; min-height: 40px; background: rgba(255,255,255,0.04);
+                         border: 1px solid var(--line-strong); color: var(--chalk-2); font-size: 10px;
+                         font-weight: 700; border-radius: 2px; cursor: pointer;
+                         font-family: var(--font-mono); letter-spacing: 0.14em;">
             RE-RACK
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Footer -->
-    <div style="margin-top: auto; padding: 12px 16px; border-top: 1px solid var(--line);
-                display: flex; justify-content: space-between; align-items: center; background: var(--ink-2);">
-      <button class="mono" style="background: transparent; border: none; color: var(--mute);
-                                   font-size: 11px; letter-spacing: 0.14em; cursor: pointer;
-                                   display:inline-flex; align-items:center; gap:4px;">
-        <Pause :size="14" /> PAUSE
-      </button>
-      <a :href="`/arbitre/match/${match.id}/fin`" class="btn" style="border-color: var(--felt-2); color: var(--felt-2);">
-        FIN DE MATCH
-      </a>
+    <!-- ── Clôture du match ────────────────────────────────── -->
+    <div style="padding: 12px 16px; border-top: 1px solid var(--line); background: var(--ink-2);">
+
+      <!-- Confirmation -->
+      <template v-if="showConfirm">
+        <div class="mono" style="font-size: 11px; color: var(--chalk-2); text-align: center;
+                                   margin-bottom: 10px; letter-spacing: 0.12em;">
+          CONFIRMER LA CLÔTURE DU MATCH ?
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <button @click="confirmClose" :disabled="closePending"
+                  class="btn btn-felt" style="justify-content: center; min-height: 48px;
+                    border-color: var(--felt-2); color: var(--felt-2); font-weight: 700;">
+            {{ closePending ? 'Clôture…' : 'Confirmer' }}
+          </button>
+          <button @click="showConfirm = false"
+                  class="btn" style="justify-content: center; min-height: 48px;">
+            Annuler
+          </button>
+        </div>
+      </template>
+
+      <!-- Bouton clôture (si race atteint) -->
+      <template v-else-if="raceReached">
+        <button @click="showConfirm = true"
+                class="btn" style="width: 100%; justify-content: center; min-height: 52px;
+                  font-size: 14px; font-weight: 700; border-color: var(--felt-2);
+                  color: var(--felt-2); background: rgba(45,168,118,0.08);">
+          Clôturer le match
+        </button>
+      </template>
+
+      <!-- Race non atteint -->
+      <template v-else>
+        <div class="mono" style="text-align: center; font-size: 10px; color: var(--mute);
+                                   letter-spacing: 0.14em; padding: 8px 0;">
+          CLÔTURE DISPONIBLE AU RACE À {{ raceTo }}
+          <span style="display: block; font-size: 18px; margin-top: 4px; font-family: var(--font-display-a);
+                       color: var(--chalk-2);">
+            {{ localScore.a }} — {{ localScore.b }}
+          </span>
+        </div>
+      </template>
     </div>
   </div>
 </template>

@@ -13,8 +13,6 @@ const sign = (playerId) => {
     signature_data: '✓',
   }, { preserveScroll: true });
 };
-
-const allSigned = computed(() => signed.value.has(props.match.player_a?.id) && signed.value.has(props.match.player_b?.id));
 </script>
 
 <template>
@@ -85,8 +83,8 @@ const allSigned = computed(() => signed.value.has(props.match.player_a?.id) && s
 
     <div style="padding: 12px 22px; border-top: 1px solid var(--line);
                 display: flex; flex-direction: column; gap: 8px; background: var(--ink-2);">
-      <Link :href="`/arbitre`" class="btn btn-felt" :disabled="!allSigned" style="justify-content: center;">
-        {{ allSigned ? 'Valider · retourner à la file' : 'En attente des signatures' }}
+      <Link href="/arbitre" class="btn btn-felt" style="justify-content: center;">
+        Retour à la file d'arbitrage
       </Link>
     </div>
   </div>
