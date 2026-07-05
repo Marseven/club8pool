@@ -87,8 +87,7 @@ const medals = ['🥇', '🥈', '🥉'];
       <div class="container">
 
         <!-- Top 3 cards -->
-        <div v-if="rows.length >= 3"
-             style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px;">
+        <div v-if="rows.length >= 3" class="top3-grid">
           <div
             v-for="(r, i) in rows.slice(0, 3)" :key="r.player_id"
             :style="{
@@ -115,16 +114,16 @@ const medals = ['🥇', '🥈', '🥉'];
         </div>
 
         <!-- Full table -->
-        <table style="width: 100%; border-collapse: collapse;">
+        <table class="ranking-table" style="width: 100%; border-collapse: collapse;">
           <thead>
             <tr style="background: var(--ink-2); border-bottom: 1px solid var(--line);">
-              <th class="mono" style="padding: 9px 12px; text-align: center; font-size: 9px; letter-spacing: 0.16em; color: var(--mute); font-weight: 500; width: 44px;">#</th>
+              <th class="mono col-rank" style="padding: 9px 12px; text-align: center; font-size: 9px; letter-spacing: 0.16em; color: var(--mute); font-weight: 500; width: 44px;">#</th>
               <th class="mono" style="padding: 9px 12px; text-align: left; font-size: 9px; letter-spacing: 0.16em; color: var(--mute); font-weight: 500;">JOUEUR</th>
-              <th class="mono" style="padding: 9px 12px; text-align: left; font-size: 9px; letter-spacing: 0.16em; color: var(--mute); font-weight: 500;">CLUB</th>
+              <th class="mono col-hide-mobile" style="padding: 9px 12px; text-align: left; font-size: 9px; letter-spacing: 0.16em; color: var(--mute); font-weight: 500;">CLUB</th>
               <th class="mono" style="padding: 9px 12px; text-align: right; font-size: 9px; letter-spacing: 0.16em; color: var(--mute); font-weight: 500;">ELO</th>
-              <th class="mono" style="padding: 9px 12px; text-align: right; font-size: 9px; letter-spacing: 0.16em; color: var(--mute); font-weight: 500; white-space: nowrap;">MATCHS</th>
-              <th class="mono" style="padding: 9px 12px; text-align: right; font-size: 9px; letter-spacing: 0.16em; color: var(--mute); font-weight: 500; white-space: nowrap;">% FRAMES</th>
-              <th class="mono" style="padding: 9px 12px; text-align: center; font-size: 9px; letter-spacing: 0.16em; color: var(--mute); font-weight: 500; white-space: nowrap;">DERNIER</th>
+              <th class="mono col-hide-mobile" style="padding: 9px 12px; text-align: right; font-size: 9px; letter-spacing: 0.16em; color: var(--mute); font-weight: 500; white-space: nowrap;">MATCHS</th>
+              <th class="mono col-hide-mobile" style="padding: 9px 12px; text-align: right; font-size: 9px; letter-spacing: 0.16em; color: var(--mute); font-weight: 500; white-space: nowrap;">% FRAMES</th>
+              <th class="mono col-hide-mobile" style="padding: 9px 12px; text-align: center; font-size: 9px; letter-spacing: 0.16em; color: var(--mute); font-weight: 500; white-space: nowrap;">DERNIER</th>
             </tr>
           </thead>
           <tbody>
@@ -133,7 +132,7 @@ const medals = ['🥇', '🥈', '🥉'];
               style="border-bottom: 1px solid var(--line);"
               onmouseover="this.style.filter='brightness(1.06)'" onmouseout="this.style.filter='none'"
             >
-              <td class="tnum" style="padding: 11px 12px; text-align: center; font-size: 13px; font-weight: 700;"
+              <td class="tnum col-rank" style="padding: 11px 12px; text-align: center; font-size: 13px; font-weight: 700;"
                   :style="{ color: r.rank <= 3 ? 'var(--felt-2)' : 'var(--mute)' }">
                 {{ r.rank }}
               </td>
@@ -146,17 +145,17 @@ const medals = ['🥇', '🥈', '🥉'];
                        style="font-size: 9px; color: #e5c048; letter-spacing: 0.1em; margin-top: 2px;">PROVISOIRE</div>
                 </Link>
               </td>
-              <td style="padding: 11px 12px; font-size: 12px; color: var(--mute);">{{ r.club ?? '—' }}</td>
+              <td class="col-hide-mobile" style="padding: 11px 12px; font-size: 12px; color: var(--mute);">{{ r.club ?? '—' }}</td>
               <td class="mono tnum" style="padding: 11px 12px; text-align: right; font-size: 16px; font-weight: 700; color: var(--chalk);">
                 {{ r.rating }}
               </td>
-              <td class="mono tnum" style="padding: 11px 12px; text-align: right; font-size: 12px; color: var(--mute);">
+              <td class="mono tnum col-hide-mobile" style="padding: 11px 12px; text-align: right; font-size: 12px; color: var(--mute);">
                 {{ r.games_played }}
               </td>
-              <td class="mono tnum" style="padding: 11px 12px; text-align: right; font-size: 12px; color: var(--mute);">
+              <td class="mono tnum col-hide-mobile" style="padding: 11px 12px; text-align: right; font-size: 12px; color: var(--mute);">
                 {{ winRate(r) }}
               </td>
-              <td class="mono" style="padding: 11px 12px; text-align: center; font-size: 11px; color: var(--mute);">
+              <td class="mono col-hide-mobile" style="padding: 11px 12px; text-align: center; font-size: 11px; color: var(--mute);">
                 {{ fmtDate(r.last_match_at) }}
               </td>
             </tr>
@@ -175,10 +174,40 @@ const medals = ['🥇', '🥈', '🥉'];
 </template>
 
 <style scoped>
+/* Top 3 grid */
+.top3-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
 @media (max-width: 640px) {
-  div[style*="grid-template-columns: repeat(3, 1fr)"] {
-    grid-template-columns: 1fr !important;
+  /* Top 3 : compact sur 3 colonnes, padding réduit */
+  .top3-grid {
+    gap: 6px;
   }
-  th:nth-child(n+5), td:nth-child(n+5) { display: none; }
+  .top3-grid > div {
+    padding: 12px 8px !important;
+  }
+  .top3-grid .disp-a {
+    font-size: 22px !important;
+  }
+  .top3-grid > div > div:first-child {
+    font-size: 20px !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* Table : masquer CLUB, MATCHS, % FRAMES, DERNIER */
+  .col-hide-mobile { display: none; }
+
+  /* Rang : plus compact */
+  .col-rank { width: 28px !important; padding: 8px 6px !important; font-size: 11px !important; }
+
+  /* Cellules JOUEUR et ELO : padding ajusté */
+  .ranking-table td, .ranking-table th {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
 }
 </style>
