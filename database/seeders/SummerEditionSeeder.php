@@ -127,9 +127,18 @@ class SummerEditionSeeder extends Seeder
         }
 
         // Always sync format fields with config (idempotent)
-        $syncFields = ['knockout_mapping_strategy' => $cfg['competition']['knockout_mapping_strategy']];
+        $syncFields = [
+            'knockout_mapping_strategy' => $cfg['competition']['knockout_mapping_strategy'],
+            'qualifiers_per_pool'       => $cfg['competition']['qualifiers_per_pool'],
+        ];
         if (isset($cfg['format']['shot_clock_first_shot'])) {
             $syncFields['shot_clock_first_shot'] = $cfg['format']['shot_clock_first_shot'];
+        }
+        // Sync round_race_to into settings (merge pour préserver les autres clés)
+        if (!empty($cfg['round_race_to'])) {
+            $settings = $competition->settings ?? [];
+            $settings['round_race_to'] = $cfg['round_race_to'];
+            $syncFields['settings'] = $settings;
         }
         $competition->update($syncFields);
 

@@ -31,7 +31,7 @@ return [
         'race_to'                 => 9,    // fallback global (R16/QF/SF)
         'pool_race_to'            => 5,
         'knockout_race_to'        => 9,    // fallback pour rounds non configurés
-        'knockout_mapping_strategy' => 'pool_cross_ad_bc_eh_fg',
+        'knockout_mapping_strategy' => 'pool_cross_ab_cd_ef_gh',
         'prize_pool'              => 1120000,
         'venue'                   => "L'Icône",
         'city'                    => 'Libreville',
