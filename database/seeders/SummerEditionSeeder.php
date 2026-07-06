@@ -66,20 +66,20 @@ class SummerEditionSeeder extends Seeder
         ['pool' => 'E', 'fgb' => 'SE-2026-E-01', 'first' => 'Aziz',        'last' => '',     'rating' => 1500, 'seed' => 5],
         ['pool' => 'E', 'fgb' => 'SE-2026-E-02', 'first' => 'Mohamed',     'last' => '',     'rating' => 1350, 'seed' => null],
         ['pool' => 'E', 'fgb' => 'SE-2026-E-03', 'first' => 'Tarek',       'last' => '',     'rating' => 1250, 'seed' => null],
-        ['pool' => 'E', 'fgb' => 'SE-2026-E-04', 'first' => 'Khaled',      'last' => '',     'rating' => 1150, 'seed' => null],
+        ['pool' => 'E', 'fgb' => 'SE-2026-E-04', 'first' => 'Youssef',     'last' => '',     'rating' => 1150, 'seed' => null],
         ['pool' => 'E', 'fgb' => 'SE-2026-E-05', 'first' => 'Valery',      'last' => '',     'rating' => 1050, 'seed' => null],
         // POULE F — 07/07 18h30
         ['pool' => 'F', 'fgb' => 'SE-2026-F-01', 'first' => 'Dimitri',     'last' => '',     'rating' => 1480, 'seed' => 6],
         ['pool' => 'F', 'fgb' => 'SE-2026-F-02', 'first' => 'Mitch',       'last' => '',     'rating' => 1320, 'seed' => null],
         ['pool' => 'F', 'fgb' => 'SE-2026-F-03', 'first' => 'Alec',        'last' => '',     'rating' => 1220, 'seed' => null],
         ['pool' => 'F', 'fgb' => 'SE-2026-F-04', 'first' => 'Teuf',        'last' => '',     'rating' => 1120, 'seed' => null],
-        ['pool' => 'F', 'fgb' => 'SE-2026-F-05', 'first' => 'TBD',         'last' => 'X2',   'rating' => 1000, 'seed' => null],
+        ['pool' => 'F', 'fgb' => 'SE-2026-F-05', 'first' => 'Khaled',      'last' => '',     'rating' => 1000, 'seed' => null],
         // POULE G — 06/07 18h30
         ['pool' => 'G', 'fgb' => 'SE-2026-G-01', 'first' => 'Attiss',      'last' => '',     'rating' => 1460, 'seed' => 7],
         ['pool' => 'G', 'fgb' => 'SE-2026-G-02', 'first' => 'Amaury',      'last' => '',     'rating' => 1300, 'seed' => null],
         ['pool' => 'G', 'fgb' => 'SE-2026-G-03', 'first' => 'Haidara',     'last' => '',     'rating' => 1200, 'seed' => null],
         ['pool' => 'G', 'fgb' => 'SE-2026-G-04', 'first' => 'Calixte',     'last' => '',     'rating' => 1100, 'seed' => null],
-        ['pool' => 'G', 'fgb' => 'SE-2026-G-05', 'first' => 'TBD',         'last' => 'X3',   'rating' => 1000, 'seed' => null],
+        ['pool' => 'G', 'fgb' => 'SE-2026-G-05', 'first' => 'Philippe',    'last' => '',     'rating' => 1000, 'seed' => null],
         // POULE H — 07/07 18h30
         ['pool' => 'H', 'fgb' => 'SE-2026-H-01', 'first' => 'Paolo',       'last' => '',     'rating' => 1600, 'seed' => 8],
         ['pool' => 'H', 'fgb' => 'SE-2026-H-02', 'first' => 'Maud',        'last' => '',     'rating' => 1280, 'seed' => null],
