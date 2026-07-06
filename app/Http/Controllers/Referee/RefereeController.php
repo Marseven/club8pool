@@ -32,16 +32,9 @@ class RefereeController extends Controller
             ->orderBy('scheduled_at')
             ->get();
 
-        $blockedPools = GameMatch::whereNotNull('referee_id')
-            ->where('referee_id', '!=', $userId)
-            ->whereNotNull('pool_id')
-            ->pluck('pool_id')
-            ->unique();
-
         $available = GameMatch::with(['playerA', 'playerB', 'table', 'competition', 'pool'])
             ->whereIn('status', ['pending', 'scheduled'])
             ->whereNull('referee_id')
-            ->when($blockedPools->isNotEmpty(), fn ($q) => $q->whereNotIn('pool_id', $blockedPools))
             ->orderBy('scheduled_at')
             ->get();
 
@@ -144,15 +137,6 @@ class RefereeController extends Controller
         }
         if ($match->referee_id) {
             return back()->with('error', 'Ce match est déjà pris en charge par un autre arbitre.');
-        }
-        if ($match->pool_id) {
-            $conflict = GameMatch::where('pool_id', $match->pool_id)
-                ->whereNotNull('referee_id')
-                ->where('referee_id', '!=', $userId)
-                ->exists();
-            if ($conflict) {
-                return back()->with('error', 'Cette poule est déjà arbitrée par un autre arbitre.');
-            }
         }
 
         DB::transaction(function () use ($match, $userId) {

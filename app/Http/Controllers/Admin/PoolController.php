@@ -149,27 +149,24 @@ class PoolController extends Controller
         }
 
         $data = $request->validate([
-            'pool_table_id' => ['required', 'exists:pool_tables,id'],
-            'referee_id' => ['nullable', 'exists:users,id'],
+            'pool_table_id' => ['nullable', 'exists:pool_tables,id'],
+            'referee_id'    => ['nullable', 'exists:users,id'],
         ]);
 
-        // Libérer toute autre table actuellement live et l'arbitre s'il était assigné ailleurs
-        GameMatch::where('competition_id', $match->competition_id)
-            ->where('pool_table_id', $data['pool_table_id'])
-            ->where('status', 'live')
-            ->where('id', '!=', $match->id)
-            ->update(['status' => 'scheduled']);
+        $tableId = $data['pool_table_id'] ?? null;
+
+        if ($tableId) {
+            PoolTable::where('id', $tableId)->update(['status' => 'live']);
+        }
 
         $match->update([
-            'pool_table_id' => $data['pool_table_id'],
-            'referee_id' => $data['referee_id'] ?? null,
-            'status' => 'live',
-            'started_at' => now(),
-            'score_a' => 0,
-            'score_b' => 0,
+            'pool_table_id' => $tableId,
+            'referee_id'    => $data['referee_id'] ?? null,
+            'status'        => 'live',
+            'started_at'    => now(),
+            'score_a'       => 0,
+            'score_b'       => 0,
         ]);
-
-        PoolTable::where('id', $data['pool_table_id'])->update(['status' => 'live']);
 
         return back()->with('success', 'Match lancé.');
     }
