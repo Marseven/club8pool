@@ -122,7 +122,7 @@ const abbrev = (p) => {
     <meta name="description" content="Suivi en direct des matchs du Icone Pool Championship — scores live, classements de poules en temps réel." head-key="description" />
   </Head>
 
-  <div style="height: 100dvh; background: var(--ink); display: flex; flex-direction: column; overflow: hidden;">
+  <div class="page-live" style="height: 100dvh; background: var(--ink); display: flex; flex-direction: column; overflow: hidden;">
     <!-- Header -->
     <header style="flex-shrink: 0; padding: clamp(8px,1.4vh,18px) 0; border-bottom: 1px solid var(--line);
                    background: rgba(10,10,11,0.92);">
@@ -240,7 +240,7 @@ const abbrev = (p) => {
     </section>
 
     <!-- ══ Section du bas : poules OU bracket selon la phase ══ -->
-    <section style="flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+    <section class="pool-section" style="flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
                     padding: clamp(8px,1.2vh,16px) clamp(12px,2.5vw,32px) clamp(6px,1vh,12px);
                     border-top: 1px solid var(--line); background: var(--ink-2);">
 
@@ -423,6 +423,26 @@ const abbrev = (p) => {
 </template>
 
 <style scoped>
+/* ── Mobile : page scrollable — section poules toujours visible ── */
+@media (max-width: 640px) {
+  .page-live {
+    height: auto !important;
+    min-height: 100dvh;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  .pool-section {
+    min-height: 360px;
+    overflow: visible !important;
+    flex: none !important;
+  }
+  /* Section matchs live : ne pas écraser toute la hauteur */
+  .section-live {
+    max-height: 55dvh;
+    overflow-y: auto;
+  }
+}
+
 /* ── Live score ── */
 .live-score { font-size: clamp(28px, 6vh, 80px); }
 .live-dash  { font-size: clamp(18px, 3.8vh, 48px); }
