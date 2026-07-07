@@ -273,7 +273,6 @@ return [
         'Clubs de chaque joueur inscrit',
         'Montant de l\'inscription (registration_fee)',
         'Opérateur Mobile Money exact (Airtel Money / Moov / autre)',
-        'Identité du joueur X4 (Groupe H)',
     ],
 
 ];

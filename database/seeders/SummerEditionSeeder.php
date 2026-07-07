@@ -85,7 +85,7 @@ class SummerEditionSeeder extends Seeder
         ['pool' => 'H', 'fgb' => 'SE-2026-H-02', 'first' => 'Maud',        'last' => '',     'rating' => 1280, 'seed' => null],
         ['pool' => 'H', 'fgb' => 'SE-2026-H-03', 'first' => 'Anne',        'last' => '',     'rating' => 1180, 'seed' => null],
         ['pool' => 'H', 'fgb' => 'SE-2026-H-04', 'first' => 'Daniel',      'last' => '',     'rating' => 1080, 'seed' => null],
-        ['pool' => 'H', 'fgb' => 'SE-2026-H-05', 'first' => 'TBD',         'last' => 'X4',   'rating' => 1000, 'seed' => null],
+        ['pool' => 'H', 'fgb' => 'SE-2026-H-05', 'first' => 'Ismael',      'last' => '',     'rating' => 1000, 'seed' => null],
     ];
 
     public function run(): void
