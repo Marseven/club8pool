@@ -113,6 +113,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/exports', [\App\Http\Controllers\Admin\ExportController::class, 'index'])->name('exports.index');
     Route::get('/exports/excel', [\App\Http\Controllers\Admin\ExportController::class, 'downloadExcel'])->name('exports.excel');
     Route::get('/exports/pdf', [\App\Http\Controllers\Admin\ExportController::class, 'printPdf'])->name('exports.pdf');
+    Route::get('/exports/competition-pdf', [\App\Http\Controllers\Admin\ExportController::class, 'competitionPdf'])->name('exports.competition-pdf');
 });
 
 // Référée (espace mobile web fallback)

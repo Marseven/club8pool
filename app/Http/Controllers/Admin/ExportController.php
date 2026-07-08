@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Competition;
 use App\Models\GameMatch;
+use App\Models\Pool;
+use App\Services\PoolStanding;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Response as ResponseFacade;
@@ -152,6 +154,62 @@ class ExportController extends Controller
         $dateLabel = $this->fmtDate($date);
 
         return response()->view('admin.print.day_results', compact('competition', 'matches', 'date', 'dateLabel'));
+    }
+
+    public function competitionPdf(): HttpResponse
+    {
+        $competition = Competition::current()
+            ?? Competition::orderByDesc('starts_on')->firstOrFail();
+
+        $pools = Pool::where('competition_id', $competition->id)
+            ->orderBy('position')
+            ->get();
+
+        $poolData = $pools->map(function (Pool $pool) use ($competition) {
+            $standings = PoolStanding::compute($pool)->map(fn ($r) => [
+                'name'      => $r['player'] ? ($r['player']->first_name . ' ' . $r['player']->last_name) : '—',
+                'pool_slot' => $r['pool_slot'],
+                'v'         => $r['v'],
+                'w'         => $r['w'],
+                'l'         => $r['l'],
+                'diff'      => $r['diff'],
+                'rank'      => $r['rank'],
+            ])->values()->all();
+
+            $matches = GameMatch::where('pool_id', $pool->id)
+                ->where('phase', 'pool')
+                ->with(['playerA', 'playerB', 'table', 'referee'])
+                ->orderBy('scheduled_at')
+                ->orderBy('id')
+                ->get()
+                ->map(fn ($m) => [
+                    'player_a'   => $m->playerA ? ($m->playerA->first_name . ' ' . $m->playerA->last_name) : '—',
+                    'player_b'   => $m->playerB ? ($m->playerB->first_name . ' ' . $m->playerB->last_name) : '—',
+                    'score_a'    => $m->score_a,
+                    'score_b'    => $m->score_b,
+                    'status'     => $m->status,
+                    'table'      => $m->table?->name,
+                    'referee'    => $m->referee?->name,
+                    'started_at' => $m->started_at?->format('H:i'),
+                    'ended_at'   => $m->ended_at?->format('H:i'),
+                    'winner'     => $m->status === 'done'
+                        ? ($m->score_a > $m->score_b ? 'a' : 'b')
+                        : null,
+                ])->all();
+
+            $played   = collect($matches)->where('status', 'done')->count();
+            $total    = count($matches);
+
+            return [
+                'name'       => $pool->name,
+                'standings'  => $standings,
+                'matches'    => $matches,
+                'played'     => $played,
+                'total'      => $total,
+            ];
+        })->all();
+
+        return response()->view('admin.print.competition', compact('competition', 'poolData'));
     }
 
     // -------------------------------------------------------------------------

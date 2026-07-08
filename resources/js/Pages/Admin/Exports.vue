@@ -153,6 +153,42 @@ const pdfUrl   = computed(() => selected.value ? `/admin/exports/pdf?date=${sele
 
       </div>
 
+      <!-- ── Export compétition complète ── -->
+      <div v-if="competition" style="padding: 0 32px 32px;">
+        <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute); margin-bottom: 12px;">
+          EXPORT COMPÉTITION COMPLÈTE
+        </div>
+        <div style="border: 1px solid var(--line); background: var(--ink-2); padding: 24px;
+                    display: flex; align-items: flex-start; justify-content: space-between;
+                    flex-wrap: wrap; gap: 16px; max-width: 760px;">
+          <div>
+            <div class="disp-a" style="font-size: 20px;">Poules & Matchs</div>
+            <div style="font-size: 12px; color: var(--mute); margin-top: 6px; line-height: 1.6; max-width: 360px;">
+              Exporte les classements de toutes les poules et l'ensemble des matchs de la compétition dans un seul document imprimable.
+            </div>
+          </div>
+          <a
+            href="/admin/exports/competition-pdf"
+            target="_blank"
+            rel="noopener"
+            style="display: flex; align-items: center; gap: 12px;
+                   padding: 14px 18px;
+                   border: 1px solid var(--line-strong);
+                   background: var(--ink-3);
+                   text-decoration: none;
+                   color: var(--chalk);
+                   white-space: nowrap;"
+          >
+            <span style="font-size: 22px; line-height: 1;">⊟</span>
+            <div>
+              <div style="font-size: 13px; font-weight: 700;">PDF Poules & Matchs</div>
+              <div class="mono" style="font-size: 9px; letter-spacing: 0.14em; color: var(--mute); margin-top: 2px;">TOUTE LA COMPÉTITION</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+
     </main>
   </div>
 </template>
