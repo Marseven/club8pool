@@ -11,11 +11,11 @@ class PoolKnockoutMappingService
     const STRATEGY_2Q = 'pool_cross_ad_bc_eh_fg';
 
     // 8 pools × 2 qualifiers/pool → R16 (8 pairs): Summer Edition 2026 official bracket
-    // Cross-pool avec interleaving pour QF cross-group:
-    //   pos0: A2vB1  pos1: C2vD1  → QF_0 (cross A/B vs C/D)
-    //   pos2: A1vB2  pos3: C1vD2  → QF_1 (cross A/B vs C/D)
-    //   pos4: E1vF2  pos5: G1vH2  → QF_2 (cross E/F vs G/H)
-    //   pos6: E2vF1  pos7: G2vH1  → QF_3 (cross E/F vs G/H)
+    // Gauche: A/B + C/D  —  Droite: E/F + H/G
+    //   pos0: A1vB2  pos1: B1vA2  → QF_0
+    //   pos2: C1vD2  pos3: D1vC2  → QF_1
+    //   pos4: E1vF2  pos5: F1vE2  → QF_2
+    //   pos6: H1vG2  pos7: G1vH2  → QF_3
     const STRATEGY_SE2026 = 'pool_cross_ab_cd_ef_gh';
 
     private static array $CONFIGS = [
@@ -29,17 +29,18 @@ class PoolKnockoutMappingService
         ],
         // Summer Edition 2026 — mapping explicite (flat_pairs)
         // Format: [poolX, rankX (0-based), poolY, rankY (0-based)]
+        // Bracket gauche : A/B + C/D — Bracket droite : E/F + H/G
         'pool_cross_ab_cd_ef_gh' => [
             'qualifiers' => 2,
             'flat_pairs' => [
-                ['A', 1, 'B', 0],  // pos 0 : A2 vs B1
-                ['C', 1, 'D', 0],  // pos 1 : C2 vs D1
-                ['A', 0, 'B', 1],  // pos 2 : A1 vs B2
-                ['C', 0, 'D', 1],  // pos 3 : C1 vs D2
-                ['E', 0, 'F', 1],  // pos 4 : E1 vs F2
-                ['G', 0, 'H', 1],  // pos 5 : G1 vs H2
-                ['E', 1, 'F', 0],  // pos 6 : E2 vs F1
-                ['G', 1, 'H', 0],  // pos 7 : G2 vs H1
+                ['A', 0, 'B', 1],  // pos 0 : A1 vs B2  → QF 0
+                ['B', 0, 'A', 1],  // pos 1 : B1 vs A2  → QF 0
+                ['C', 0, 'D', 1],  // pos 2 : C1 vs D2  → QF 1
+                ['D', 0, 'C', 1],  // pos 3 : D1 vs C2  → QF 1
+                ['E', 0, 'F', 1],  // pos 4 : E1 vs F2  → QF 2
+                ['F', 0, 'E', 1],  // pos 5 : F1 vs E2  → QF 2
+                ['H', 0, 'G', 1],  // pos 6 : H1 vs G2  → QF 3
+                ['G', 0, 'H', 1],  // pos 7 : G1 vs H2  → QF 3
             ],
         ],
     ];
