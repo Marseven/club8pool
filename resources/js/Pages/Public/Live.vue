@@ -347,7 +347,7 @@ const abbrev = (p) => {
                 </span>
                 <!-- Score ou VS -->
                 <span class="disp-a tnum bc-row-score">
-                  <template v-if="m.status !== 'pending'">{{ m.score_a }}<span class="bc-sep">—</span>{{ m.score_b }}</template>
+                  <template v-if="m.status === 'live' || m.status === 'done'">{{ m.score_a }}<span class="bc-sep">—</span>{{ m.score_b }}</template>
                   <template v-else><span class="bc-vs mono">VS</span></template>
                 </span>
                 <!-- Nom B (3 lettres, aligné à gauche) -->
@@ -369,11 +369,11 @@ const abbrev = (p) => {
                    :class="{ 'bc-live': m.status==='live', 'bc-done': m.status==='done', 'bc-pending': m.status==='pending' }">
                 <div class="bc-player" :class="{ 'bc-winner': m.status==='done' && m.score_a > m.score_b }">
                   <span class="bc-name">{{ m.player_a ? m.player_a.first_name+' '+m.player_a.last_name : '—' }}</span>
-                  <span v-if="m.status!=='pending'" class="disp-a tnum bc-score">{{ m.score_a }}</span>
+                  <span v-if="m.status==='live' || m.status==='done'" class="disp-a tnum bc-score">{{ m.score_a }}</span>
                 </div>
                 <div class="bc-player" :class="{ 'bc-winner': m.status==='done' && m.score_b > m.score_a }">
                   <span class="bc-name">{{ m.player_b ? m.player_b.first_name+' '+m.player_b.last_name : '—' }}</span>
-                  <span v-if="m.status!=='pending'" class="disp-a tnum bc-score">{{ m.score_b }}</span>
+                  <span v-if="m.status==='live' || m.status==='done'" class="disp-a tnum bc-score">{{ m.score_b }}</span>
                 </div>
                 <div v-if="m.status==='live'" class="bc-badge bc-badge-live mono">● LIVE</div>
                 <div v-else-if="m.status==='done'" class="bc-badge bc-badge-done mono">{{ fmtTime(m.ended_at) }}</div>
