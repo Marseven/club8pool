@@ -29,18 +29,21 @@ class PoolKnockoutMappingService
         ],
         // Summer Edition 2026 — mapping explicite (flat_pairs)
         // Format: [poolX, rankX (0-based), poolY, rankY (0-based)]
-        // Bracket gauche : A/B + C/D — Bracket droite : E/F + H/G
+        // BracketProgression groupe intdiv(pos,2) → QF slot :
+        //   pos 0+1 → QF[0], pos 2+3 → QF[1], pos 4+5 → QF[2], pos 6+7 → QF[3]
+        // Bracket gauche : QF[0] = A/B × C/D seeds — QF[1] = B/A × D/C seeds
+        // Bracket droite : QF[2] = E/F × G/H seeds — QF[3] = F/E × H/G seeds
         'pool_cross_ab_cd_ef_gh' => [
             'qualifiers' => 2,
             'flat_pairs' => [
                 ['A', 0, 'B', 1],  // pos 0 : A1 vs B2  → QF 0
-                ['B', 0, 'A', 1],  // pos 1 : B1 vs A2  → QF 0
-                ['C', 0, 'D', 1],  // pos 2 : C1 vs D2  → QF 1
+                ['C', 0, 'D', 1],  // pos 1 : C1 vs D2  → QF 0
+                ['B', 0, 'A', 1],  // pos 2 : B1 vs A2  → QF 1
                 ['D', 0, 'C', 1],  // pos 3 : D1 vs C2  → QF 1
                 ['E', 0, 'F', 1],  // pos 4 : E1 vs F2  → QF 2
-                ['F', 0, 'E', 1],  // pos 5 : F1 vs E2  → QF 2
-                ['H', 0, 'G', 1],  // pos 6 : H1 vs G2  → QF 3
-                ['G', 0, 'H', 1],  // pos 7 : G1 vs H2  → QF 3
+                ['G', 0, 'H', 1],  // pos 5 : G1 vs H2  → QF 2
+                ['F', 0, 'E', 1],  // pos 6 : F1 vs E2  → QF 3
+                ['H', 0, 'G', 1],  // pos 7 : H1 vs G2  → QF 3
             ],
         ],
     ];
