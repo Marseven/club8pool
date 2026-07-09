@@ -39,7 +39,11 @@ class KnockoutController extends Controller
         // Detect knockout mapping strategy
         $knockoutStrategy = $competition->knockout_mapping_strategy ?? null;
 
-        $supportedStrategies = [PoolKnockoutMappingService::STRATEGY, PoolKnockoutMappingService::STRATEGY_2Q];
+        $supportedStrategies = [
+            PoolKnockoutMappingService::STRATEGY,
+            PoolKnockoutMappingService::STRATEGY_2Q,
+            PoolKnockoutMappingService::STRATEGY_SE2026,
+        ];
 
         if ($knockoutStrategy && in_array($knockoutStrategy, $supportedStrategies, true)) {
             $mappingService = new PoolKnockoutMappingService();
@@ -70,7 +74,7 @@ class KnockoutController extends Controller
         $poolDone = $poolMatches->where('status', 'done')->count();
         $poolTotal = $poolMatches->count();
 
-        $sourceLabelMap = ($knockoutStrategy && in_array($knockoutStrategy, $supportedStrategies, true))
+        $sourceLabelMap = ($knockoutStrategy && in_array($knockoutStrategy, $supportedStrategies))
             ? (new PoolKnockoutMappingService())->getSourceLabelMap($knockoutStrategy)
             : [];
 
