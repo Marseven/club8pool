@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import PublicNav from '@/Components/PublicNav.vue';
 import PublicFooter from '@/Components/PublicFooter.vue';
@@ -106,10 +106,6 @@ const medals = ['🥇', '🥈', '🥉'];
               {{ r.rating }}
             </div>
             <div class="mono" style="font-size: 9px; letter-spacing: 0.16em; color: var(--mute); margin-top: 2px;">ELO</div>
-            <div v-if="r.provisional"
-                 class="mono"
-                 style="font-size: 9px; letter-spacing: 0.12em; color: #e5c048; border: 1px solid #e5c048;
-                        padding: 2px 6px; margin-top: 8px; display: inline-block;">PROVISOIRE</div>
           </div>
         </div>
 
@@ -128,7 +124,7 @@ const medals = ['🥇', '🥈', '🥉'];
           </thead>
           <tbody>
             <tr
-              v-for="r in rows" :key="r.player_id"
+              v-for="r in rows" :key="r.rank"
               style="border-bottom: 1px solid var(--line);"
               onmouseover="this.style.filter='brightness(1.06)'" onmouseout="this.style.filter='none'"
             >
@@ -137,13 +133,9 @@ const medals = ['🥇', '🥈', '🥉'];
                 {{ r.rank }}
               </td>
               <td style="padding: 11px 12px;">
-                <Link :href="`/joueurs/${r.player_id}`" style="text-decoration: none;">
-                  <div style="font-size: 13px; font-weight: 600; color: var(--chalk);">
-                    {{ r.first_name }} {{ r.last_name }}
-                  </div>
-                  <div v-if="r.provisional" class="mono"
-                       style="font-size: 9px; color: #e5c048; letter-spacing: 0.1em; margin-top: 2px;">PROVISOIRE</div>
-                </Link>
+                <div style="font-size: 13px; font-weight: 600; color: var(--chalk);">
+                  {{ r.first_name }} {{ r.last_name }}
+                </div>
               </td>
               <td class="col-hide-mobile" style="padding: 11px 12px; font-size: 12px; color: var(--mute);">{{ r.club ?? '—' }}</td>
               <td class="mono tnum" style="padding: 11px 12px; text-align: right; font-size: 16px; font-weight: 700; color: var(--chalk);">
