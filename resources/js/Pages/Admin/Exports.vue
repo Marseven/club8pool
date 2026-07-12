@@ -158,33 +158,64 @@ const pdfUrl   = computed(() => selected.value ? `/admin/exports/pdf?date=${sele
         <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute); margin-bottom: 12px;">
           EXPORT COMPÉTITION COMPLÈTE
         </div>
-        <div style="border: 1px solid var(--line); background: var(--ink-2); padding: 24px;
-                    display: flex; align-items: flex-start; justify-content: space-between;
-                    flex-wrap: wrap; gap: 16px; max-width: 760px;">
-          <div>
-            <div class="disp-a" style="font-size: 20px;">Poules & Matchs</div>
-            <div style="font-size: 12px; color: var(--mute); margin-top: 6px; line-height: 1.6; max-width: 360px;">
-              Exporte les classements de toutes les poules et l'ensemble des matchs de la compétition dans un seul document imprimable.
-            </div>
-          </div>
-          <a
-            href="/admin/exports/competition-pdf"
-            target="_blank"
-            rel="noopener"
-            style="display: flex; align-items: center; gap: 12px;
-                   padding: 14px 18px;
-                   border: 1px solid var(--line-strong);
-                   background: var(--ink-3);
-                   text-decoration: none;
-                   color: var(--chalk);
-                   white-space: nowrap;"
-          >
-            <span style="font-size: 22px; line-height: 1;">⊟</span>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 760px;">
+          <!-- Rapport complet -->
+          <div style="border: 1px solid var(--felt-2); background: rgba(45,168,118,0.04); padding: 22px;
+                      display: flex; flex-direction: column; justify-content: space-between; gap: 16px;">
             <div>
-              <div style="font-size: 13px; font-weight: 700;">PDF Poules & Matchs</div>
-              <div class="mono" style="font-size: 9px; letter-spacing: 0.14em; color: var(--mute); margin-top: 2px;">TOUTE LA COMPÉTITION</div>
+              <div class="disp-a" style="font-size: 20px;">Rapport complet</div>
+              <div style="font-size: 12px; color: var(--mute); margin-top: 6px; line-height: 1.6;">
+                Synthèse, poules, phase finale, podium et meilleures statistiques dans un seul document.
+              </div>
             </div>
-          </a>
+            <a
+              :href="`/admin/competitions/${competition.id}/rapport`"
+              target="_blank"
+              rel="noopener"
+              style="display: flex; align-items: center; gap: 12px;
+                     padding: 14px 18px;
+                     border: 1px solid var(--felt-2);
+                     background: var(--felt);
+                     text-decoration: none;
+                     color: #fff;
+                     white-space: nowrap;"
+            >
+              <span style="font-size: 22px; line-height: 1;">▦</span>
+              <div>
+                <div style="font-size: 13px; font-weight: 700;">Rapport complet PDF</div>
+                <div class="mono" style="font-size: 9px; letter-spacing: 0.14em; color: rgba(255,255,255,0.75); margin-top: 2px;">TOUT LE TOURNOI</div>
+              </div>
+            </a>
+          </div>
+
+          <!-- Poules & Matchs -->
+          <div style="border: 1px solid var(--line); background: var(--ink-2); padding: 22px;
+                      display: flex; flex-direction: column; justify-content: space-between; gap: 16px;">
+            <div>
+              <div class="disp-a" style="font-size: 20px;">Poules & Matchs</div>
+              <div style="font-size: 12px; color: var(--mute); margin-top: 6px; line-height: 1.6;">
+                Classements de toutes les poules et l'ensemble des matchs de la compétition.
+              </div>
+            </div>
+            <a
+              href="/admin/exports/competition-pdf"
+              target="_blank"
+              rel="noopener"
+              style="display: flex; align-items: center; gap: 12px;
+                     padding: 14px 18px;
+                     border: 1px solid var(--line-strong);
+                     background: var(--ink-3);
+                     text-decoration: none;
+                     color: var(--chalk);
+                     white-space: nowrap;"
+            >
+              <span style="font-size: 22px; line-height: 1;">⊟</span>
+              <div>
+                <div style="font-size: 13px; font-weight: 700;">PDF Poules & Matchs</div>
+                <div class="mono" style="font-size: 9px; letter-spacing: 0.14em; color: var(--mute); margin-top: 2px;">POULES UNIQUEMENT</div>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
 

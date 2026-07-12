@@ -50,6 +50,7 @@ const fmtFcfa = (n) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
           <Link v-if="competition.structure?.includes('pool')" :href="`/admin/competitions/${competition.id}/poules`" class="btn">Poules →</Link>
           <Link v-if="competition.structure?.includes('knockout')" :href="`/admin/competitions/${competition.id}/phase-finale`" class="btn">Phase finale →</Link>
           <Link :href="`/admin/competitions/${competition.id}/stats`" class="btn">Stats →</Link>
+          <a :href="`/admin/competitions/${competition.id}/rapport`" target="_blank" rel="noopener" class="btn">Rapport ↗</a>
           <Link :href="`/admin/competitions/${competition.id}/edit`" class="btn btn-felt">Éditer</Link>
           <!-- Status transitions -->
           <template v-if="competition.status !== 'finished'">

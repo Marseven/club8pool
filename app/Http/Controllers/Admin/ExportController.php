@@ -212,7 +212,133 @@ class ExportController extends Controller
         return response()->view('admin.print.competition', compact('competition', 'poolData'));
     }
 
+    /**
+     * Rapport complet d'une compétition : synthèse, poules, phase finale,
+     * podium et meilleures statistiques — dans un seul document imprimable.
+     */
+    public function competitionReport(Competition $competition): HttpResponse
+    {
+        $competition->loadCount('registrations');
+
+        // ── Poules : classements + matchs ────────────────────────────────────
+        $pools = Pool::where('competition_id', $competition->id)
+            ->orderBy('position')
+            ->get();
+
+        $poolData = $pools->map(function (Pool $pool) {
+            $standings = PoolStanding::compute($pool)->map(fn ($r) => [
+                'name'      => $r['player'] ? ($r['player']->first_name . ' ' . $r['player']->last_name) : '—',
+                'pool_slot' => $r['pool_slot'],
+                'v'         => $r['v'],
+                'w'         => $r['w'],
+                'l'         => $r['l'],
+                'diff'      => $r['diff'],
+                'rank'      => $r['rank'],
+            ])->values()->all();
+
+            $matches = GameMatch::where('pool_id', $pool->id)
+                ->where('phase', 'pool')
+                ->with(['playerA', 'playerB', 'table', 'referee'])
+                ->orderBy('scheduled_at')->orderBy('id')
+                ->get()
+                ->map(fn ($m) => $this->reportMatchRow($m))
+                ->all();
+
+            return [
+                'name'      => $pool->name,
+                'standings' => $standings,
+                'matches'   => $matches,
+                'played'    => collect($matches)->where('status', 'done')->count(),
+                'total'     => count($matches),
+            ];
+        })->all();
+
+        // ── Phase finale : matchs groupés par tour ───────────────────────────
+        $roundLabels = ['R16' => '8es de finale', 'QF' => 'Quarts', 'SF' => 'Demi-finales', 'F' => 'Finale'];
+        $knockout = GameMatch::where('competition_id', $competition->id)
+            ->where('phase', 'knockout')
+            ->with(['playerA', 'playerB', 'table', 'referee'])
+            ->orderBy('round_position')
+            ->get()
+            ->groupBy('round')
+            ->map(fn ($rows) => $rows->map(fn ($m) => $this->reportMatchRow($m))->all());
+
+        $knockoutRounds = [];
+        foreach (['R16', 'QF', 'SF', 'F'] as $r) {
+            if (! empty($knockout[$r])) {
+                $knockoutRounds[] = ['key' => $r, 'label' => $roundLabels[$r], 'matches' => $knockout[$r]];
+            }
+        }
+
+        // ── Vainqueur (finale terminée) ──────────────────────────────────────
+        $winner = null;
+        $final  = collect($knockout['F'] ?? [])->first();
+        if ($final && $final['status'] === 'done') {
+            $winner = $final['winner'] === 'a' ? $final['player_a'] : $final['player_b'];
+        }
+
+        // ── Synthèse globale ─────────────────────────────────────────────────
+        $allMatches = GameMatch::where('competition_id', $competition->id)->get();
+        $done       = $allMatches->where('status', 'done');
+        $totalFrames = $done->sum(fn ($m) => (int) $m->score_a + (int) $m->score_b);
+        $durations   = $done->whereNotNull('duration_seconds')->pluck('duration_seconds');
+
+        $overview = [
+            'players'       => $competition->registrations_count,
+            'pools'         => count($poolData),
+            'matches_total' => $allMatches->count(),
+            'matches_done'  => $done->count(),
+            'frames_total'  => $totalFrames,
+            'frames_avg'    => $done->count() ? round($totalFrames / $done->count(), 1) : 0,
+            'avg_duration'  => $durations->count() ? round($durations->avg() / 60) : null,
+            'total_hours'   => $durations->sum() ? round($durations->sum() / 3600, 1) : null,
+        ];
+
+        // ── Meilleures statistiques (top joueurs) ────────────────────────────
+        $stats = \App\Models\PlayerCompetitionStatistic::with('player.club')
+            ->where('competition_id', $competition->id)
+            ->get();
+
+        $topBy = fn (string $field, int $limit = 5) => $stats
+            ->sortByDesc($field)
+            ->filter(fn ($s) => (int) $s->{$field} > 0)
+            ->take($limit)
+            ->map(fn ($s) => [
+                'name'  => $s->player ? ($s->player->first_name . ' ' . $s->player->last_name) : '—',
+                'club'  => $s->player?->club?->name,
+                'value' => (int) $s->{$field},
+            ])->values()->all();
+
+        $topStats = [
+            'frames_won'     => $topBy('frames_won'),
+            'matches_won'    => $topBy('matches_won'),
+            'break_and_runs' => $topBy('break_and_runs'),
+        ];
+
+        return response()->view('admin.print.report', compact(
+            'competition', 'overview', 'poolData', 'knockoutRounds', 'winner', 'topStats'
+        ));
+    }
+
     // -------------------------------------------------------------------------
+
+    private function reportMatchRow(GameMatch $m): array
+    {
+        return [
+            'player_a'   => $m->playerA ? ($m->playerA->first_name . ' ' . $m->playerA->last_name) : '—',
+            'player_b'   => $m->playerB ? ($m->playerB->first_name . ' ' . $m->playerB->last_name) : '—',
+            'score_a'    => $m->score_a,
+            'score_b'    => $m->score_b,
+            'status'     => $m->status,
+            'table'      => $m->table?->name,
+            'referee'    => $m->referee?->name,
+            'started_at' => $m->started_at?->format('H:i'),
+            'ended_at'   => $m->ended_at?->format('H:i'),
+            'winner'     => $m->status === 'done'
+                ? ($m->score_a > $m->score_b ? 'a' : 'b')
+                : null,
+        ];
+    }
 
     private function matchesForDay(int $competitionId, string $date): array
     {

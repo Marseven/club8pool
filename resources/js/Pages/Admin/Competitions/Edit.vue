@@ -143,6 +143,28 @@ const submit = () => {
           </label>
         </div>
 
+        <h3 class="disp-a" style="font-size: 20px; margin-bottom: 6px;">Dates &amp; calendrier</h3>
+        <p style="font-size: 12px; color: var(--mute); margin-bottom: 14px;">
+          Dates affichées sur la page publique et utilisées pour le tri des compétitions.
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 14px; margin-bottom: 28px;">
+          <label>
+            <div class="mono" style="font-size: 10px; color: var(--mute); margin-bottom: 6px;">DÉBUT</div>
+            <input v-model="form.starts_on" type="date" />
+            <div v-if="form.errors.starts_on" style="font-size: 11px; color: var(--live); margin-top: 4px;">{{ form.errors.starts_on }}</div>
+          </label>
+          <label>
+            <div class="mono" style="font-size: 10px; color: var(--mute); margin-bottom: 6px;">FIN</div>
+            <input v-model="form.ends_on" type="date" :min="form.starts_on || undefined" />
+            <div v-if="form.errors.ends_on" style="font-size: 11px; color: var(--live); margin-top: 4px;">{{ form.errors.ends_on }}</div>
+          </label>
+          <label>
+            <div class="mono" style="font-size: 10px; color: var(--mute); margin-bottom: 6px;">CLÔTURE DES INSCRIPTIONS</div>
+            <input v-model="form.registration_closes_at" type="datetime-local" />
+            <div v-if="form.errors.registration_closes_at" style="font-size: 11px; color: var(--live); margin-top: 4px;">{{ form.errors.registration_closes_at }}</div>
+          </label>
+        </div>
+
         <h3 class="disp-a" style="font-size: 20px; margin-bottom: 6px;">Statut de la compétition</h3>
         <p style="font-size: 12px; color: var(--mute); margin-bottom: 14px;">
           Quand le statut est <strong style="color: var(--chalk);">« En cours »</strong> ou <strong style="color: var(--chalk);">« Terminée »</strong>, les inscriptions publiques sont automatiquement fermées.
