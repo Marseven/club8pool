@@ -15,6 +15,7 @@ const items = [
   ['comps', 'Compétitions', '◇', '/admin/competitions'],
   ['pools', 'Poules', '▤', '/admin/poules'],
   ['knockout', 'Phase finale', '⊙', '/admin/phase-finale'],
+  ['scoring', 'Live Scoring', '⊕', '/admin/scoring'],
   ['import', 'Import Excel', '↓', '/admin/import'],
   ['export', 'Exports', '⇩', '/admin/exports'],
   ['players', 'Joueurs', '○', '/admin/joueurs'],

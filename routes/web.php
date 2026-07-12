@@ -73,6 +73,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Legacy redirects → current competition
     Route::get('/phase-finale', [\App\Http\Controllers\Admin\KnockoutController::class, 'show'])->name('knockout.show');
     Route::post('/phase-finale', [\App\Http\Controllers\Admin\KnockoutController::class, 'generate'])->name('knockout.generate');
+    Route::get('/scoring', [\App\Http\Controllers\Admin\LiveScoringController::class, 'index'])->name('scoring.index');
+
     Route::post('/phase-finale/matchs/{match}/lancer', [\App\Http\Controllers\Admin\KnockoutController::class, 'startMatch'])->name('knockout.match.start');
     Route::post('/phase-finale/matchs/{match}/frame', [\App\Http\Controllers\Admin\KnockoutController::class, 'scoreFrame'])->name('knockout.match.frame');
     Route::post('/phase-finale/matchs/{match}/undo', [\App\Http\Controllers\Admin\KnockoutController::class, 'undoFrame'])->name('knockout.match.undo');

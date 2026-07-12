@@ -107,7 +107,7 @@ const saisirMatch = ref(null);
 const saisirScore = ref({ score_a: 0, score_b: 0 });
 const saisirSaving = ref(false);
 
-const openSaisir = (m) => { saisirMatch.value = m; saisirScore.value = { score_a: 0, score_b: 0 }; };
+const openSaisir = (m) => { saisirMatch.value = m; saisirScore.value = { score_a: m.score_a ?? 0, score_b: m.score_b ?? 0 }; };
 const closeSaisir = () => { saisirMatch.value = null; };
 const saveSaisir = () => {
   saisirSaving.value = true;
