@@ -254,7 +254,7 @@ class ExportController extends Controller
         })->all();
 
         // ── Phase finale : matchs groupés par tour ───────────────────────────
-        $roundLabels = ['R16' => '8es de finale', 'QF' => 'Quarts', 'SF' => 'Demi-finales', 'F' => 'Finale'];
+        $roundLabels = ['R16' => '8es de finale', 'QF' => 'Quarts', 'SF' => 'Demi-finales', '3P' => 'Match pour la 3e place', 'F' => 'Finale'];
         $knockout = GameMatch::where('competition_id', $competition->id)
             ->where('phase', 'knockout')
             ->with(['playerA', 'playerB', 'table', 'referee'])
@@ -264,17 +264,22 @@ class ExportController extends Controller
             ->map(fn ($rows) => $rows->map(fn ($m) => $this->reportMatchRow($m))->all());
 
         $knockoutRounds = [];
-        foreach (['R16', 'QF', 'SF', 'F'] as $r) {
+        foreach (['R16', 'QF', 'SF', '3P', 'F'] as $r) {
             if (! empty($knockout[$r])) {
                 $knockoutRounds[] = ['key' => $r, 'label' => $roundLabels[$r], 'matches' => $knockout[$r]];
             }
         }
 
-        // ── Vainqueur (finale terminée) ──────────────────────────────────────
-        $winner = null;
+        // ── Vainqueur (finale terminée) + 3e place ───────────────────────────
+        $winner = $runnerUp = $third = null;
         $final  = collect($knockout['F'] ?? [])->first();
         if ($final && $final['status'] === 'done') {
-            $winner = $final['winner'] === 'a' ? $final['player_a'] : $final['player_b'];
+            $winner   = $final['winner'] === 'a' ? $final['player_a'] : $final['player_b'];
+            $runnerUp = $final['winner'] === 'a' ? $final['player_b'] : $final['player_a'];
+        }
+        $thirdMatch = collect($knockout['3P'] ?? [])->first();
+        if ($thirdMatch && $thirdMatch['status'] === 'done') {
+            $third = $thirdMatch['winner'] === 'a' ? $thirdMatch['player_a'] : $thirdMatch['player_b'];
         }
 
         // ── Synthèse globale ─────────────────────────────────────────────────
@@ -316,7 +321,7 @@ class ExportController extends Controller
         ];
 
         return response()->view('admin.print.report', compact(
-            'competition', 'overview', 'poolData', 'knockoutRounds', 'winner', 'topStats'
+            'competition', 'overview', 'poolData', 'knockoutRounds', 'winner', 'runnerUp', 'third', 'topStats'
         ));
     }
 

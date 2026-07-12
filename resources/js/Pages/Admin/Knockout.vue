@@ -65,7 +65,7 @@ const generate = () => {
 };
 
 const labelOf = (q) => q ? `${q.pool_name}${q.pool_slot}` : '—';
-const roundLabel = (r) => ({ R16: '8e de finale', QF: 'Quart de finale', SF: 'Demi-finale', F: 'Finale' }[r] ?? r);
+const roundLabel = (r) => ({ R16: '8e de finale', QF: 'Quart de finale', SF: 'Demi-finale', '3P': 'Match 3e place', F: 'Finale' }[r] ?? r);
 
 // ── Score correction modal (done matches) ─────────────────────────
 const editingMatch = ref(null);
@@ -121,7 +121,7 @@ const saveSaisir = () => {
 const scoringMatchId = ref(null);
 const scoringMatch = computed(() => {
   if (!scoringMatchId.value) return null;
-  for (const round of ['R16','QF','SF','F']) {
+  for (const round of ['R16','QF','SF','3P','F']) {
     const m = (props.existing?.[round] ?? []).find(m => m.id === scoringMatchId.value);
     if (m) return m;
   }
@@ -171,7 +171,7 @@ const closeMatchToEdit = (m) => { scoringMatchId.value = null; openSaisir(m); };
       <section v-if="hasExisting" style="margin: 24px 32px;">
         <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--felt-2); margin-bottom: 14px;">BRACKET ACTUEL</div>
 
-        <div v-for="round in ['R16', 'QF', 'SF', 'F']" :key="round">
+        <div v-for="round in ['R16', 'QF', 'SF', '3P', 'F']" :key="round">
           <template v-if="(existing[round] || []).length">
             <div class="mono" style="font-size: 9px; color: var(--mute); letter-spacing: 0.22em;
                                      padding: 8px 0 6px; border-bottom: 1px solid var(--line);">

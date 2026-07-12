@@ -37,7 +37,7 @@ class LiveController extends Controller
             ->get();
 
         $knockoutBracket = [];
-        foreach (['R16', 'QF', 'SF', 'F'] as $r) {
+        foreach (['R16', 'QF', 'SF', '3P', 'F'] as $r) {
             $rounds = $koMatches->where('round', $r)->values();
             if ($rounds->isNotEmpty()) {
                 $knockoutBracket[$r] = $rounds->map(fn ($m) => [

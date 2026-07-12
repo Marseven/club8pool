@@ -20,6 +20,7 @@ const qfR   = computed(() => (props.matches?.QF  ?? []).slice(2, 4));
 const sfL   = computed(() => (props.matches?.SF  ?? [])[0] ?? null);
 const sfR   = computed(() => (props.matches?.SF  ?? [])[1] ?? null);
 const fin   = computed(() => (props.matches?.F   ?? [])[0] ?? null);
+const third = computed(() => (props.matches?.['3P'] ?? [])[0] ?? null);
 
 // ── Position helpers ──────────────────────────────────────────────────────────
 const cx    = (col)  => col * CX;
@@ -134,6 +135,15 @@ const COL_LABELS = [
         <!-- FINALE -->
         <div :style="{ position: 'absolute', left: cx(3) + 'px', top: sfY() + 'px' }">
           <BracketCard :match="fin" :is-final="true" />
+        </div>
+
+        <!-- MATCH 3e PLACE (petite finale) — sous la finale -->
+        <div v-if="third"
+             :style="{ position: 'absolute', left: cx(3) + 'px', top: (sfY() + MH + 34) + 'px' }">
+          <div class="mono" style="font-size: 9px; letter-spacing: .18em; color: #b87333; text-align: center; margin-bottom: 6px;">
+            🥉 MATCH 3e PLACE
+          </div>
+          <BracketCard :match="third" />
         </div>
 
         <!-- SF RIGHT -->

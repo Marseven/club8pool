@@ -83,13 +83,13 @@ const selectPool = (i) => { currentPoolIdx.value = i; carouselCountdown.value = 
 const currentPool = computed(() => props.pools?.[currentPoolIdx.value] ?? null);
 
 // ── Bracket ──────────────────────────────────────────────────
-const ROUND_ORDER = ['R16', 'QF', 'SF', 'F'];
+const ROUND_ORDER = ['R16', 'QF', 'SF', '3P', 'F'];
 const bracketRounds = computed(() =>
   ROUND_ORDER.filter(r => (props.knockoutBracket?.[r]?.length ?? 0) > 0)
 );
 const hasBracket = computed(() => bracketRounds.value.length > 0);
 
-const roundLabel = (r) => ({ R16: '8es DE FINALE', QF: 'QUARTS', SF: 'DEMIS', F: 'FINALE' }[r] ?? r);
+const roundLabel = (r) => ({ R16: '8es DE FINALE', QF: 'QUARTS', SF: 'DEMIS', '3P': '3e PLACE', F: 'FINALE' }[r] ?? r);
 
 // ── Utilitaires ───────────────────────────────────────────────
 const secondsAgo = computed(() => {
@@ -170,7 +170,7 @@ const abbrev = (p) => {
             <div>
               <div class="disp-a" style="font-size: 22px;">{{ m.table?.name?.toUpperCase() }}</div>
               <div class="mono" style="font-size: 10px; letter-spacing: 0.18em; color: var(--mute); margin-top: 4px;">
-                {{ m.phase === 'pool' ? 'POULE · ROUND-ROBIN' : m.round?.replace('R16', '8e').replace('QF', 'QUARTS').replace('SF', 'DEMI').replace('F', 'FINALE') }}
+                {{ m.phase === 'pool' ? 'POULE · ROUND-ROBIN' : m.round?.replace('R16', '8e').replace('QF', 'QUARTS').replace('SF', 'DEMI').replace('3P', '3e PLACE').replace('F', 'FINALE') }}
                 · RACE TO {{ raceFor(m) }}
               </div>
             </div>
@@ -208,7 +208,7 @@ const abbrev = (p) => {
               <div>
                 <div class="disp-a" style="font-size: 22px;">{{ m.table?.name?.toUpperCase() ?? 'TABLE À DÉFINIR' }}</div>
                 <div class="mono" style="font-size: 10px; letter-spacing: 0.18em; color: var(--mute); margin-top: 4px;">
-                  {{ m.phase === 'pool' ? 'POULE · ROUND-ROBIN' : m.round?.replace('R16','8e').replace('QF','QUARTS').replace('SF','DEMI').replace('F','FINALE') }}
+                  {{ m.phase === 'pool' ? 'POULE · ROUND-ROBIN' : m.round?.replace('R16','8e').replace('QF','QUARTS').replace('SF','DEMI').replace('3P','3e PLACE').replace('F','FINALE') }}
                   · RACE TO {{ raceFor(m) }}
                   <template v-if="fmtTime(m.scheduled_at)"> · {{ fmtTime(m.scheduled_at) }}</template>
                 </div>

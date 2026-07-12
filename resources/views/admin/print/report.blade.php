@@ -142,14 +142,34 @@
   ⊕ Imprimer / Enregistrer PDF
 </button>
 
-{{-- ── Vainqueur ── --}}
+{{-- ── Podium ── --}}
 @if($winner)
-<div class="winner" style="margin: 0 20px 20px;">
-  <span class="trophy">🏆</span>
-  <div>
-    <div class="lbl">Vainqueur</div>
-    <div class="name">{{ $winner }}</div>
+<div style="display: flex; gap: 12px; margin: 0 20px 20px; flex-wrap: wrap;">
+  <div class="winner" style="flex: 1; min-width: 200px;">
+    <span class="trophy">🏆</span>
+    <div>
+      <div class="lbl">Champion</div>
+      <div class="name">{{ $winner }}</div>
+    </div>
   </div>
+  @if($runnerUp)
+  <div class="winner" style="flex: 1; min-width: 160px; border-color: #999; background: #f4f4f4;">
+    <span class="trophy">🥈</span>
+    <div>
+      <div class="lbl">Finaliste</div>
+      <div class="name" style="color: #555;">{{ $runnerUp }}</div>
+    </div>
+  </div>
+  @endif
+  @if($third)
+  <div class="winner" style="flex: 1; min-width: 160px; border-color: #b87333; background: #faf3ec;">
+    <span class="trophy">🥉</span>
+    <div>
+      <div class="lbl">3e place</div>
+      <div class="name" style="color: #a35a20;">{{ $third }}</div>
+    </div>
+  </div>
+  @endif
 </div>
 @endif
 
