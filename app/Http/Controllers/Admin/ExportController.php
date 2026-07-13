@@ -22,10 +22,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportController extends Controller
 {
-    public function index(): InertiaResponse
+    public function index(Request $request): InertiaResponse
     {
-        $competition = Competition::current()
-            ?? Competition::orderByDesc('starts_on')->first();
+        $competition = $this->resolveCompetition($request);
 
         $days = [];
         if ($competition) {
@@ -50,8 +49,20 @@ class ExportController extends Controller
                 'name' => $competition->name,
                 'slug' => $competition->slug,
             ] : null,
+            'competitions' => Competition::orderByDesc('starts_on')->get(['id', 'name', 'status']),
             'days' => $days,
         ]);
+    }
+
+    /** Résout la compétition à exporter : paramètre ?competition=, sinon courante. */
+    private function resolveCompetition(Request $request): ?Competition
+    {
+        if ($request->filled('competition')) {
+            return Competition::find($request->input('competition'));
+        }
+
+        return Competition::current()
+            ?? Competition::orderByDesc('starts_on')->first();
     }
 
     public function downloadExcel(Request $request): StreamedResponse
@@ -59,7 +70,7 @@ class ExportController extends Controller
         $request->validate(['date' => ['required', 'date_format:Y-m-d']]);
         $date = $request->input('date');
 
-        $competition = Competition::current()
+        $competition = $this->resolveCompetition($request)
             ?? Competition::orderByDesc('starts_on')->firstOrFail();
 
         $matches = $this->matchesForDay($competition->id, $date);
@@ -148,7 +159,7 @@ class ExportController extends Controller
         $request->validate(['date' => ['required', 'date_format:Y-m-d']]);
         $date = $request->input('date');
 
-        $competition = Competition::current()
+        $competition = $this->resolveCompetition($request)
             ?? Competition::orderByDesc('starts_on')->firstOrFail();
 
         $matches  = $this->matchesForDay($competition->id, $date);

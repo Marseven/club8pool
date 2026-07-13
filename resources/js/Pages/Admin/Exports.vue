@@ -1,16 +1,24 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AdminSidebar from '@/Components/AdminSidebar.vue';
 
 const props = defineProps({
   competition: Object,
+  competitions: { type: Array, default: () => [] },
   days: Array,
 });
 
 const selected = ref(props.days?.[0]?.date ?? null);
 
 const selectedDay = computed(() => props.days?.find(d => d.date === selected.value) ?? null);
+
+const switchCompetition = (e) => {
+  const id = e.target.value;
+  if (id && Number(id) !== props.competition?.id) {
+    router.get('/admin/exports', { competition: id }, { preserveState: false });
+  }
+};
 
 const fmtDate = (d) => {
   if (!d) return '—';
@@ -19,8 +27,9 @@ const fmtDate = (d) => {
   return `${parseInt(day)} ${months[parseInt(m) - 1]} ${y}`;
 };
 
-const excelUrl = computed(() => selected.value ? `/admin/exports/excel?date=${selected.value}` : null);
-const pdfUrl   = computed(() => selected.value ? `/admin/exports/pdf?date=${selected.value}` : null);
+const cid = computed(() => props.competition?.id);
+const excelUrl = computed(() => selected.value ? `/admin/exports/excel?date=${selected.value}&competition=${cid.value}` : null);
+const pdfUrl   = computed(() => selected.value ? `/admin/exports/pdf?date=${selected.value}&competition=${cid.value}` : null);
 </script>
 
 <template>
@@ -30,10 +39,18 @@ const pdfUrl   = computed(() => selected.value ? `/admin/exports/pdf?date=${sele
     <main style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
 
       <header style="display: flex; justify-content: space-between; align-items: center;
-                     padding: 20px 32px; border-bottom: 1px solid var(--line);">
+                     padding: 20px 32px; border-bottom: 1px solid var(--line); flex-wrap: wrap; gap: 12px;">
         <div>
-          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">EXPORTS · RÉSULTATS PAR JOURNÉE</div>
-          <div class="disp-a" style="font-size: 24px; margin-top: 6px;">
+          <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">EXPORTS · RÉSULTATS</div>
+          <select v-if="competitions.length > 1 && competition" :value="competition.id" @change="switchCompetition"
+                  class="disp-a"
+                  style="font-size: 24px; margin-top: 6px; background: transparent; border: none;
+                         color: var(--chalk); cursor: pointer; padding: 0; max-width: 100%;">
+            <option v-for="c in competitions" :key="c.id" :value="c.id" style="background: var(--ink-2); font-size: 14px;">
+              {{ c.name }}{{ c.status === 'finished' ? ' (archivée)' : '' }}
+            </option>
+          </select>
+          <div v-else class="disp-a" style="font-size: 24px; margin-top: 6px;">
             {{ competition?.name ?? 'Aucune compétition active' }}
           </div>
         </div>
@@ -198,7 +215,7 @@ const pdfUrl   = computed(() => selected.value ? `/admin/exports/pdf?date=${sele
               </div>
             </div>
             <a
-              href="/admin/exports/competition-pdf"
+              :href="`/admin/competitions/${competition.id}/export/poules-pdf`"
               target="_blank"
               rel="noopener"
               style="display: flex; align-items: center; gap: 12px;
