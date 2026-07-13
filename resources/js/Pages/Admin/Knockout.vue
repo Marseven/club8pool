@@ -7,6 +7,7 @@ import { AlertTriangle, RotateCcw, Check, Pencil, Play, Square, Plus, Minus, Tro
 
 const props = defineProps({
   competition: Object,
+  competitions: { type: Array, default: () => [] },
   qualifiers: Object,
   ties: Array,
   pairs: Array,
@@ -15,6 +16,13 @@ const props = defineProps({
   referees: Array,
   progress: Object,
 });
+
+const switchCompetition = (e) => {
+  const id = e.target.value;
+  if (id && Number(id) !== props.competition.id) {
+    router.get(`/admin/competitions/${id}/phase-finale`);
+  }
+};
 
 // Local mutable copy so the admin can reorder ties before submitting.
 const localQualifiers = ref(JSON.parse(JSON.stringify(props.qualifiers)));
@@ -141,18 +149,32 @@ const closeMatchToEdit = (m) => { scoringMatchId.value = null; openSaisir(m); };
     <AdminSidebar active="knockout" />
     <main style="flex: 1;">
       <header style="display: flex; justify-content: space-between; align-items: center;
-                     padding: 20px 32px; border-bottom: 1px solid var(--line);">
+                     padding: 20px 32px; border-bottom: 1px solid var(--line); flex-wrap: wrap; gap: 12px;">
         <div>
           <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">PHASE FINALE</div>
-          <div class="disp-a" style="font-size: 28px; margin-top: 6px;">{{ competition.name }}</div>
+          <select v-if="competitions.length > 1" :value="competition.id" @change="switchCompetition"
+                  class="disp-a"
+                  style="font-size: 28px; margin-top: 6px; background: transparent; border: none;
+                         color: var(--chalk); cursor: pointer; padding: 0; max-width: 100%;">
+            <option v-for="c in competitions" :key="c.id" :value="c.id" style="background: var(--ink-2); font-size: 14px;">
+              {{ c.name }}{{ c.status === 'finished' ? ' (archivée)' : '' }}
+            </option>
+          </select>
+          <div v-else class="disp-a" style="font-size: 28px; margin-top: 6px;">{{ competition.name }}</div>
           <a :href="`/admin/competitions/${competition.id}`"
              style="font-size: 11px; color: var(--mute); text-decoration: none; margin-top: 4px; display: inline-block;">
             ← Compétition
           </a>
         </div>
-        <Chip :variant="progress.pool_ready ? 'felt' : 'live'">
-          {{ progress.pool_done }}/{{ progress.pool_total }} POULES JOUÉES
-        </Chip>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+          <Chip :variant="progress.pool_ready ? 'felt' : 'live'">
+            {{ progress.pool_done }}/{{ progress.pool_total }} POULES JOUÉES
+          </Chip>
+          <a :href="`/admin/competitions/${competition.id}/export/classement-qf`" target="_blank" rel="noopener"
+             class="btn" style="padding: 8px 14px; font-size: 12px; white-space: nowrap;">🏆 Classement 1-8</a>
+          <a :href="`/admin/competitions/${competition.id}/rapport`" target="_blank" rel="noopener"
+             class="btn" style="padding: 8px 14px; font-size: 12px; white-space: nowrap;">⊟ Rapport</a>
+        </div>
       </header>
 
       <!-- Bandeau d'état -->

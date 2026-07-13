@@ -103,7 +103,7 @@ class KnockoutR32MappingTest extends TestCase
 
         $comp = Competition::where('slug', 'summer-edition')->first();
         $this->assertNotNull($comp);
-        $this->assertSame(PoolKnockoutMappingService::STRATEGY_2Q, $comp->knockout_mapping_strategy);
+        $this->assertSame(PoolKnockoutMappingService::STRATEGY_SE2026, $comp->knockout_mapping_strategy);
     }
 
     public function test_seeder_is_idempotent_and_keeps_knockout_strategy(): void
@@ -112,7 +112,7 @@ class KnockoutR32MappingTest extends TestCase
         $this->artisan('db:seed', ['--class' => SummerEditionSeeder::class])->assertSuccessful();
 
         $comp = Competition::where('slug', 'summer-edition')->first();
-        $this->assertSame(PoolKnockoutMappingService::STRATEGY_2Q, $comp->knockout_mapping_strategy);
+        $this->assertSame(PoolKnockoutMappingService::STRATEGY_SE2026, $comp->knockout_mapping_strategy);
     }
 
     // ─────────────────────────────────────────────────────────────────────────

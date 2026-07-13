@@ -80,6 +80,9 @@ class KnockoutController extends Controller
 
         return Inertia::render('Admin/Knockout', [
             'competition' => $competition,
+            'competitions' => Competition::where('structure', 'like', '%knockout%')
+                ->orderByDesc('starts_on')
+                ->get(['id', 'name', 'status']),
             'qualifiers'  => $qualifiers,
             'ties'        => $ties,
             'pairs'       => $pairs,

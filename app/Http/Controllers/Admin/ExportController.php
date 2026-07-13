@@ -7,6 +7,7 @@ use App\Models\Competition;
 use App\Models\GameMatch;
 use App\Models\Pool;
 use App\Services\PoolStanding;
+use App\Services\QuarterFinalRankingService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Response as ResponseFacade;
@@ -161,55 +162,63 @@ class ExportController extends Controller
         $competition = Competition::current()
             ?? Competition::orderByDesc('starts_on')->firstOrFail();
 
-        $pools = Pool::where('competition_id', $competition->id)
+        return $this->renderPoolsPdf($competition);
+    }
+
+    /** Version scoped : PDF poules & matchs d'une compétition précise. */
+    public function competitionPoolsPdf(Competition $competition): HttpResponse
+    {
+        return $this->renderPoolsPdf($competition);
+    }
+
+    private function renderPoolsPdf(Competition $competition): HttpResponse
+    {
+        $poolData = Pool::where('competition_id', $competition->id)
             ->orderBy('position')
-            ->get();
+            ->get()
+            ->map(function (Pool $pool) {
+                $standings = PoolStanding::compute($pool)->map(fn ($r) => [
+                    'name'      => $r['player'] ? ($r['player']->first_name . ' ' . $r['player']->last_name) : '—',
+                    'pool_slot' => $r['pool_slot'],
+                    'v'         => $r['v'],
+                    'w'         => $r['w'],
+                    'l'         => $r['l'],
+                    'diff'      => $r['diff'],
+                    'rank'      => $r['rank'],
+                ])->values()->all();
 
-        $poolData = $pools->map(function (Pool $pool) use ($competition) {
-            $standings = PoolStanding::compute($pool)->map(fn ($r) => [
-                'name'      => $r['player'] ? ($r['player']->first_name . ' ' . $r['player']->last_name) : '—',
-                'pool_slot' => $r['pool_slot'],
-                'v'         => $r['v'],
-                'w'         => $r['w'],
-                'l'         => $r['l'],
-                'diff'      => $r['diff'],
-                'rank'      => $r['rank'],
-            ])->values()->all();
+                $matches = GameMatch::where('pool_id', $pool->id)
+                    ->where('phase', 'pool')
+                    ->with(['playerA', 'playerB', 'table', 'referee'])
+                    ->orderBy('scheduled_at')
+                    ->orderBy('id')
+                    ->get()
+                    ->map(fn ($m) => $this->reportMatchRow($m))
+                    ->all();
 
-            $matches = GameMatch::where('pool_id', $pool->id)
-                ->where('phase', 'pool')
-                ->with(['playerA', 'playerB', 'table', 'referee'])
-                ->orderBy('scheduled_at')
-                ->orderBy('id')
-                ->get()
-                ->map(fn ($m) => [
-                    'player_a'   => $m->playerA ? ($m->playerA->first_name . ' ' . $m->playerA->last_name) : '—',
-                    'player_b'   => $m->playerB ? ($m->playerB->first_name . ' ' . $m->playerB->last_name) : '—',
-                    'score_a'    => $m->score_a,
-                    'score_b'    => $m->score_b,
-                    'status'     => $m->status,
-                    'table'      => $m->table?->name,
-                    'referee'    => $m->referee?->name,
-                    'started_at' => $m->started_at?->format('H:i'),
-                    'ended_at'   => $m->ended_at?->format('H:i'),
-                    'winner'     => $m->status === 'done'
-                        ? ($m->score_a > $m->score_b ? 'a' : 'b')
-                        : null,
-                ])->all();
-
-            $played   = collect($matches)->where('status', 'done')->count();
-            $total    = count($matches);
-
-            return [
-                'name'       => $pool->name,
-                'standings'  => $standings,
-                'matches'    => $matches,
-                'played'     => $played,
-                'total'      => $total,
-            ];
-        })->all();
+                return [
+                    'name'      => $pool->name,
+                    'standings' => $standings,
+                    'matches'   => $matches,
+                    'played'    => collect($matches)->where('status', 'done')->count(),
+                    'total'     => count($matches),
+                ];
+            })->all();
 
         return response()->view('admin.print.competition', compact('competition', 'poolData'));
+    }
+
+    /** Classement final des 8 quart-de-finalistes (1er → 8e). */
+    public function qfRankingPdf(Competition $competition, QuarterFinalRankingService $service): HttpResponse
+    {
+        $result = $service->compute($competition);
+
+        return response()->view('admin.print.qf_ranking', [
+            'competition' => $competition,
+            'rows'        => $result['rows'],
+            'provisional' => $result['provisional'],
+            'hasQf'       => $result['has_qf'],
+        ]);
     }
 
     /**

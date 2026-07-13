@@ -117,6 +117,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/exports/pdf', [\App\Http\Controllers\Admin\ExportController::class, 'printPdf'])->name('exports.pdf');
     Route::get('/exports/competition-pdf', [\App\Http\Controllers\Admin\ExportController::class, 'competitionPdf'])->name('exports.competition-pdf');
     Route::get('/competitions/{competition}/rapport', [\App\Http\Controllers\Admin\ExportController::class, 'competitionReport'])->name('competitions.report');
+    Route::get('/competitions/{competition}/export/poules-pdf', [\App\Http\Controllers\Admin\ExportController::class, 'competitionPoolsPdf'])->name('competitions.export.pools-pdf');
+    Route::get('/competitions/{competition}/export/classement-qf', [\App\Http\Controllers\Admin\ExportController::class, 'qfRankingPdf'])->name('competitions.export.qf-ranking');
 });
 
 // Référée (espace mobile web fallback)

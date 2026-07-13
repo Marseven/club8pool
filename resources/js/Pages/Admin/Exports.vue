@@ -158,7 +158,7 @@ const pdfUrl   = computed(() => selected.value ? `/admin/exports/pdf?date=${sele
         <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute); margin-bottom: 12px;">
           EXPORT COMPÉTITION COMPLÈTE
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 760px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; max-width: 900px;">
           <!-- Rapport complet -->
           <div style="border: 1px solid var(--felt-2); background: rgba(45,168,118,0.04); padding: 22px;
                       display: flex; flex-direction: column; justify-content: space-between; gap: 16px;">
@@ -213,6 +213,35 @@ const pdfUrl   = computed(() => selected.value ? `/admin/exports/pdf?date=${sele
               <div>
                 <div style="font-size: 13px; font-weight: 700;">PDF Poules & Matchs</div>
                 <div class="mono" style="font-size: 9px; letter-spacing: 0.14em; color: var(--mute); margin-top: 2px;">POULES UNIQUEMENT</div>
+              </div>
+            </a>
+          </div>
+
+          <!-- Classement 8 quart-de-finalistes -->
+          <div style="border: 1px solid var(--line); background: var(--ink-2); padding: 22px;
+                      display: flex; flex-direction: column; justify-content: space-between; gap: 16px;">
+            <div>
+              <div class="disp-a" style="font-size: 20px;">Classement 1-8</div>
+              <div style="font-size: 12px; color: var(--mute); margin-top: 6px; line-height: 1.6;">
+                Classement final des 8 quart-de-finalistes, du 1<sup>er</sup> au 8<sup>e</sup>.
+              </div>
+            </div>
+            <a
+              :href="`/admin/competitions/${competition.id}/export/classement-qf`"
+              target="_blank"
+              rel="noopener"
+              style="display: flex; align-items: center; gap: 12px;
+                     padding: 14px 18px;
+                     border: 1px solid var(--line-strong);
+                     background: var(--ink-3);
+                     text-decoration: none;
+                     color: var(--chalk);
+                     white-space: nowrap;"
+            >
+              <span style="font-size: 22px; line-height: 1;">🏆</span>
+              <div>
+                <div style="font-size: 13px; font-weight: 700;">Classement des quarts</div>
+                <div class="mono" style="font-size: 9px; letter-spacing: 0.14em; color: var(--mute); margin-top: 2px;">1<sup>er</sup> AU 8<sup>e</sup></div>
               </div>
             </a>
           </div>

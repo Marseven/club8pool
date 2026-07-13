@@ -67,6 +67,9 @@ class PoolController extends Controller
 
         return Inertia::render('Admin/Pools/Index', [
             'competition' => $competition,
+            'competitions' => Competition::whereIn('structure', ['pools_knockout', 'pools_only'])
+                ->orderByDesc('starts_on')
+                ->get(['id', 'name', 'status']),
             'pools' => $pools,
             'tables' => PoolTable::where('competition_id', $competition->id)
                 ->orderBy('id')

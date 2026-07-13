@@ -8,10 +8,18 @@ import { Play, Square, RotateCcw, Plus, Minus, Trophy } from 'lucide-vue-next';
 
 const props = defineProps({
   competition: Object,
+  competitions: { type: Array, default: () => [] },
   pools: Array,
   tables: Array,
   referees: Array,
 });
+
+const switchCompetition = (e) => {
+  const id = e.target.value;
+  if (id && Number(id) !== props.competition.id) {
+    router.get(`/admin/competitions/${id}/poules`);
+  }
+};
 
 const selectedPool = ref(props.pools[0]?.id);
 const editingMatch = ref(null);
@@ -116,20 +124,33 @@ const playerLabel = (pool, playerId) => {
           <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; color: var(--mute);">
             PHASE DE POULES · RACE TO {{ competition.pool_race_to ?? competition.race_to }}
           </div>
-          <div class="disp-a" style="font-size: 28px; margin-top: 6px;">{{ competition.name }}</div>
+          <!-- Sélecteur de compétition -->
+          <select v-if="competitions.length > 1" :value="competition.id" @change="switchCompetition"
+                  class="disp-a comp-select"
+                  style="font-size: 28px; margin-top: 6px; background: transparent; border: none;
+                         color: var(--chalk); cursor: pointer; padding: 0; max-width: 100%;">
+            <option v-for="c in competitions" :key="c.id" :value="c.id" style="background: var(--ink-2); font-size: 14px;">
+              {{ c.name }}{{ c.status === 'finished' ? ' (archivée)' : '' }}
+            </option>
+          </select>
+          <div v-else class="disp-a" style="font-size: 28px; margin-top: 6px;">{{ competition.name }}</div>
           <a :href="`/admin/competitions/${competition.id}`"
              style="font-size: 11px; color: var(--mute); text-decoration: none; margin-top: 4px; display: inline-block;">
             ← Compétition
           </a>
         </div>
-        <div class="pool-selector" style="display: flex; gap: 8px;">
-          <button v-for="p in pools" :key="p.id" @click="selectedPool = p.id" :style="{
-            padding: '8px 16px',
-            border: '1px solid ' + (selectedPool === p.id ? 'var(--felt-2)' : 'var(--line-strong)'),
-            background: selectedPool === p.id ? 'rgba(45,168,118,0.08)' : 'transparent',
-            color: 'var(--chalk)', cursor: 'pointer',
-            fontFamily: 'var(--font-display-a)', fontWeight: 700, fontSize: '14px', letterSpacing: '0.02em',
-          }">POULE {{ p.name }}</button>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+          <div class="pool-selector" style="display: flex; gap: 8px;">
+            <button v-for="p in pools" :key="p.id" @click="selectedPool = p.id" :style="{
+              padding: '8px 16px',
+              border: '1px solid ' + (selectedPool === p.id ? 'var(--felt-2)' : 'var(--line-strong)'),
+              background: selectedPool === p.id ? 'rgba(45,168,118,0.08)' : 'transparent',
+              color: 'var(--chalk)', cursor: 'pointer',
+              fontFamily: 'var(--font-display-a)', fontWeight: 700, fontSize: '14px', letterSpacing: '0.02em',
+            }">POULE {{ p.name }}</button>
+          </div>
+          <a :href="`/admin/competitions/${competition.id}/export/poules-pdf`" target="_blank" rel="noopener"
+             class="btn" style="padding: 8px 14px; font-size: 12px; white-space: nowrap;">⊟ Export PDF</a>
         </div>
       </header>
 
